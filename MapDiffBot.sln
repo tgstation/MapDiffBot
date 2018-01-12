@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 		AssemblyInfo.global.cs = AssemblyInfo.global.cs
 		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapDiffBot.Tests", "MapDiffBot.Tests\MapDiffBot.Tests.csproj", "{B2589134-1CF3-44EB-BCA3-E61028C4326D}"
