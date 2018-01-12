@@ -14,10 +14,23 @@ namespace MapDiffBot.WebHook
 		/// Called on the first request to the <see cref="Application"/>
 		/// </summary>
 		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		protected void Application_Start()
 		{
-			GlobalConfiguration.Configure(WebHooksConfig.Initialize);
+			System.Diagnostics.Debugger.Launch();
+			GlobalConfiguration.Configure((config) =>
+			{
+				config.MapHttpAttributeRoutes();
+				WebHooksConfig.Initialize(config);
+				config.InitializeReceiveGitHubWebHooks();
+			});
+		}
+
+		/// <summary>
+		/// Called before every request
+		/// </summary>
+		protected void Application_BeginRequest()
+		{
+			Context.RewritePath("~/api/webhooks/incoming/github");
 		}
 	}
 }
