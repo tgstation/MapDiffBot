@@ -42,7 +42,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\AssemblyInfo.global.cs" />
+    <Compile Include="DiffGenerator.cs" />
+    <Compile Include="DiffRegion.cs" />
+    <Compile Include="GeneratorException.cs" />
+    <Compile Include="GeneratorFactory.cs" />
+    <Compile Include="IGenerator.cs" />
+    <Compile Include="IGeneratorFactory.cs" />
+    <Compile Include="IMapDiff.cs" />
+    <Compile Include="MapDiff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

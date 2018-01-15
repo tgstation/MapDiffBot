@@ -24,13 +24,5 @@ namespace MapDiffBot.WebHook
 				config.InitializeReceiveGitHubWebHooks();
 			});
 		}
-
-		/// <summary>
-		/// Called before every request
-		/// </summary>
-		protected void Application_BeginRequest()
-		{
-			Context.RewritePath("~/api/webhooks/incoming/github");
-		}
 	}
 }
