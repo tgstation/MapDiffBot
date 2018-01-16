@@ -89,6 +89,10 @@ namespace MapDiffBot.WebHook
 			{
 				return await TryLoadRepository(repoPath, token);
 			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
 			catch
 			{
 				//TODO, more specific exceptions
