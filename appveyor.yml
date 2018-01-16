@@ -23,7 +23,7 @@ build:
 test_script:
   - set path=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\TestAgent\Common7\IDE\CommonExtensions\Microsoft\TestWindow;%path%
   - copy "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Extensions\appveyor.*" "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\TestAgent\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Extensions" /y
-  - vstest.console /logger:Appveyor "MapDiffBot.Tests\bin\Release\MapDiffBot.Tests.dll" /Enablecodecoverage /Settings:"Tools/CoverageExclusions.runsettings"
+  - vstest.console /logger:Appveyor "MapDiffBot.Tests\bin\Release\MapDiffBot.Tests.dll" /Enablecodecoverage /Settings:"Tools/CoverageExclusions.runsettings" /inIsolation
 after_test:
   - ps: Tools/UploadCoverage.ps1
   - ps: Tools/BuildDox.ps1
