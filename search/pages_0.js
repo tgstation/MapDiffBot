@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mapdiffbot',['MapDiffBot',['../index.html',1,'']]]
+  ['issue_5ftemplate',['ISSUE_TEMPLATE',['../md_ISSUE_TEMPLATE.html',1,'']]]
 ];
