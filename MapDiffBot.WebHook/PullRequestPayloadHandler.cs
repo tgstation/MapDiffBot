@@ -85,9 +85,10 @@ namespace MapDiffBot.WebHook
 		/// </summary>
 		/// <param name="diffs">The <see cref="IMapDiff"/>s in the table</param>
 		/// <param name="config">The <see cref="IWebHookReceiverConfig"/> for the operation</param>
+		/// <param name="pullRequest">The <see cref="PullRequest"/> being commented on</param>
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in the markdown table <see cref="string"/></returns>
-		static async Task<string> UploadDiffsAndGenerateMarkdown(IEnumerable<IMapDiff> diffs, IWebHookReceiverConfig config, CancellationToken token)
+		static async Task<string> UploadDiffsAndGenerateMarkdown(IEnumerable<IMapDiff> diffs, IWebHookReceiverConfig config, PullRequest pullRequest, CancellationToken token)
 		{
 			StringBuilder result = null;
 			List<Task<string>> tasks = null;
@@ -99,17 +100,17 @@ namespace MapDiffBot.WebHook
 				{
 					imgurID = await config.GetReceiverConfigAsync(GitHubWebHookReceiver.ReceiverName, ImgurIDConfigKey);
 					imgurSecret = await config.GetReceiverConfigAsync(GitHubWebHookReceiver.ReceiverName, ImgurSecretConfigKey);
-					result = new StringBuilder(String.Format(CultureInfo.InvariantCulture, "<details><summary>Rendered Map Changes</summary>{0}{0}Map | Old | New | Status{0}--- | --- | --- | ---", Environment.NewLine));
+					result = new StringBuilder(String.Format(CultureInfo.CurrentCulture, "Maps with diff:{0}", Environment.NewLine));
 					tasks = new List<Task<string>>();
 				}
 
 				if(I.BeforePath == null && I.AfterPath == null)
 				{
-					result.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | Unavailable | Unavailable | {2}", Environment.NewLine, I.OriginalMapName, "Errored"));
+					result.Append(String.Format(CultureInfo.InvariantCulture, "{0}<details><summary>{1}</summary>{0}{0}Old | New | Status{0}--- | --- | ---{0}Unavailable | Unavailable | {2}{0}{0}</details>", Environment.NewLine, I.OriginalMapName, "Errored"));
 					continue;
 				}
 
-				result.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | ![]({{{2}}}) | ![]({{{3}}}) | {4}", Environment.NewLine, I.OriginalMapName, formatterCount++, formatterCount++, I.BeforePath != null ? (I.AfterPath != null ? "Modified" : "Deleted") : "Created"));
+				result.Append(String.Format(CultureInfo.InvariantCulture, "{0}<details><summary>{1}</summary>{0}{0}Old | New | Status{0}--- | --- | ---{0}![]({{{2}}}) | ![]({{{3}}}) | {4}{0}{0}</details>", Environment.NewLine, I.OriginalMapName, formatterCount++, formatterCount++, I.BeforePath != null ? (I.AfterPath != null ? "Modified" : "Deleted") : "Created"));
 
 				if (I.BeforePath != null)
 					tasks.Add(fileUploader.Upload(I.BeforePath, String.Format(CultureInfo.InvariantCulture, "{0}/{1}", imgurID, imgurSecret), token));
@@ -124,7 +125,9 @@ namespace MapDiffBot.WebHook
 
 			await Task.WhenAll(tasks);
 
-			return String.Format(CultureInfo.InvariantCulture, result.ToString(), tasks.Select(x => x.Result).ToArray());
+			var comment = String.Format(CultureInfo.InvariantCulture, result.ToString(), tasks.Select(x => x.Result).ToArray());
+			comment = String.Format(CultureInfo.CurrentCulture, "{0}{1}<br>Last updated from merging commit {2} into {3}", comment, Environment.NewLine, pullRequest.Head.Sha, pullRequest.Base.Sha);
+			return comment;
 		}
 
 		/// <summary>
@@ -220,7 +223,7 @@ namespace MapDiffBot.WebHook
 						if (results.Count == 0 || errors.Count == results.Count)
 							return;
 
-						var comment = await UploadDiffsAndGenerateMarkdown(results, config, token);
+						var comment = await UploadDiffsAndGenerateMarkdown(results, config, payload.PullRequest, token);
 						await gitHub.CreateSingletonComment(payload.Repository, payload.Number, comment);
 					}
 					catch (Exception e)
@@ -232,7 +235,7 @@ namespace MapDiffBot.WebHook
 					finally
 					{
 						if (errors.Count > 0)
-							throw new AggregateException(String.Format(CultureInfo.CurrentCulture, "Generation errors occurred! Repo: {0}/{1}, PR: {2} (#{3}) Base: {4} ({5}), HEAD: {6}", payload.Repository.Owner, payload.Repository.Name, payload.PullRequest.Title, payload.PullRequest.Number, payload.PullRequest.Base.Sha, payload.PullRequest.Base.Label, payload.PullRequest.Head.Sha), errors);
+							throw new AggregateException(String.Format(CultureInfo.CurrentCulture, "Generation errors occurred! Repo: {0}/{1}, PR: {2} (#{3}) Base: {4} ({5}), HEAD: {6}", payload.Repository.Owner.Login, payload.Repository.Name, payload.PullRequest.Title, payload.PullRequest.Number, payload.PullRequest.Base.Sha, payload.PullRequest.Base.Label, payload.PullRequest.Head.Sha), errors);
 					}
 				}
 				finally
