@@ -55,5 +55,11 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="CompileDMMTools.ps1" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>Powershell -File "$(ProjectDir)/CompileDMMTools.ps1"</PreBuildEvent>
+  </PropertyGroup>
 </Project>
