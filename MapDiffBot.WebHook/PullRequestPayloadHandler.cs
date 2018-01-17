@@ -99,7 +99,7 @@ namespace MapDiffBot.WebHook
 				{
 					imgurID = await config.GetReceiverConfigAsync(GitHubWebHookReceiver.ReceiverName, ImgurIDConfigKey);
 					imgurSecret = await config.GetReceiverConfigAsync(GitHubWebHookReceiver.ReceiverName, ImgurSecretConfigKey);
-					result = new StringBuilder(String.Format(CultureInfo.InvariantCulture, "Map | Old | New | Status{0}--- | --- | --- | ---", Environment.NewLine));
+					result = new StringBuilder(String.Format(CultureInfo.InvariantCulture, "<details><summary>Rendered Map Changes</summary>{0}{0}Map | Old | New | Status{0}--- | --- | --- | ---", Environment.NewLine));
 					tasks = new List<Task<string>>();
 				}
 
