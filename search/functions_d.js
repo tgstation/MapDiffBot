@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['writeallbytes',['WriteAllBytes',['../class_map_diff_bot_1_1_web_hook_1_1_default_i_o_manager.html#a202f20e54e0d69a922267966040f68c6',1,'MapDiffBot.WebHook.DefaultIOManager.WriteAllBytes()'],['../interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html#ab219742ec27c678acbdaca26e3740b89',1,'MapDiffBot.WebHook.IIOManager.WriteAllBytes()']]]
+  ['upload',['Upload',['../interface_map_diff_bot_1_1_web_hook_1_1_i_file_uploader.html#ada4537a338bedebf6b7da969853cd578',1,'MapDiffBot.WebHook.IFileUploader.Upload()'],['../class_map_diff_bot_1_1_web_hook_1_1_imgur_file_uploader.html#ae58cced14f57d4d5dd2533a154f713f1',1,'MapDiffBot.WebHook.ImgurFileUploader.Upload()']]],
+  ['uploaddiffsandgeneratemarkdown',['UploadDiffsAndGenerateMarkdown',['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html#aae9b4b6680ec8c075c82fceece8899b5',1,'MapDiffBot::WebHook::PullRequestPayloadHandler']]]
 ];
