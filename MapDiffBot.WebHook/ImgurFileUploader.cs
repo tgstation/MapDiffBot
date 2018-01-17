@@ -17,6 +17,11 @@ namespace MapDiffBot.WebHook
 	[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Imgur")]
 	public class ImgurFileUploader : IFileUploader
 	{
+		/// <summary>
+		/// Maximum number of retries for an upload
+		/// </summary>
+		const int MaxRetries = 10;
+
 		/// <inheritdoc />
 		public async Task<string> Upload(string path, string apiKey, CancellationToken token)
 		{
@@ -40,7 +45,7 @@ namespace MapDiffBot.WebHook
 				catch (WebException)
 				{
 					//try again a few times
-					if (I > 3)
+					if (I > MaxRetries)
 						throw;
 
 					await Task.Delay(I * 1000, token);
