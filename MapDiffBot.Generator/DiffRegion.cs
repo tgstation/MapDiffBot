@@ -14,6 +14,10 @@
 		/// </summary>
 		public int MinY { get; set; }
 		/// <summary>
+		/// The Y coordinate of the bottom left turf
+		/// </summary>
+		public int MinZ { get; set; }
+		/// <summary>
 		/// The X coordinate of the top right turf
 		/// </summary>
 		public int MaxX { get; set; }
@@ -21,5 +25,9 @@
 		/// The Y coordinate of the top right turf
 		/// </summary>
 		public int MaxY { get; set; }
+		/// <summary>
+		/// The Z coordinate of the top right turf
+		/// </summary>
+		public int MaxZ { get; set; }
 	}
 }

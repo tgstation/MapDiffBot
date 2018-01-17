@@ -103,10 +103,23 @@ namespace MapDiffBot.WebHook
 					tasks = new List<Task<string>>();
 				}
 
+				if(I.BeforePath == null && I.AfterPath == null)
+				{
+					result.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | Unavailable | Unavailable | {2}", Environment.NewLine, I.OriginalMapName, "Errored"));
+					continue;
+				}
+
 				result.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | ![]({{{2}}}) | ![]({{{3}}}) | {4}", Environment.NewLine, I.OriginalMapName, formatterCount++, formatterCount++, I.BeforePath != null ? (I.AfterPath != null ? "Modified" : "Deleted") : "Created"));
 
-				tasks.Add(fileUploader.Upload(I.BeforePath, String.Format(CultureInfo.InvariantCulture, "{0}/{1}", imgurID, imgurSecret), token));
-				tasks.Add(fileUploader.Upload(I.AfterPath, String.Format(CultureInfo.InvariantCulture, "{0}/{1}", imgurID, imgurSecret), token));
+				if (I.BeforePath != null)
+					tasks.Add(fileUploader.Upload(I.BeforePath, String.Format(CultureInfo.InvariantCulture, "{0}/{1}", imgurID, imgurSecret), token));
+				else
+					tasks.Add(Task.FromResult<string>(null));
+
+				if (I.AfterPath != null)
+					tasks.Add(fileUploader.Upload(I.AfterPath, String.Format(CultureInfo.InvariantCulture, "{0}/{1}", imgurID, imgurSecret), token));
+				else
+					tasks.Add(Task.FromResult<string>(null));
 			}
 
 			await Task.WhenAll(tasks);
@@ -158,45 +171,69 @@ namespace MapDiffBot.WebHook
 						return;
 
 					var results = new List<IMapDiff>();
-					using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, token))
+					var errors = new List<Exception>();
+					try
 					{
-						var baseSha = payload.PullRequest.Base.Sha;
-						if (!await repo.ContainsCommit(baseSha, token))
-							await repo.Fetch(token);
-
-						await repo.FetchPullRequest(payload.PullRequest.Number, token);
-
-						await currentIOManager.DeleteDirectory(".", token);
-						await currentIOManager.CreateDirectory(".", token);
-
-						var outputDirectory = currentIOManager.ResolvePath(".");
-
-						var mapDiffer = generatorFactory.CreateGenerator();
-
-						foreach (var path in await gitHub.GetChangedMapFiles(payload.Repository, payload.PullRequest.Number))
+						using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, token))
 						{
-							await repo.Checkout(baseSha, token);
+							var baseSha = payload.PullRequest.Base.Sha;
+							if (!await repo.ContainsCommit(baseSha, token))
+								await repo.Fetch(token);
 
-							var originalPath = currentIOManager.ConcatPath(repo.Path, path);
-							string oldMapPath;
-							if (await currentIOManager.FileExists(originalPath, token))
+							await repo.FetchPullRequest(payload.PullRequest.Number, token);
+
+							await currentIOManager.DeleteDirectory(".", token);
+							await currentIOManager.CreateDirectory(".", token);
+
+							var outputDirectory = currentIOManager.ResolvePath(".");
+
+							var mapDiffer = generatorFactory.CreateGenerator();
+
+							foreach (var path in await gitHub.GetChangedMapFiles(payload.Repository, payload.PullRequest.Number))
 							{
-								oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}.old_map_diff_bot", originalPath);
-								await currentIOManager.CopyFile(originalPath, oldMapPath, token);
+								await repo.Checkout(baseSha, token);
+
+								var originalPath = currentIOManager.ConcatPath(repo.Path, path);
+								string oldMapPath;
+								if (await currentIOManager.FileExists(originalPath, token))
+								{
+									oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}.old_map_diff_bot", originalPath);
+									await currentIOManager.CopyFile(originalPath, oldMapPath, token);
+								}
+								else
+									oldMapPath = null;
+
+								await repo.Merge(payload.PullRequest.Head.Sha, token);
+
+								try
+								{
+									results.Add(await mapDiffer.GenerateDiff(oldMapPath, originalPath, repo.Path, outputDirectory, token));
+								}
+								catch (GeneratorException e)
+								{
+									results.Add(new MapDiff(currentIOManager.GetFileNameWithoutExtension(originalPath ?? oldMapPath), null, null));
+									errors.Add(e);
+								}
 							}
-							else
-								oldMapPath = null;
-
-							await repo.Merge(payload.PullRequest.Head.Sha, token);
-							results.Add(await mapDiffer.GenerateDiff(oldMapPath, originalPath, repo.Path, outputDirectory, token));
 						}
+
+						if (results.Count == 0 || errors.Count == results.Count)
+							return;
+
+						var comment = await UploadDiffsAndGenerateMarkdown(results, config, token);
+						await gitHub.CreateSingletonComment(payload.Repository, payload.Number, comment);
 					}
-
-					if (results.Count == 0)
-						return;
-
-					var comment = await UploadDiffsAndGenerateMarkdown(results, config, token);
-					await gitHub.CreateSingletonComment(payload.Repository, payload.Number, comment);
+					catch (Exception e)
+					{
+						if (errors.Count == 0)
+							throw;
+						errors.Add(e);
+					}
+					finally
+					{
+						if (errors.Count > 0)
+							throw new AggregateException(String.Format(CultureInfo.CurrentCulture, "Generation errors occurred! Repo: {0}/{1}, PR: {2} (#{3}) Base: {4} ({5}), HEAD: {6}", payload.Repository.Owner, payload.Repository.Name, payload.PullRequest.Title, payload.PullRequest.Number, payload.PullRequest.Base.Sha, payload.PullRequest.Base.Label, payload.PullRequest.Head.Sha), errors);
+					}
 				}
 				finally
 				{

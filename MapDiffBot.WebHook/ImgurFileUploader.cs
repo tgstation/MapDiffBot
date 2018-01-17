@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,8 +30,21 @@ namespace MapDiffBot.WebHook
 
 			var endpoint = new ImageEndpoint(new ImgurClient(splits[0], splits[1]));
 			IImage image;
-			using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete, DefaultIOManager.DefaultBufferSize, true))
-				image = await endpoint.UploadImageStreamAsync(fs);
+			for (var I = 1; ; ++I)
+				try
+				{
+					using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete, DefaultIOManager.DefaultBufferSize, true))
+						image = await endpoint.UploadImageStreamAsync(fs);
+					break;
+				}
+				catch (WebException)
+				{
+					//try again a few times
+					if (I > 3)
+						throw;
+
+					await Task.Delay(I * 1000, token);
+				}
 			return image.Link;
 		}
 	}
