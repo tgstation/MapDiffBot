@@ -6,12 +6,13 @@ environment:
 skip_branch_with_pr: true
 image: Previous Visual Studio 2017
 configuration: Release
-shallow_clone: true
+clone_depth: 1
 cache:
   - packages -> **\packages.config
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
 install:
+  - git submodule update --init --recursive
   - choco install fciv doxygen.portable codecov
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
