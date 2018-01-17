@@ -16,7 +16,9 @@ namespace MapDiffBot.WebHook
 		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
 		protected void Application_Start()
 		{
+#if DEBUG
 			System.Diagnostics.Debugger.Launch();
+#endif
 			GlobalConfiguration.Configure((config) =>
 			{
 				config.MapHttpAttributeRoutes();
