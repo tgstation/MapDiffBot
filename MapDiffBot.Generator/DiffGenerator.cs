@@ -12,6 +12,8 @@ namespace MapDiffBot.Generator
 	/// <inheritdoc />
 	sealed class DiffGenerator : IGenerator
 	{
+		string pathToDmmTools;
+
 		/// <summary>
 		/// Generate the dmm-tools.exe command line arguments with the exception of the .dmm paramter which can be formatted in for rendering a map
 		/// </summary>
@@ -25,12 +27,30 @@ namespace MapDiffBot.Generator
 		}
 
 		/// <summary>
+		/// Clean up the extracted dmm-tools.exe
+		/// </summary>
+		public void Dispose()
+		{
+			if (pathToDmmTools != null)
+				try
+				{
+					File.Delete(pathToDmmTools);
+				}
+				catch (IOException) { /* well we tried */ }
+		}
+
+		/// <summary>
 		/// Extract the dmm-tools.exe from the running <see cref="System.Reflection.Assembly"/> and return the path to it
 		/// </summary>
-		static async Task<string> GetDMMToolsPath()
+		async Task<string> GetDMMToolsPath(string workingDirectory)
 		{
-			//TODO
-			return await Task.FromResult("S:/Documents/Actual Documents/DA Git/SpacemanDMM/target/debug/dmm-tools.exe");
+			if (pathToDmmTools == null)
+			{
+				pathToDmmTools = Path.Combine(workingDirectory, "dmm-tools.exe");
+				using (var F = new FileStream(pathToDmmTools, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+					await F.WriteAsync(DMMTools.dmm_tools, 0, DMMTools.dmm_tools.Length);
+			}
+			return pathToDmmTools;
 		}
 
 		/// <summary>
@@ -40,7 +60,7 @@ namespace MapDiffBot.Generator
 		/// <param name="output">A <see cref="StringBuilder"/> used to accept stdout</param>
 		/// <param name="errorOutput">A <see cref="StringBuilder"/> used to accept stderr</param>
 		/// <returns>A <see cref="Task"/> resulting in a pre-configured <see cref="Process"/> pointing to dmm-tools.exe</returns>
-		static async Task<Process> CreateDMMToolsProcess(string workingDirectory, StringBuilder output, StringBuilder errorOutput)
+		async Task<Process> CreateDMMToolsProcess(string workingDirectory, StringBuilder output, StringBuilder errorOutput)
 		{
 			var P = new Process();
 			P.StartInfo.RedirectStandardOutput = true;
@@ -64,7 +84,7 @@ namespace MapDiffBot.Generator
 
 			try
 			{
-				P.StartInfo.FileName = await GetDMMToolsPath();
+				P.StartInfo.FileName = await GetDMMToolsPath(workingDirectory);
 			}
 			catch
 			{
@@ -120,7 +140,7 @@ namespace MapDiffBot.Generator
 		/// <param name="region">The <see cref="DiffRegion"/> to render, if any</param>
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in the path to the rendered .png file</returns>
-		static async Task<string> RenderMap(string mapPath, string workingDirectory, DiffRegion region, CancellationToken token)
+		async Task<string> RenderMap(string mapPath, string workingDirectory, DiffRegion region, CancellationToken token)
 		{
 			var output = new StringBuilder();
 			var errorOutput = new StringBuilder();
@@ -155,7 +175,7 @@ namespace MapDiffBot.Generator
 		/// <param name="workingDirectory">The path that contains the .dme for the .dmms</param>
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in a <see cref="DiffRegion"/> for the two maps</returns>
-		static async Task<DiffRegion> GetDiffRegion(string mapPathA, string mapPathB, string workingDirectory, CancellationToken token)
+		async Task<DiffRegion> GetDiffRegion(string mapPathA, string mapPathB, string workingDirectory, CancellationToken token)
 		{
 			if (mapPathA == null || mapPathB == null)
 				//need a full rendering
@@ -201,14 +221,6 @@ namespace MapDiffBot.Generator
 			}
 
 			return region;
-		}
-
-		/// <summary>
-		/// Clean up the extracted dmm-tools.exe
-		/// </summary>
-		public void Dispose()
-		{
-			//TODO
 		}
 
 		/// <inheritdoc />
