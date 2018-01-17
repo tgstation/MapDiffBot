@@ -110,7 +110,7 @@ namespace MapDiffBot.WebHook
 					continue;
 				}
 
-				result.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | <details><summary>Rendered Map Changes</summary>{0}![]({{{2}}}) | <details><summary>Rendered Map Changes</summary>{0}![]({{{3}}}) | {4}", Environment.NewLine, I.OriginalMapName, formatterCount++, formatterCount++, I.BeforePath != null ? (I.AfterPath != null ? "Modified" : "Deleted") : "Created"));
+				result.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | <details><summary>Rendered Map Changes</summary>{0}![]({{{2}}})</details> | <details><summary>Rendered Map Changes</summary>{0}![]({{{3}}})</details> | {4}", Environment.NewLine, I.OriginalMapName, formatterCount++, formatterCount++, I.BeforePath != null ? (I.AfterPath != null ? "Modified" : "Deleted") : "Created"));
 
 				if (I.BeforePath != null)
 					tasks.Add(fileUploader.Upload(I.BeforePath, String.Format(CultureInfo.InvariantCulture, "{0}/{1}", imgurID, imgurSecret), token));
