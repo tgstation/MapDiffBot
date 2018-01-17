@@ -111,16 +111,16 @@ Inheritance diagram for MapDiffBot.Generator.IGenerator:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af9c381586771bb9d5b567208d37899bf"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_map_diff.html">IMapDiff</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator.html#af9c381586771bb9d5b567208d37899bf">GenerateDiff</a> (string mapPathA, string mapPathB, CancellationToken token)</td></tr>
-<tr class="memdesc:af9c381586771bb9d5b567208d37899bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate one or two cropped comparison images of .dmm file  <a href="#af9c381586771bb9d5b567208d37899bf">More...</a><br /></td></tr>
-<tr class="separator:af9c381586771bb9d5b567208d37899bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab70ee825afffbd7056b8704a7f112fcf"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_map_diff.html">IMapDiff</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator.html#ab70ee825afffbd7056b8704a7f112fcf">GenerateDiff</a> (string mapPathA, string mapPathB, string workingDirectory, string outputDirectory, CancellationToken token)</td></tr>
+<tr class="memdesc:ab70ee825afffbd7056b8704a7f112fcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate one or two cropped comparison images of .dmm file  <a href="#ab70ee825afffbd7056b8704a7f112fcf">More...</a><br /></td></tr>
+<tr class="separator:ab70ee825afffbd7056b8704a7f112fcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Used for generating cropped comparison images of .dmm files </p>
 
 <p>Definition at line <a class="el" href="_i_generator_8cs_source.html#l00010">10</a> of file <a class="el" href="_i_generator_8cs_source.html">IGenerator.cs</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="af9c381586771bb9d5b567208d37899bf"></a>
+<a class="anchor" id="ab70ee825afffbd7056b8704a7f112fcf"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -135,6 +135,18 @@ Public Member Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">string&#160;</td>
           <td class="paramname"><em>mapPathB</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>workingDirectory</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>outputDirectory</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -155,13 +167,15 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">mapPathA</td><td>The path to the "before" map. Must be in the proper place in it's codebase structure. May be  if <em>mapPathB</em>  isn't</td></tr>
     <tr><td class="paramname">mapPathB</td><td>The path to the "after" map. Must be in the proper place in it's codebase structure. May be  if <em>mapPathA</em>  isn't</td></tr>
+    <tr><td class="paramname">workingDirectory</td><td>The path that contains the .dme for the .dmms</td></tr>
+    <tr><td class="paramname">outputDirectory</td><td>The path to the directory in which to store the output files</td></tr>
     <tr><td class="paramname">token</td><td>The CancellationToken for the operation</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
-<p>Implemented in <a class="el" href="class_map_diff_bot_1_1_generator_1_1_diff_generator.html#a24c5ee9cbc3c240f2f2104a526b04334">MapDiffBot.Generator.DiffGenerator</a>.</p>
+<p>Implemented in <a class="el" href="class_map_diff_bot_1_1_generator_1_1_diff_generator.html#a3c978210e01f9c7ceaa0f10e6f9ebc29">MapDiffBot.Generator.DiffGenerator</a>.</p>
 
 </div>
 </div>

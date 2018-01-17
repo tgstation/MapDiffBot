@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['subdirectory',['subdirectory',['../class_map_diff_bot_1_1_web_hook_1_1_resolving_i_o_manager.html#aedb2a1b33dbab9dd319e712703f21d7d',1,'MapDiffBot::WebHook::ResolvingIOManager']]]
+  ['repositorylib',['repositoryLib',['../class_map_diff_bot_1_1_web_hook_1_1_repository.html#a8a757628149eb2d2928b325eb75b921a',1,'MapDiffBot::WebHook::Repository']]],
+  ['repositorymanager',['repositoryManager',['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html#a7b43135bd085427b17e9d04c7c85438d',1,'MapDiffBot::WebHook::PullRequestPayloadHandler']]]
 ];

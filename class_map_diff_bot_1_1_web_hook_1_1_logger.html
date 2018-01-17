@@ -114,9 +114,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2689d9759bec17d52def1d1709a444c4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a2689d9759bec17d52def1d1709a444c4">Logger</a> (<a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html">IIOManager</a> _ioManager)</td></tr>
 <tr class="memdesc:a2689d9759bec17d52def1d1709a444c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html">Logger</a>  <a href="#a2689d9759bec17d52def1d1709a444c4">More...</a><br /></td></tr>
 <tr class="separator:a2689d9759bec17d52def1d1709a444c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac72b700f069b022fec01447c26c8066b"><td class="memItemLeft" align="right" valign="top">Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#ac72b700f069b022fec01447c26c8066b">LogError</a> (string message)</td></tr>
-<tr class="memdesc:ac72b700f069b022fec01447c26c8066b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an error message to the log   <a href="#ac72b700f069b022fec01447c26c8066b">More...</a><br /></td></tr>
-<tr class="separator:ac72b700f069b022fec01447c26c8066b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec2d4dcd0719f96d599687f10e8432f6"><td class="memItemLeft" align="right" valign="top">async Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#aec2d4dcd0719f96d599687f10e8432f6">LogError</a> (string message)</td></tr>
+<tr class="memdesc:aec2d4dcd0719f96d599687f10e8432f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an error message to the log   <a href="#aec2d4dcd0719f96d599687f10e8432f6">More...</a><br /></td></tr>
+<tr class="separator:aec2d4dcd0719f96d599687f10e8432f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -124,6 +124,7 @@ Private Attributes</h2></td></tr>
 <tr class="memdesc:a32ceed5b69796f542247e44abe83f944"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html" title="Interface for using filesystems ">IIOManager</a> for the <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html">Logger</a>  <a href="#a32ceed5b69796f542247e44abe83f944">More...</a><br /></td></tr>
 <tr class="separator:a32ceed5b69796f542247e44abe83f944"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a175a24dff538fac13881b258369cc838"><td class="memItemLeft" align="right" valign="top">readonly string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a175a24dff538fac13881b258369cc838">logFile</a></td></tr>
+<tr class="memdesc:a175a24dff538fac13881b258369cc838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Path to the log file  <a href="#a175a24dff538fac13881b258369cc838">More...</a><br /></td></tr>
 <tr class="separator:a175a24dff538fac13881b258369cc838"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -152,19 +153,19 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_logger_8cs_source.html#l00022">22</a> of file <a class="el" href="_logger_8cs_source.html">Logger.cs</a>.</p>
-<div class="fragment"><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        {</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a32ceed5b69796f542247e44abe83f944">ioManager</a> = <span class="keyword">new</span> ResolvingIOManager(_ioManager ?? <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(_ioManager)), <span class="stringliteral">&quot;Logs&quot;</span>);</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a175a24dff538fac13881b258369cc838">logFile</a> = String.Format(CultureInfo.InvariantCulture, <span class="stringliteral">&quot;{0}.txt&quot;</span>, DateTime.Now.Ticks);</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_web_hook_1_1_logger_html_a175a24dff538fac13881b258369cc838"><div class="ttname"><a href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a175a24dff538fac13881b258369cc838">MapDiffBot.WebHook.Logger.logFile</a></div><div class="ttdeci">readonly string logFile</div><div class="ttdef"><b>Definition:</b> <a href="_logger_8cs_source.html#l00016">Logger.cs:16</a></div></div>
+<p>Definition at line <a class="el" href="_logger_8cs_source.html#l00025">25</a> of file <a class="el" href="_logger_8cs_source.html">Logger.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        {</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a32ceed5b69796f542247e44abe83f944">ioManager</a> = <span class="keyword">new</span> ResolvingIOManager(_ioManager ?? <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(_ioManager)), <span class="stringliteral">&quot;Logs&quot;</span>);</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a175a24dff538fac13881b258369cc838">logFile</a> = String.Format(CultureInfo.InvariantCulture, <span class="stringliteral">&quot;{0}.txt&quot;</span>, DateTime.Now.Ticks);</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_web_hook_1_1_logger_html_a175a24dff538fac13881b258369cc838"><div class="ttname"><a href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a175a24dff538fac13881b258369cc838">MapDiffBot.WebHook.Logger.logFile</a></div><div class="ttdeci">readonly string logFile</div><div class="ttdoc">Path to the log file </div><div class="ttdef"><b>Definition:</b> <a href="_logger_8cs_source.html#l00019">Logger.cs:19</a></div></div>
 <div class="ttc" id="class_map_diff_bot_1_1_web_hook_1_1_logger_html_a32ceed5b69796f542247e44abe83f944"><div class="ttname"><a href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a32ceed5b69796f542247e44abe83f944">MapDiffBot.WebHook.Logger.ioManager</a></div><div class="ttdeci">readonly IIOManager ioManager</div><div class="ttdoc">The IIOManager for the Logger </div><div class="ttdef"><b>Definition:</b> <a href="_logger_8cs_source.html#l00014">Logger.cs:14</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="ac72b700f069b022fec01447c26c8066b"></a>
+<a class="anchor" id="aec2d4dcd0719f96d599687f10e8432f6"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Task MapDiffBot.WebHook.Logger.LogError </td>
+          <td class="memname">async Task MapDiffBot.WebHook.Logger.LogError </td>
           <td>(</td>
           <td class="paramtype">string&#160;</td>
           <td class="paramname"><em>message</em></td><td>)</td>
@@ -177,9 +178,10 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_logger.html#a6f2dc9e33549fb7a074765705b396239">MapDiffBot.WebHook.ILogger</a>.</p>
 
-<p>Definition at line <a class="el" href="_logger_8cs_source.html#l00029">29</a> of file <a class="el" href="_logger_8cs_source.html">Logger.cs</a>.</p>
-<div class="fragment"><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        {</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a32ceed5b69796f542247e44abe83f944">ioManager</a>.<a class="code" href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html#a65073e00ab8212c88464fd0ed988e635">AppendAllText</a>(<a class="code" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a175a24dff538fac13881b258369cc838">logFile</a>, String.Format(CultureInfo.CurrentCulture, <span class="stringliteral">&quot;{0}: {1}&quot;</span>, DateTime.Now.ToLongTimeString(), message), CancellationToken.None);</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_web_hook_1_1_logger_html_a175a24dff538fac13881b258369cc838"><div class="ttname"><a href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a175a24dff538fac13881b258369cc838">MapDiffBot.WebHook.Logger.logFile</a></div><div class="ttdeci">readonly string logFile</div><div class="ttdef"><b>Definition:</b> <a href="_logger_8cs_source.html#l00016">Logger.cs:16</a></div></div>
+<p>Definition at line <a class="el" href="_logger_8cs_source.html#l00032">32</a> of file <a class="el" href="_logger_8cs_source.html">Logger.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        {</div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;            await <a class="code" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a32ceed5b69796f542247e44abe83f944">ioManager</a>.<a class="code" href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html#aa708ecba273e114736c61473a2e2580a">CreateDirectory</a>(<span class="stringliteral">&quot;.&quot;</span>, CancellationToken.None);</div><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;            await <a class="code" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a32ceed5b69796f542247e44abe83f944">ioManager</a>.<a class="code" href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html#a65073e00ab8212c88464fd0ed988e635">AppendAllText</a>(<a class="code" href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a175a24dff538fac13881b258369cc838">logFile</a>, String.Format(CultureInfo.CurrentCulture, <span class="stringliteral">&quot;{0}: {1}{2}&quot;</span>, DateTime.Now.ToLongTimeString(), message, Environment.NewLine), CancellationToken.None);</div><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_web_hook_1_1_logger_html_a175a24dff538fac13881b258369cc838"><div class="ttname"><a href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a175a24dff538fac13881b258369cc838">MapDiffBot.WebHook.Logger.logFile</a></div><div class="ttdeci">readonly string logFile</div><div class="ttdoc">Path to the log file </div><div class="ttdef"><b>Definition:</b> <a href="_logger_8cs_source.html#l00019">Logger.cs:19</a></div></div>
 <div class="ttc" id="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager_html_a65073e00ab8212c88464fd0ed988e635"><div class="ttname"><a href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html#a65073e00ab8212c88464fd0ed988e635">MapDiffBot.WebHook.IIOManager.AppendAllText</a></div><div class="ttdeci">Task AppendAllText(string path, string additional_contents, CancellationToken token)</div><div class="ttdoc">Writes some additional_contents  to a file at path  after previous content </div></div>
+<div class="ttc" id="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager_html_aa708ecba273e114736c61473a2e2580a"><div class="ttname"><a href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html#aa708ecba273e114736c61473a2e2580a">MapDiffBot.WebHook.IIOManager.CreateDirectory</a></div><div class="ttdeci">Task CreateDirectory(string path, CancellationToken token)</div><div class="ttdoc">Create a directory at path  </div></div>
 <div class="ttc" id="class_map_diff_bot_1_1_web_hook_1_1_logger_html_a32ceed5b69796f542247e44abe83f944"><div class="ttname"><a href="class_map_diff_bot_1_1_web_hook_1_1_logger.html#a32ceed5b69796f542247e44abe83f944">MapDiffBot.WebHook.Logger.ioManager</a></div><div class="ttdeci">readonly IIOManager ioManager</div><div class="ttdoc">The IIOManager for the Logger </div><div class="ttdef"><b>Definition:</b> <a href="_logger_8cs_source.html#l00014">Logger.cs:14</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -227,7 +229,9 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="_logger_8cs_source.html#l00016">16</a> of file <a class="el" href="_logger_8cs_source.html">Logger.cs</a>.</p>
+<p>Path to the log file </p>
+
+<p>Definition at line <a class="el" href="_logger_8cs_source.html#l00019">19</a> of file <a class="el" href="_logger_8cs_source.html">Logger.cs</a>.</p>
 
 </div>
 </div>

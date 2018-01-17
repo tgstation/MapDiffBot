@@ -9,6 +9,7 @@ var searchData=
   ['mapdiffoperations',['mapDiffOperations',['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html#a78a4c12b02a35e632dc39db7f8775a13',1,'MapDiffBot::WebHook::PullRequestPayloadHandler']]],
   ['maxx',['MaxX',['../class_map_diff_bot_1_1_generator_1_1_diff_region.html#a49af6513ed251754fca2240bc3681b9d',1,'MapDiffBot::Generator::DiffRegion']]],
   ['maxy',['MaxY',['../class_map_diff_bot_1_1_generator_1_1_diff_region.html#a8a6218f09af60bc8e35c56b012faa2f2',1,'MapDiffBot::Generator::DiffRegion']]],
+  ['merge',['Merge',['../interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html#a0a62c8310d06afc9de1e80f76028c307',1,'MapDiffBot.WebHook.IRepository.Merge()'],['../class_map_diff_bot_1_1_web_hook_1_1_repository.html#afc7a934b07a3a04ab3a2d2ba8067ec0d',1,'MapDiffBot.WebHook.Repository.Merge()']]],
   ['minx',['MinX',['../class_map_diff_bot_1_1_generator_1_1_diff_region.html#aa6e4a42a6df9dd3e50f30ea288c0caf1',1,'MapDiffBot::Generator::DiffRegion']]],
   ['miny',['MinY',['../class_map_diff_bot_1_1_generator_1_1_diff_region.html#ae56d6ea9c581cbc652f3329d9be71e97',1,'MapDiffBot::Generator::DiffRegion']]],
   ['webhook',['WebHook',['../namespace_map_diff_bot_1_1_web_hook.html',1,'MapDiffBot']]]
