@@ -235,7 +235,7 @@ namespace MapDiffBot.WebHook
 					finally
 					{
 						if (errors.Count > 0)
-							throw new AggregateException(String.Format(CultureInfo.CurrentCulture, "Generation errors occurred! Repo: {0}/{1}, PR: {2} (#{3}) Base: {4} ({5}), HEAD: {6}", payload.Repository.Owner, payload.Repository.Name, payload.PullRequest.Title, payload.PullRequest.Number, payload.PullRequest.Base.Sha, payload.PullRequest.Base.Label, payload.PullRequest.Head.Sha), errors);
+							throw new AggregateException(String.Format(CultureInfo.CurrentCulture, "Generation errors occurred! Repo: {0}/{1}, PR: {2} (#{3}) Base: {4} ({5}), HEAD: {6}", payload.Repository.Owner.Login, payload.Repository.Name, payload.PullRequest.Title, payload.PullRequest.Number, payload.PullRequest.Base.Sha, payload.PullRequest.Base.Label, payload.PullRequest.Head.Sha), errors);
 					}
 				}
 				finally
