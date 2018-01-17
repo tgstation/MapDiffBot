@@ -149,6 +149,14 @@ namespace MapDiffBot.WebHook
 		}
 
 		/// <inheritdoc />
+		public string GetFileNameWithoutExtension(string path)
+		{
+			if (path == null)
+				throw new ArgumentNullException(nameof(path));
+			return Path.GetFileNameWithoutExtension(path);
+		}
+
+		/// <inheritdoc />
 		public async Task<byte[]> ReadAllBytes(string path, CancellationToken token)
 		{
 			path = ResolvePath(path);
