@@ -27,7 +27,5 @@ var searchData=
   ['irepository',['IRepository',['../interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html',1,'MapDiffBot::WebHook']]],
   ['irepository_2ecs',['IRepository.cs',['../_i_repository_8cs.html',1,'']]],
   ['irepositorymanager',['IRepositoryManager',['../interface_map_diff_bot_1_1_web_hook_1_1_i_repository_manager.html',1,'MapDiffBot::WebHook']]],
-  ['irepositorymanager_2ecs',['IRepositoryManager.cs',['../_i_repository_manager_8cs.html',1,'']]],
-  ['issue_5ftemplate_2emd',['ISSUE_TEMPLATE.md',['../_i_s_s_u_e___t_e_m_p_l_a_t_e_8md.html',1,'']]],
-  ['issue_5ftemplate',['ISSUE_TEMPLATE',['../md_ISSUE_TEMPLATE.html',1,'']]]
+  ['irepositorymanager_2ecs',['IRepositoryManager.cs',['../_i_repository_manager_8cs.html',1,'']]]
 ];

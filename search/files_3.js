@@ -11,6 +11,5 @@ var searchData=
   ['ipayloaddelegator_2ecs',['IPayloadDelegator.cs',['../_i_payload_delegator_8cs.html',1,'']]],
   ['ipayloadhandler_2ecs',['IPayloadHandler.cs',['../_i_payload_handler_8cs.html',1,'']]],
   ['irepository_2ecs',['IRepository.cs',['../_i_repository_8cs.html',1,'']]],
-  ['irepositorymanager_2ecs',['IRepositoryManager.cs',['../_i_repository_manager_8cs.html',1,'']]],
-  ['issue_5ftemplate_2emd',['ISSUE_TEMPLATE.md',['../_i_s_s_u_e___t_e_m_p_l_a_t_e_8md.html',1,'']]]
+  ['irepositorymanager_2ecs',['IRepositoryManager.cs',['../_i_repository_manager_8cs.html',1,'']]]
 ];
