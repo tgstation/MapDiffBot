@@ -124,9 +124,10 @@ namespace MapDiffBot.Generator
 		{
 			var output = new StringBuilder();
 			var errorOutput = new StringBuilder();
+			var args = String.Format(CultureInfo.InvariantCulture, GenerateRenderCommandLine(region), mapPath);
 			using (var P = await CreateDMMToolsProcess(workingDirectory, output, errorOutput))
 			{
-				P.StartInfo.Arguments = String.Format(CultureInfo.InvariantCulture, GenerateRenderCommandLine(region), mapPath);
+				P.StartInfo.Arguments = args;
 
 				await StartAndWaitForProcessExit(P, output, errorOutput, token);
 			}
@@ -143,7 +144,7 @@ namespace MapDiffBot.Generator
 					expectNext = false;
 			}
 
-			throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find .png file in dmm-tools output! Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString()));
+			throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find .png file in dmm-tools output!{1}Command line: {3}{1}Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString(), args));
 		}
 
 		/// <summary>
