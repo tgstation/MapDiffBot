@@ -44,11 +44,12 @@ namespace MapDiffBot.WebHook
 				}
 				catch (WebException)
 				{
-					//try again a few times
+					//try again a few times because api.imgur.com can just choose to not resolve for no bloody reason
 					if (I > MaxRetries)
 						throw;
 
 					await Task.Delay(I * 1000, token);
+					token.ThrowIfCancellationRequested();
 				}
 			return image.Link;
 		}
