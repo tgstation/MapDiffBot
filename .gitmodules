@@ -1,0 +1,4 @@
+[submodule "SpacemanDMM"]
+	path = SpacemanDMM
+	url = https://github.com/SpaceManiac/SpacemanDMM
+	branch = master
