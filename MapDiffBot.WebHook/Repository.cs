@@ -32,12 +32,7 @@ namespace MapDiffBot.WebHook
 		}
 
 		/// <inheritdoc />
-		public string Path => repositoryLib.Info.Path;
-
-		/// <summary>
-		/// The <see cref="IIOManager"/> for the <see cref="Repository"/>
-		/// </summary>
-		readonly IIOManager ioManager;
+		public string Path => repositoryLib.Info.WorkingDirectory;
 
 		/// <summary>
 		/// The backing <see cref="LibGit2Sharp.Repository"/>
@@ -51,14 +46,12 @@ namespace MapDiffBot.WebHook
 		/// <summary>
 		/// Construct a <see cref="Repository"/>
 		/// </summary>
-		/// <param name="_ioManager">The value of <see cref="ioManager"/></param>
 		/// <param name="_repositoryLib">The value of <see cref="repositoryLib"/></param>
 		/// <param name="_onDisposal">The value of <see cref="onDisposal"/></param>
-		public Repository(IIOManager _ioManager, LibGit2Sharp.Repository _repositoryLib, TaskCompletionSource<object> _onDisposal)
+		public Repository(LibGit2Sharp.Repository _repositoryLib, TaskCompletionSource<object> _onDisposal)
 		{
 			repositoryLib = _repositoryLib ?? throw new ArgumentNullException(nameof(_repositoryLib));
 			onDisposal = _onDisposal ?? throw new ArgumentNullException(nameof(_onDisposal));
-			ioManager = new ResolvingIOManager(_ioManager ?? throw new ArgumentNullException(nameof(_ioManager)), ioManager.GetDirectoryName(repositoryLib.Info.Path));
 		}
 
 		/// <summary>
@@ -74,8 +67,8 @@ namespace MapDiffBot.WebHook
 		public Task Checkout(string commitish, CancellationToken token)
 		{
 			if (commitish == null)
-				throw new ArgumentNullException(commitish);
-			return Task.Factory.StartNew(() => Commands.Checkout(repositoryLib, commitish), token, TaskCreationOptions.LongRunning, Task.Factory.Scheduler);
+				throw new ArgumentNullException(nameof(commitish));
+			return Task.Factory.StartNew(() => Commands.Checkout(repositoryLib, commitish), token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 		}
 
 		/// <inheritdoc />
@@ -93,7 +86,7 @@ namespace MapDiffBot.WebHook
 				var refSpecs = remote.FetchRefSpecs.Select(X => X.Specification);
 				Commands.Fetch(repositoryLib, remote.Name, refSpecs, GenerateFetchOptions(token), "Update of origin branch");
 				token.ThrowIfCancellationRequested();
-			}, token, TaskCreationOptions.LongRunning, Task.Factory.Scheduler);
+			}, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 		}
 
 		/// <inheritdoc />
@@ -111,7 +104,22 @@ namespace MapDiffBot.WebHook
 				};
 				Commands.Fetch(repositoryLib, remote.Name, refSpecs, GenerateFetchOptions(token), String.Format(CultureInfo.CurrentCulture, "Fetch of pull request #{0}", prNumber));
 				token.ThrowIfCancellationRequested();
-			}, token, TaskCreationOptions.LongRunning, Task.Factory.Scheduler);
+			}, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+		}
+
+		/// <inheritdoc />
+		public Task Merge(string commitish, CancellationToken token)
+		{
+			if (commitish == null)
+				throw new ArgumentNullException(nameof(commitish));
+			return Task.Factory.StartNew(() =>
+			{
+				if (repositoryLib.Merge(commitish, new Signature(new Identity(nameof(MapDiffBot), String.Format(CultureInfo.InvariantCulture, "{0}@users.noreply.github.com", nameof(MapDiffBot))), DateTime.UtcNow)).Status == MergeStatus.Conflicts)
+				{
+					repositoryLib.Reset(ResetMode.Hard);
+					throw new InvalidOperationException("The resulting merge has conflicts!");
+				}
+			}, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 		}
 	}
 }

@@ -44,5 +44,13 @@ namespace MapDiffBot.WebHook
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		Task FetchPullRequest(int prNumber, CancellationToken token);
+
+		/// <summary>
+		/// Attempt to merge <paramref name="commitish"/> into the current HEAD
+		/// </summary>
+		/// <param name="commitish">The name of the commit pointing object to merge to</param>
+		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task"/> representing the running operation</returns>
+		Task Merge(string commitish, CancellationToken token);
 	}
 }

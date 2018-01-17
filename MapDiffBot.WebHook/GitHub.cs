@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MapDiffBot.WebHook
@@ -62,7 +61,7 @@ namespace MapDiffBot.WebHook
 		}
 
 		/// <inheritdoc />
-		public async Task<List<string>> GetChangedMapFiles(Octokit.Repository repository, int pullRequestNumber, CancellationToken token)
+		public async Task<List<string>> GetChangedMapFiles(Octokit.Repository repository, int pullRequestNumber)
 		{
 			if (repository == null)
 				throw new ArgumentNullException(nameof(repository));
@@ -78,7 +77,7 @@ namespace MapDiffBot.WebHook
 		}
 
 		/// <inheritdoc />
-		public async Task CreateSingletonComment(Octokit.Repository repository, int issueNumber, string body, CancellationToken token)
+		public async Task CreateSingletonComment(Octokit.Repository repository, int issueNumber, string body)
 		{
 			if (repository == null)
 				throw new ArgumentNullException(nameof(repository));
@@ -102,6 +101,21 @@ namespace MapDiffBot.WebHook
 				}
 
 			await gitHubClient.Issue.Comment.Create(repository.Id, issueNumber, body);
+		}
+
+		/// <inheritdoc />
+		public async Task<bool?> CheckPullRequestMergeable(Octokit.Repository repository, int pullRequestNumber)
+		{
+			if (repository == null)
+				throw new ArgumentNullException(nameof(repository));
+
+			if (pullRequestNumber < 1)
+				throw new ArgumentOutOfRangeException(nameof(pullRequestNumber), pullRequestNumber, String.Format(CultureInfo.CurrentCulture, "{0} must be greater than zero!", nameof(pullRequestNumber)));
+
+			CheckCredentials();
+
+			var pr = await gitHubClient.PullRequest.Get(repository.Id, pullRequestNumber);
+			return pr.Mergeable;
 		}
 	}
 }

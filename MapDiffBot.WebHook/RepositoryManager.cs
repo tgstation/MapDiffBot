@@ -56,17 +56,23 @@ namespace MapDiffBot.WebHook
 			}
 
 			bool needsNewKey;
-			using(var reg = token.Register(() => {
+			using(token.Register(() => {
 					tcs1.SetCanceled();
 					tcs2.SetCanceled();
 				}))
 				needsNewKey = await tcs1.Task;
-
 			token.ThrowIfCancellationRequested();
+			
+			var repoObj = new LibGit2Sharp.Repository(ioManager.ResolvePath(repoPath));
+			token.ThrowIfCancellationRequested();
+
+			repoObj.RemoveUntrackedFiles();
+			token.ThrowIfCancellationRequested();
+
+			var res = new Repository(repoObj, tcs2);
 
 			lock (this)
 			{
-				var res = new Repository(ioManager, new LibGit2Sharp.Repository(repoPath), tcs2);
 				if (needsNewKey)
 					activeRepositories.Add(repoPath, tcs2.Task);
 				else
@@ -83,20 +89,15 @@ namespace MapDiffBot.WebHook
 			if (name == null)
 				throw new ArgumentNullException(nameof(name));
 
+			await ioManager.CreateDirectory(".", token);
+
 			var repoPath = ioManager.ConcatPath(owner, name);
 
 			try
 			{
 				return await TryLoadRepository(repoPath, token);
 			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
-			catch
-			{
-				//TODO, more specific exceptions
-			}
+			catch (RepositoryNotFoundException) { }
 
 			await ioManager.DeleteDirectory(repoPath, token);
 			await ioManager.CreateDirectory(repoPath, token);
@@ -113,7 +114,8 @@ namespace MapDiffBot.WebHook
 				}
 			};
 
-			await Task.Factory.StartNew(() => LibGit2Sharp.Repository.Clone(String.Format(CultureInfo.InvariantCulture, "https://github.com/{0}/{1}", owner, name), ioManager.ResolvePath(repoPath), cloneOpts), token, TaskCreationOptions.LongRunning, Task.Factory.Scheduler);
+			var gitHubURL = String.Format(CultureInfo.InvariantCulture, "https://github.com/{0}/{1}", owner, name);
+			await Task.Factory.StartNew(() => LibGit2Sharp.Repository.Clone(gitHubURL, ioManager.ResolvePath(repoPath), cloneOpts), token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
 			token.ThrowIfCancellationRequested();
 			return await TryLoadRepository(repoPath, token);

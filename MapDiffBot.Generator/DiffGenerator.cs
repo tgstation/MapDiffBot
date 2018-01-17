@@ -19,7 +19,7 @@ namespace MapDiffBot.Generator
 		/// <returns>The dmm-tools.exe command line arguments</returns>
 		static string GenerateCommandLine(DiffRegion region)
 		{
-			const string minimapParam = "--minimap {{0}}";
+			const string minimapParam = "--disable hide-space --minimap \"{0}\"";
 			if (region == null)
 				return minimapParam;
 			return String.Format(CultureInfo.InvariantCulture, "--min {0},{1} --max {2},{3} {4}", region.MinX, region.MaxX, region.MaxX, region.MaxY, minimapParam);
@@ -38,19 +38,21 @@ namespace MapDiffBot.Generator
 		/// Renders the map at <paramref name="mapPath"/> with the given <paramref name="region"/>
 		/// </summary>
 		/// <param name="mapPath">The path of the map to render. Must be among associated codebase files</param>
+		/// <param name="workingDirectory">The path that contains the .dme for the .dmm</param>
 		/// <param name="region">The <see cref="DiffRegion"/> to render, if any</param>
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in the path to the rendered .png file</returns>
-		static async Task<string> RenderMap(string mapPath, DiffRegion region, CancellationToken token)
+		static async Task<string> RenderMap(string mapPath, string workingDirectory, DiffRegion region, CancellationToken token)
 		{
 			var output = new StringBuilder();
 			var errorOutput = new StringBuilder();
 			using (var P = new Process())
 			{
 				P.StartInfo.Arguments = String.Format(CultureInfo.InvariantCulture, GenerateCommandLine(region), mapPath);
-				P.StartInfo.CreateNoWindow = true;
 				P.StartInfo.RedirectStandardOutput = true;
 				P.StartInfo.RedirectStandardError = true;
+				P.StartInfo.UseShellExecute = false;
+				P.StartInfo.WorkingDirectory = workingDirectory;
 				P.OutputDataReceived += new DataReceivedEventHandler(
 					delegate (object sender, DataReceivedEventArgs e)
 					{
@@ -69,7 +71,9 @@ namespace MapDiffBot.Generator
 				P.StartInfo.FileName = await GetDMMToolsPath();
 
 				var tcs = new TaskCompletionSource<object>();
-				P.Exited += (a, b) => {
+				P.EnableRaisingEvents = true;
+				P.Exited += (a, b) =>
+				{
 					if (token.IsCancellationRequested)
 						tcs.SetCanceled();
 					else
@@ -77,25 +81,33 @@ namespace MapDiffBot.Generator
 				};
 
 				P.Start();
-				using (var reg = token.Register(() => P.Kill()))
+				P.BeginOutputReadLine();
+				P.BeginErrorReadLine();
+				using (var reg = token.Register(() =>
+				{
+					try
+					{
+						P.Kill();
+					}
+					catch (InvalidOperationException) { }
+				}))
 					await tcs.Task;
 
 				if (P.ExitCode != 0)
 					throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "dmm-tools.exe exited with error code {0}! Output:{1}{2}{1}Error:{1}{3}", P.ExitCode, Environment.NewLine, output.ToString(), errorOutput.ToString()));
 			}
-
-			string result = null;
+			
 			bool expectNext = false;
 			foreach (var I in output.ToString().Split(' '))
-				if (I == "saving")
+			{
+				var text = I.Trim();
+				if (text == "saving")
 					expectNext = true;
-				else if (expectNext && I.EndsWith(".png"))
-				{
-					result = I;
-					break;
-				}
-
-
+				else if (expectNext && text.EndsWith(".png"))
+					return text;
+				else
+					expectNext = false;
+			}
 
 			throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find .png file in dmm-tools output! Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString()));
 		}
@@ -105,12 +117,14 @@ namespace MapDiffBot.Generator
 		/// </summary>
 		/// <param name="mapPathA">The path to the "before" map</param>
 		/// <param name="mapPathB">The path to the "after" map</param>
+		/// <param name="workingDirectory">The path that contains the .dme for the .dmms</param>
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in a <see cref="DiffRegion"/> for the two maps</returns>
+		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "workingDirectory")]
 		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "mapPathA")]
 		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "mapPathB")]
 		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "token")]
-		static async Task<DiffRegion> GetDiffRegion(string mapPathA, string mapPathB, CancellationToken token)
+		static async Task<DiffRegion> GetDiffRegion(string mapPathA, string mapPathB, string workingDirectory, CancellationToken token)
 		{
 			//TODO
 			return await Task.FromResult<DiffRegion>(null);
@@ -125,19 +139,27 @@ namespace MapDiffBot.Generator
 		}
 
 		/// <inheritdoc />
-		public async Task<IMapDiff> GenerateDiff(string mapPathA, string mapPathB, CancellationToken token)
+		public async Task<IMapDiff> GenerateDiff(string mapPathA, string mapPathB, string workingDirectory, string outputDirectory, CancellationToken token)
 		{
-			var region = await GetDiffRegion(mapPathA, mapPathB, token);
+			var region = await GetDiffRegion(mapPathA, mapPathB, workingDirectory, token);
 
-			var ma = RenderMap(mapPathA, region, token);
-			var mb = RenderMap(mapPathB, region, token);
+			Directory.CreateDirectory(Path.Combine(workingDirectory, "data", "minimaps"));
+			
+			var mA = RenderMap(mapPathA, workingDirectory, region, token);
+			var mB = RenderMap(mapPathB, workingDirectory, region, token);
 
-			var mapName = Path.GetFileNameWithoutExtension(mapPathA.Length > mapPathB.Length ? mapPathB : mapPathA); 
+			var mapName = Path.GetFileNameWithoutExtension(mapPathA.Length > mapPathB.Length ? mapPathB : mapPathA);
 
-			var outputA = await mb;
-			var outputB = await mb;
+			var outputA = Path.Combine(workingDirectory, await mA);
+			var outputB = Path.Combine(workingDirectory, await mB);
 
-			return new MapDiff(mapName, outputA, outputB);
+			var movedA = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.before.png", mapName));
+			var movedB = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.after.png", mapName));
+
+			File.Move(outputA, movedA);
+			File.Move(outputB, movedB);
+
+			return new MapDiff(mapName, movedA, movedB);
 		}
 	}
 }
