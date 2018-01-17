@@ -30,6 +30,13 @@ namespace MapDiffBot.WebHook
 		string GetFileName(string path);
 
 		/// <summary>
+		/// Gets the file name portion of a <paramref name="path"/> with
+		/// </summary>
+		/// <param name="path">The path to get the file name of</param>
+		/// <returns>The file name portion of <paramref name="path"/></returns>
+		string GetFileNameWithoutExtension(string path);
+
+		/// <summary>
 		/// Check that the file at <paramref name="path"/> exists
 		/// </summary>
 		/// <param name="path">The file to check for existence</param>
