@@ -103,12 +103,16 @@ namespace MapDiffBot.WebHook
 				try
 				{
 					foreach (var I in handlers)
-						await I.Run(json, config, token);
+						try
+						{
+							await I.Run(json, config, token);
+						}
+						catch (NotImplementedException) { }
 				}
 				catch (OperationCanceledException) { }
 				catch (Exception e)
 				{
-					await logger.LogError(String.Format(CultureInfo.CurrentCulture, "Unhandled exception in payload processing! Action: {0}, JSON:{1}{2}{1}Error:{1}{3}", action, Environment.NewLine, json, e));
+					await logger.LogError(String.Format(CultureInfo.CurrentCulture, "Unhandled exception in payload processing! Action: {0}, Error:{1}{2}", action, Environment.NewLine, e));
 				}
 			});
 		}

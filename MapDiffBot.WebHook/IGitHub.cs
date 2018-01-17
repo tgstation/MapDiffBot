@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MapDiffBot.WebHook
@@ -19,9 +18,8 @@ namespace MapDiffBot.WebHook
 		/// </summary>
 		/// <param name="repository">The <see cref="Octokit.Repository"/> the pull request is from</param>
 		/// <param name="pullRequestNumber">The number of the pull request</param>
-		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>List paths to .dmm files changed/added/deleted by the pull request represented by <paramref name="pullRequestNumber"/> in the target <paramref name="repository"/></returns>
-		Task<List<string>> GetChangedMapFiles(Octokit.Repository repository, int pullRequestNumber, CancellationToken token);
+		Task<List<string>> GetChangedMapFiles(Octokit.Repository repository, int pullRequestNumber);
 
 		/// <summary>
 		/// Creates a comment on the specified issue, or updates it if it has already done so
@@ -29,8 +27,15 @@ namespace MapDiffBot.WebHook
 		/// <param name="repository">The <see cref="Repository"/> that contains the issue</param>
 		/// <param name="issueNumber">The number of the issue</param>
 		/// <param name="body">The body of the comment</param>
-		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		Task CreateSingletonComment(Octokit.Repository repository, int issueNumber, string body, CancellationToken token);
+		Task CreateSingletonComment(Octokit.Repository repository, int issueNumber, string body);
+
+		/// <summary>
+		/// Check that the provided pull request is mergeable
+		/// </summary>
+		/// <param name="repository">The <see cref="Octokit.Repository"/> the pull request is from</param>
+		/// <param name="pullRequestNumber">The number of the pull request</param>
+		/// <returns>The value of <see cref="Octokit.PullRequest.Mergeable"/> for the pull request</returns>
+		Task<bool?> CheckPullRequestMergeable(Octokit.Repository repository, int pullRequestNumber);
 	}
 }

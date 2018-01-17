@@ -13,6 +13,9 @@ namespace MapDiffBot.WebHook
 		/// </summary>
 		readonly IIOManager ioManager;
 
+		/// <summary>
+		/// Path to the log file
+		/// </summary>
 		readonly string logFile;
 
 		/// <summary>
@@ -26,9 +29,10 @@ namespace MapDiffBot.WebHook
 		}
 
 		/// <inheritdoc />
-		public Task LogError(string message)
+		public async Task LogError(string message)
 		{
-			return ioManager.AppendAllText(logFile, String.Format(CultureInfo.CurrentCulture, "{0}: {1}", DateTime.Now.ToLongTimeString(), message), CancellationToken.None);
+			await ioManager.CreateDirectory(".", CancellationToken.None);
+			await ioManager.AppendAllText(logFile, String.Format(CultureInfo.CurrentCulture, "{0}: {1}{2}", DateTime.Now.ToLongTimeString(), message, Environment.NewLine), CancellationToken.None);
 		}
 	}
 }

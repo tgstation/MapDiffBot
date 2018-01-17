@@ -24,9 +24,13 @@ namespace MapDiffBot.WebHook
 		/// </summary>
 		const string AccessTokenConfigKey = "AccessToken";
 		/// <summary>
+		/// The config key used for imgur client ids
+		/// </summary>
+		const string ImgurIDConfigKey = "ImgurID";
+		/// <summary>
 		/// The config key used for imgur client secrets
 		/// </summary>
-		const string ImgurSecretConfigKey = "ImgurKey";
+		const string ImgurSecretConfigKey = "ImgurSecret";
 
 		/// <summary>
 		/// The <see cref="IFileUploader"/> for the <see cref="PullRequestPayloadHandler"/>
@@ -83,24 +87,26 @@ namespace MapDiffBot.WebHook
 		/// <param name="config">The <see cref="IWebHookReceiverConfig"/> for the operation</param>
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in the markdown table <see cref="string"/></returns>
-		async Task<string> UploadDiffsAndGenerateMarkdown(IEnumerable<IMapDiff> diffs, IWebHookReceiverConfig config, CancellationToken token)
+		static async Task<string> UploadDiffsAndGenerateMarkdown(IEnumerable<IMapDiff> diffs, IWebHookReceiverConfig config, CancellationToken token)
 		{
 			StringBuilder result = null;
 			List<Task<string>> tasks = null;
-			string imgurSecret = null;
+			string imgurSecret = null, imgurID = null;
 			int formatterCount = 0;
 			foreach (var I in diffs)
 			{
 				if (result == null)
 				{
+					imgurID = await config.GetReceiverConfigAsync(GitHubWebHookReceiver.ReceiverName, ImgurIDConfigKey);
 					imgurSecret = await config.GetReceiverConfigAsync(GitHubWebHookReceiver.ReceiverName, ImgurSecretConfigKey);
 					result = new StringBuilder(String.Format(CultureInfo.InvariantCulture, "Map | Old | New | Status{0}--- | --- | --- | ---", Environment.NewLine));
 					tasks = new List<Task<string>>();
 				}
 
-				result.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | ![]({{{2}}}) | ![]({{{3}}}) | {4}", Environment.NewLine, I.BeforePath != null ? ioManager.GetFileName(I.BeforePath) : ioManager.GetFileName(I.AfterPath), ++formatterCount, ++formatterCount, I.BeforePath != null ? (I.AfterPath != null ? "Modified" : "Deleted") : "Created"));
+				result.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | ![]({{{2}}}) | ![]({{{3}}}) | {4}", Environment.NewLine, I.OriginalMapName, formatterCount++, formatterCount++, I.BeforePath != null ? (I.AfterPath != null ? "Modified" : "Deleted") : "Created"));
 
-				tasks.Add(fileUploader.Upload(I.AfterPath, imgurSecret, token));
+				tasks.Add(fileUploader.Upload(I.BeforePath, String.Format(CultureInfo.InvariantCulture, "{0}/{1}", imgurID, imgurSecret), token));
+				tasks.Add(fileUploader.Upload(I.AfterPath, String.Format(CultureInfo.InvariantCulture, "{0}/{1}", imgurID, imgurSecret), token));
 			}
 
 			await Task.WhenAll(tasks);
@@ -116,13 +122,13 @@ namespace MapDiffBot.WebHook
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		async Task GenerateMapDiff(PullRequestEventPayload payload, IWebHookReceiverConfig config, CancellationToken token)
-		{
+		{			
 			var requestIdentifier = String.Concat(payload.Repository.Owner.Login, payload.Repository.Name, payload.PullRequest.Number);
 			var currentIOManager = new ResolvingIOManager(ioManager, requestIdentifier);
 			//Generate our own cancellation token for rolling builds of the same PR
 			using (var cts = new CancellationTokenSource())
+			using (token.Register(() => cts.Cancel()))
 			{
-				token.Register(() => cts.Cancel());
 				token = cts.Token;
 
 				lock (mapDiffOperations)
@@ -135,55 +141,69 @@ namespace MapDiffBot.WebHook
 					else
 						mapDiffOperations.Add(requestIdentifier, cts);
 				}
-
-				var results = new List<IMapDiff>();
-				using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, token))
+				try
 				{
-					var baseSha = payload.PullRequest.Base.Sha;
-					if (!await repo.ContainsCommit(baseSha, token))
-						await repo.Fetch(token);
-					
-					await repo.FetchPullRequest(payload.PullRequest.Number, token);
+					gitHub.AccessToken = await config.GetReceiverConfigAsync(GitHubWebHookReceiver.ReceiverName, AccessTokenConfigKey);
 
-					var mapDiffer = generatorFactory.CreateGenerator();
+					bool? mergeable = payload.PullRequest.Mergeable;
 
-					foreach (var path in await gitHub.GetChangedMapFiles(payload.Repository, payload.PullRequest.Number, token))
+					for (var I = 0; mergeable == null && I < 5; ++I)
 					{
-						await repo.Checkout(baseSha, token);
-
-						var originalPath = currentIOManager.ConcatPath(repo.Path, path);
-						string oldMapPath;
-						if (await currentIOManager.FileExists(originalPath, token))
-						{
-							oldMapPath = currentIOManager.ConcatPath(originalPath, ".old_map_diff_bot");
-							await currentIOManager.CopyFile(originalPath, oldMapPath, token);
-						}
-						else
-							oldMapPath = null;
-
-						await repo.Checkout(payload.PullRequest.MergeCommitSha, token);
-						
-						try
-						{
-							results.Add(await mapDiffer.GenerateDiff(oldMapPath, originalPath, token));
-						}
-						catch(OperationCanceledException)
-						{
-							throw;
-						}
-						catch
-						{
-							//TODO specific exception
-						}
-						if (oldMapPath != null)
-							await currentIOManager.DeleteFile(oldMapPath, token);
+						await Task.Delay(5000);
+						mergeable = await gitHub.CheckPullRequestMergeable(payload.Repository, payload.PullRequest.Number);
+						token.ThrowIfCancellationRequested();
 					}
-				}
-				
-				var comment = await UploadDiffsAndGenerateMarkdown(results, config, token);
 
-				gitHub.AccessToken = await config.GetReceiverConfigAsync(GitHubWebHookReceiver.ReceiverName, AccessTokenConfigKey);
-				await gitHub.CreateSingletonComment(payload.Repository, payload.Number, comment, token);
+					if (mergeable == null || !mergeable.Value)
+						return;
+
+					var results = new List<IMapDiff>();
+					using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, token))
+					{
+						var baseSha = payload.PullRequest.Base.Sha;
+						if (!await repo.ContainsCommit(baseSha, token))
+							await repo.Fetch(token);
+
+						await repo.FetchPullRequest(payload.PullRequest.Number, token);
+
+						await currentIOManager.DeleteDirectory(".", token);
+						await currentIOManager.CreateDirectory(".", token);
+
+						var outputDirectory = currentIOManager.ResolvePath(".");
+
+						var mapDiffer = generatorFactory.CreateGenerator();
+
+						foreach (var path in await gitHub.GetChangedMapFiles(payload.Repository, payload.PullRequest.Number))
+						{
+							await repo.Checkout(baseSha, token);
+
+							var originalPath = currentIOManager.ConcatPath(repo.Path, path);
+							string oldMapPath;
+							if (await currentIOManager.FileExists(originalPath, token))
+							{
+								oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}.old_map_diff_bot", originalPath);
+								await currentIOManager.CopyFile(originalPath, oldMapPath, token);
+							}
+							else
+								oldMapPath = null;
+
+							await repo.Merge(payload.PullRequest.Head.Sha, token);
+							results.Add(await mapDiffer.GenerateDiff(oldMapPath, originalPath, repo.Path, outputDirectory, token));
+						}
+					}
+
+					if (results.Count == 0)
+						return;
+
+					var comment = await UploadDiffsAndGenerateMarkdown(results, config, token);
+					await gitHub.CreateSingletonComment(payload.Repository, payload.Number, comment);
+				}
+				finally
+				{
+					lock (mapDiffOperations)
+						if (mapDiffOperations.TryGetValue(requestIdentifier, out CancellationTokenSource maybeOurOperation) && maybeOurOperation == cts)
+							mapDiffOperations.Remove(requestIdentifier);
+				}
 			}
 		}
 
@@ -192,6 +212,8 @@ namespace MapDiffBot.WebHook
 		{
 			if (payload == null)
 				throw new ArgumentNullException(nameof(payload));
+			if (config == null)
+				throw new ArgumentNullException(nameof(config));
 
 			var truePayload = new SimpleJsonSerializer().Deserialize<PullRequestEventPayload>(payload.ToString());
 

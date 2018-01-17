@@ -17,6 +17,11 @@ namespace MapDiffBot.WebHook
 	class DefaultIOManager : IIOManager
 	{
 		/// <summary>
+		/// Default <see cref="FileStream"/> buffer size used by .NET
+		/// </summary>
+		public const int DefaultBufferSize = 4096;
+
+		/// <summary>
 		/// Recursively empty a directory
 		/// </summary>
 		/// <param name="dir"><see cref="DirectoryInfo"/> of the directory to empty</param>
@@ -48,7 +53,7 @@ namespace MapDiffBot.WebHook
 		{
 			if (additional_contents == null)
 				throw new ArgumentNullException(nameof(additional_contents));
-			using (var destStream = new FileStream(ResolvePath(path), FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete, 0, FileOptions.Asynchronous))
+			using (var destStream = new FileStream(ResolvePath(path), FileMode.Append, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete, DefaultBufferSize, true))
 			{
 				var buf = Encoding.UTF8.GetBytes(additional_contents);
 				await destStream.WriteAsync(buf, 0, buf.Length, token);
@@ -70,9 +75,9 @@ namespace MapDiffBot.WebHook
 				throw new ArgumentNullException(nameof(src));
 			if (dest == null)
 				throw new ArgumentNullException(nameof(dest));
-			using (var srcStream = new FileStream(ResolvePath(src), FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete, 0, FileOptions.Asynchronous))
-			using (var destStream = new FileStream(ResolvePath(dest), FileMode.Create, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete, 0, FileOptions.Asynchronous))
-				await srcStream.CopyToAsync(destStream, 0, token);
+			using (var srcStream = new FileStream(ResolvePath(src), FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete, DefaultBufferSize, true))
+			using (var destStream = new FileStream(ResolvePath(dest), FileMode.Create, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete, DefaultBufferSize, true))
+				await srcStream.CopyToAsync(destStream, DefaultBufferSize, token);
 		}
 
 		/// <inheritdoc />
@@ -106,7 +111,7 @@ namespace MapDiffBot.WebHook
 			var request = WebRequest.Create(url);
 			var tcs = new TaskCompletionSource<string>();
 
-			using (var reg = cancellationToken.Register(() => request.Abort()))
+			using (cancellationToken.Register(() => request.Abort()))
 			{
 				request.BeginGetResponse(new AsyncCallback(async (r) =>
 				{
@@ -147,7 +152,7 @@ namespace MapDiffBot.WebHook
 		public async Task<byte[]> ReadAllBytes(string path, CancellationToken token)
 		{
 			path = ResolvePath(path);
-			using (var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete, Int32.MaxValue, FileOptions.Asynchronous))
+			using (var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete, DefaultBufferSize, true))
 			{
 				byte[] buf;
 #if LARGE_FILE_SUPPORT
