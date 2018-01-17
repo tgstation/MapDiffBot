@@ -12,6 +12,9 @@ namespace MapDiffBot.Generator
 	/// <inheritdoc />
 	sealed class DiffGenerator : IGenerator
 	{
+		/// <summary>
+		/// Path to the extracted dmm-tools.exe
+		/// </summary>
 		string pathToDmmTools;
 
 		/// <summary>
