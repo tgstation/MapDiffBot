@@ -1,7 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.AspNet.WebHooks.Config;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Web;
 using System.Web.Http;
-using Microsoft.AspNet.WebHooks.Config;
 
 namespace MapDiffBot.WebHook
 {
@@ -10,6 +11,11 @@ namespace MapDiffBot.WebHook
 	/// </summary>
 	public class Application : HttpApplication
 	{
+		/// <summary>
+		/// Get the path to the App_Data folder
+		/// </summary>
+		public static string DataDirectory => AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
+
 		/// <summary>
 		/// Called on the first request to the <see cref="Application"/>
 		/// </summary>

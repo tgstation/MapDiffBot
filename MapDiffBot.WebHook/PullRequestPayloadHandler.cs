@@ -35,7 +35,7 @@ namespace MapDiffBot.WebHook
 		/// <summary>
 		/// The <see cref="IFileUploader"/> for the <see cref="PullRequestPayloadHandler"/>
 		/// </summary>
-		static readonly IFileUploader fileUploader = new ImgurFileUploader();
+		static readonly IFileUploader fileUploader = new LocalFileUploader();
 		/// <summary>
 		/// The <see cref="IGeneratorFactory"/> for the <see cref="PullRequestPayloadHandler"/>
 		/// </summary>
@@ -139,8 +139,8 @@ namespace MapDiffBot.WebHook
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		async Task GenerateMapDiff(PullRequestEventPayload payload, IWebHookReceiverConfig config, CancellationToken token)
 		{			
-			var requestIdentifier = String.Concat(payload.Repository.Owner.Login, payload.Repository.Name, payload.PullRequest.Number);
-			var currentIOManager = new ResolvingIOManager(ioManager, requestIdentifier);
+			var requestIdentifier = ioManager.ConcatPath(payload.Repository.Owner.Login, payload.Repository.Name, payload.PullRequest.Number.ToString());
+			var currentIOManager = new ResolvingIOManager(ioManager, ioManager.ConcatPath("Operations", requestIdentifier));
 			//Generate our own cancellation token for rolling builds of the same PR
 			using (var cts = new CancellationTokenSource())
 			using (token.Register(() => cts.Cancel()))
@@ -185,8 +185,7 @@ namespace MapDiffBot.WebHook
 
 							await repo.FetchPullRequest(payload.PullRequest.Number, token);
 
-							await currentIOManager.DeleteDirectory(".", token);
-							await currentIOManager.CreateDirectory(".", token);
+							Task cdt = null;
 
 							var outputDirectory = currentIOManager.ResolvePath(".");
 
@@ -196,11 +195,21 @@ namespace MapDiffBot.WebHook
 							{
 								await repo.Checkout(baseSha, token);
 
+								async Task handleCreateDirectory()
+								{
+									await currentIOManager.DeleteDirectory(".", token);
+									await currentIOManager.CreateDirectory(".", token);
+								};
+
+								if (cdt == null)
+									cdt = handleCreateDirectory();
+
 								var originalPath = currentIOManager.ConcatPath(repo.Path, path);
 								string oldMapPath;
 								if (await currentIOManager.FileExists(originalPath, token))
 								{
 									oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}.old_map_diff_bot", originalPath);
+									await cdt;
 									await currentIOManager.CopyFile(originalPath, oldMapPath, token);
 								}
 								else
@@ -261,6 +270,7 @@ namespace MapDiffBot.WebHook
 			{
 				case "opened":
 				case "synchronize":
+				case "edited":
 					await GenerateMapDiff(truePayload, config, token);
 					break;
 				default:
