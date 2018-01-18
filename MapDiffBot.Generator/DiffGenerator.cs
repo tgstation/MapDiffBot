@@ -26,7 +26,7 @@ namespace MapDiffBot.Generator
 		{
 			if (region == null)
 				return "minimap --disable hide-space \"{0}\"";
-			return String.Format(CultureInfo.InvariantCulture, "minimap --disable hide-space --min {0},{1},{2} --max {3},{4},{5} {{0}}", region.MinX, region.MinY, region.MinZ, region.MaxX, region.MaxY, region.MaxZ);
+			return String.Format(CultureInfo.InvariantCulture, "minimap --disable hide-space --min {0},{1},{2} --max {3},{4},{5} \"{{0}}\"", region.MinX, region.MinY, region.MinZ, region.MaxX, region.MaxY, region.MaxZ);
 		}
 
 		/// <summary>

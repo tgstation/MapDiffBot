@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Resources;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -17,3 +18,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("ff7e833c-d4aa-48fd-9d9c-cedc4481ceef")]
+
+[assembly: NeutralResourcesLanguage("en")]
