@@ -64,7 +64,7 @@ namespace MapDiffBot.WebHook
 					{
 						Task loggerInvocation()
 						{
-							return logger.LogError(String.Format(CultureInfo.CurrentCulture, "Error loading {0}: {1}. Error: {2}", nameof(IPayloadHandler), I.FullName, e));
+							return logger.LogException(e);
 						}
 						if (task != null)
 							task = task.ContinueWith(async (t) =>
@@ -112,7 +112,7 @@ namespace MapDiffBot.WebHook
 				catch (OperationCanceledException) { }
 				catch (Exception e)
 				{
-					await logger.LogError(String.Format(CultureInfo.CurrentCulture, "Unhandled exception in payload processing! Action: {0}, Error:{1}{2}", action, Environment.NewLine, e));
+					await logger.LogException(e);
 				}
 			});
 		}

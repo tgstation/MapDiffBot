@@ -236,7 +236,16 @@ namespace MapDiffBot.Generator
 			var mA = RenderMap(mapPathA, workingDirectory, region, token);
 			var mB = RenderMap(mapPathB, workingDirectory, region, token);
 
-			var mapName = Path.GetFileNameWithoutExtension(mapPathA.Length > mapPathB.Length ? mapPathB : mapPathA);
+			string mapName;
+			if (mapPathA == null || mapPathB == null)
+				mapName = mapPathA ?? mapPathB;
+			else
+				mapName = mapPathA.Length > mapPathB.Length ? mapPathB : mapPathA;
+
+			mapName = Path.GetFileNameWithoutExtension(mapName);
+
+			if(region != null)
+				File.WriteAllText(Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.diff_region.txt", mapName)), String.Format(CultureInfo.InvariantCulture, "Min: {0}, {1}, {2}{3}Max: {4}, {5}, {6}{3}", region.MinX, region.MinY, region.MinZ, Environment.NewLine, region.MaxX, region.MaxY, region.MaxZ));
 
 			var outputA = Path.Combine(workingDirectory, await mA);
 			var outputB = Path.Combine(workingDirectory, await mB);

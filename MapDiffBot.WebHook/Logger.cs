@@ -8,6 +8,8 @@ namespace MapDiffBot.WebHook
 	/// <inheritdoc />
 	sealed class Logger : ILogger
 	{
+		public const string OutputFileExceptionKey = "LoggerOutputFile";
+
 		/// <summary>
 		/// The <see cref="IIOManager"/> for the <see cref="Logger"/>
 		/// </summary>
@@ -28,11 +30,27 @@ namespace MapDiffBot.WebHook
 			logFile = String.Format(CultureInfo.InvariantCulture, "{0}.txt", DateTime.Now.Ticks);
 		}
 
-		/// <inheritdoc />
-		public async Task LogError(string message)
+		/// <summary>
+		/// Writes <paramref name="errorLogMessage"/> to <see cref="logFile"/>
+		/// </summary>
+		/// <param name="errorLogMessage">The message to log</param>
+		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task"/> representing the running operation</returns>
+		async Task WriteToMainLog(string errorLogMessage, CancellationToken token)
 		{
-			await ioManager.CreateDirectory(".", CancellationToken.None);
-			await ioManager.AppendAllText(logFile, String.Format(CultureInfo.CurrentCulture, "{0}: {1}{2}", DateTime.Now.ToLongTimeString(), message, Environment.NewLine), CancellationToken.None);
+			await ioManager.CreateDirectory(".", token);
+			await ioManager.AppendAllText(logFile, errorLogMessage, token);
+		}
+
+		/// <inheritdoc />
+		public async Task LogException(Exception exception)
+		{
+			var message = exception.ToString();
+			var errorLogMessage = String.Format(CultureInfo.CurrentCulture, "{0}: {1}{2}", DateTime.Now.ToLongTimeString(), message, Environment.NewLine);
+			var mainLogTask = WriteToMainLog(errorLogMessage, CancellationToken.None);
+			if (exception.Data.Contains(OutputFileExceptionKey))
+				await ioManager.AppendAllText(exception.Data[OutputFileExceptionKey].ToString(), errorLogMessage, CancellationToken.None);
+			await mainLogTask;
 		}
 	}
 }
