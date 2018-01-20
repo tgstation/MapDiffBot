@@ -277,7 +277,6 @@ namespace MapDiffBot.WebHook
 			{
 				case "opened":
 				case "synchronize":
-				case "edited":
 					await GenerateMapDiff(truePayload, config, token);
 					break;
 				default:
