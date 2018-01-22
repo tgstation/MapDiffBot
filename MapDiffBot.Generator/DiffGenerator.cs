@@ -13,6 +13,10 @@ namespace MapDiffBot.Generator
 	sealed class DiffGenerator : IGenerator
 	{
 		/// <summary>
+		/// Used as a lock for accessing <see cref="pathToDmmTools"/>
+		/// </summary>
+		SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+		/// <summary>
 		/// Path to the extracted dmm-tools.exe
 		/// </summary>
 		string pathToDmmTools;
@@ -40,6 +44,7 @@ namespace MapDiffBot.Generator
 					File.Delete(pathToDmmTools);
 				}
 				catch (IOException) { /* well we tried */ }
+			semaphore.Dispose();
 		}
 
 		/// <summary>
@@ -47,11 +52,19 @@ namespace MapDiffBot.Generator
 		/// </summary>
 		async Task<string> GetDMMToolsPath(string workingDirectory)
 		{
-			if (pathToDmmTools == null)
+			await semaphore.WaitAsync();
+			try
 			{
-				pathToDmmTools = Path.Combine(workingDirectory, "dmm-tools.exe");
-				using (var F = new FileStream(pathToDmmTools, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
-					await F.WriteAsync(DMMTools.dmm_tools, 0, DMMTools.dmm_tools.Length);
+				if (pathToDmmTools == null)
+				{
+					pathToDmmTools = Path.Combine(workingDirectory, "dmm-tools.exe");
+					using (var F = new FileStream(pathToDmmTools, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+						await F.WriteAsync(DMMTools.dmm_tools, 0, DMMTools.dmm_tools.Length);
+				}
+			}
+			finally
+			{
+				semaphore.Release();
 			}
 			return pathToDmmTools;
 		}
@@ -180,7 +193,7 @@ namespace MapDiffBot.Generator
 				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find .png file in dmm-tools output!{1}Command line: {3}{1}Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString(), args));
 
 			var outFile = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.{1}png", mapName, postfix != null ? String.Concat(postfix, '.') : null));
-			File.Move(result, outFile);
+			File.Move(Path.Combine(workingDirectory, result), outFile);
 			return outFile;
 		}
 
