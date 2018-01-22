@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['mapdiff_2ecs',['MapDiff.cs',['../_map_diff_8cs.html',1,'']]]
+  ['localfileuploader_2ecs',['LocalFileUploader.cs',['../_local_file_uploader_8cs.html',1,'']]],
+  ['logger_2ecs',['Logger.cs',['../_logger_8cs.html',1,'']]]
 ];

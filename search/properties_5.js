@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['path',['Path',['../interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html#ae77e15194afd716a06225e5e25a93667',1,'MapDiffBot::WebHook::IRepository']]]
+  ['originalmapname',['OriginalMapName',['../interface_map_diff_bot_1_1_generator_1_1_i_map_diff.html#a9f981d6808093dea79ed93d9d9379f2f',1,'MapDiffBot::Generator::IMapDiff']]]
 ];
