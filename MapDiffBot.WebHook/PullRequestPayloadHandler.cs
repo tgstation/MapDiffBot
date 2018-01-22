@@ -306,12 +306,10 @@ namespace MapDiffBot.WebHook
 							var r2 = GetRenderingResult(afterTask);
 							if (r1 != null || r2 != null)
 								results.Add(new MapDiff(currentIOManager.GetFileNameWithoutExtension(changedMaps[I]), r1, r2));
-							else
-								results.Add(null);
 						}
 
 						//nothing to do if nothing
-						if (results.Count == 0 || errors.Count == results.Count)
+						if (results.Count == 0)
 							return;
 
 						//and the finishers
