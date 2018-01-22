@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace MapDiffBot.WebHook
 {
@@ -8,10 +9,10 @@ namespace MapDiffBot.WebHook
 	interface ILogger
 	{
 		/// <summary>
-		/// Write an error message to the log
+		/// Write an <see cref="Exception"/> to the log
 		/// </summary>
-		/// <param name="message">The error message</param>
+		/// <param name="exception">The <see cref="Exception"/> that occurred</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		Task LogError(string message);
+		Task LogException(Exception exception);
 	}
 }

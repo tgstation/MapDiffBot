@@ -13,6 +13,10 @@ namespace MapDiffBot.Generator
 	sealed class DiffGenerator : IGenerator
 	{
 		/// <summary>
+		/// Used as a lock for accessing <see cref="pathToDmmTools"/>
+		/// </summary>
+		SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+		/// <summary>
 		/// Path to the extracted dmm-tools.exe
 		/// </summary>
 		string pathToDmmTools;
@@ -20,9 +24,9 @@ namespace MapDiffBot.Generator
 		/// <summary>
 		/// Generate the dmm-tools.exe command line arguments with the exception of the .dmm paramter which can be formatted in for rendering a map
 		/// </summary>
-		/// <param name="region">The <see cref="DiffRegion"/> to put on the command line, if any</param>
+		/// <param name="region">The <see cref="MapRegion"/> to put on the command line, if any</param>
 		/// <returns>The dmm-tools.exe command line arguments</returns>
-		static string GenerateRenderCommandLine(DiffRegion region)
+		static string GenerateRenderCommandLine(MapRegion region)
 		{
 			if (region == null)
 				return "minimap --disable hide-space \"{0}\"";
@@ -40,6 +44,7 @@ namespace MapDiffBot.Generator
 					File.Delete(pathToDmmTools);
 				}
 				catch (IOException) { /* well we tried */ }
+			semaphore.Dispose();
 		}
 
 		/// <summary>
@@ -47,11 +52,19 @@ namespace MapDiffBot.Generator
 		/// </summary>
 		async Task<string> GetDMMToolsPath(string workingDirectory)
 		{
-			if (pathToDmmTools == null)
+			await semaphore.WaitAsync();
+			try
 			{
-				pathToDmmTools = Path.Combine(workingDirectory, "dmm-tools.exe");
-				using (var F = new FileStream(pathToDmmTools, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
-					await F.WriteAsync(DMMTools.dmm_tools, 0, DMMTools.dmm_tools.Length);
+				if (pathToDmmTools == null)
+				{
+					pathToDmmTools = Path.Combine(workingDirectory, "dmm-tools.exe");
+					using (var F = new FileStream(pathToDmmTools, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+						await F.WriteAsync(DMMTools.dmm_tools, 0, DMMTools.dmm_tools.Length);
+				}
+			}
+			finally
+			{
+				semaphore.Release();
 			}
 			return pathToDmmTools;
 		}
@@ -135,16 +148,17 @@ namespace MapDiffBot.Generator
 				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "dmm-tools.exe exited with error code {0}!{1}Command line: {4}{1}Output:{1}{2}{1}Error:{1}{3}", process.ExitCode, Environment.NewLine, output, errorOutput, process.StartInfo.Arguments));
 		}
 
-		/// <summary>
-		/// Renders the map at <paramref name="mapPath"/> with the given <paramref name="region"/>
-		/// </summary>
-		/// <param name="mapPath">The path of the map to render. Must be among associated codebase files</param>
-		/// <param name="workingDirectory">The path that contains the .dme for the .dmm</param>
-		/// <param name="region">The <see cref="DiffRegion"/> to render, if any</param>
-		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
-		/// <returns>A <see cref="Task"/> resulting in the path to the rendered .png file</returns>
-		async Task<string> RenderMap(string mapPath, string workingDirectory, DiffRegion region, CancellationToken token)
+		/// <inheritdoc />
+		public async Task<string> RenderMap(string mapPath, MapRegion region, string workingDirectory, string outputDirectory, string postfix, CancellationToken token)
 		{
+			if (mapPath == null)
+				throw new ArgumentNullException(nameof(mapPath));
+			if (workingDirectory == null)
+				throw new ArgumentNullException(nameof(workingDirectory));
+			if (outputDirectory == null)
+				throw new ArgumentNullException(nameof(outputDirectory));
+
+			string mapName;
 			var output = new StringBuilder();
 			var errorOutput = new StringBuilder();
 			var args = String.Format(CultureInfo.InvariantCulture, GenerateRenderCommandLine(region), mapPath);
@@ -152,38 +166,48 @@ namespace MapDiffBot.Generator
 			{
 				P.StartInfo.Arguments = args;
 
-				await StartAndWaitForProcessExit(P, output, errorOutput, token);
+				var processTask = StartAndWaitForProcessExit(P, output, errorOutput, token);
+
+				mapName = Path.GetFileNameWithoutExtension(mapPath);
+
+				await processTask;
 			}
-			
+
 			bool expectNext = false;
+			string result = null;
 			foreach (var I in output.ToString().Split(' '))
 			{
 				var text = I.Trim();
 				if (text == "saving")
 					expectNext = true;
 				else if (expectNext && text.EndsWith(".png"))
-					return text;
+				{
+					result = text;
+					break;
+				}
 				else
 					expectNext = false;
 			}
 
-			throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find .png file in dmm-tools output!{1}Command line: {3}{1}Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString(), args));
+			if (result == null)
+				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find .png file in dmm-tools output!{1}Command line: {3}{1}Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString(), args));
+
+			var outFile = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.{1}png", mapName, postfix != null ? String.Concat(postfix, '.') : null));
+			var sourceFile = Path.Combine(workingDirectory, result);
+			File.Move(sourceFile, outFile);
+			return outFile;
 		}
 
-		/// <summary>
-		/// Generate a <see cref="DiffRegion"/> given two map files with a common ancestor
-		/// </summary>
-		/// <param name="mapPathA">The path to the "before" map</param>
-		/// <param name="mapPathB">The path to the "after" map</param>
-		/// <param name="workingDirectory">The path that contains the .dme for the .dmms</param>
-		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
-		/// <returns>A <see cref="Task"/> resulting in a <see cref="DiffRegion"/> for the two maps</returns>
-		async Task<DiffRegion> GetDiffRegion(string mapPathA, string mapPathB, string workingDirectory, CancellationToken token)
+		/// <inheritdoc />
+		public async Task<MapRegion> GetDifferences(string mapPathA, string mapPathB, string workingDirectory, CancellationToken token)
 		{
-			if (mapPathA == null || mapPathB == null)
-				//need a full rendering
-				return null;
-			
+			if (mapPathA == null)
+				throw new ArgumentNullException(nameof(mapPathA));
+			if (mapPathB == null)
+				throw new ArgumentNullException(nameof(mapPathB));
+			if (workingDirectory == null)
+				throw new ArgumentNullException(nameof(workingDirectory));
+
 			var output = new StringBuilder();
 			var errorOutput = new StringBuilder();
 			using (var P = await CreateDMMToolsProcess(workingDirectory, output, errorOutput))
@@ -197,7 +221,7 @@ namespace MapDiffBot.Generator
 			if (matches.Count == 0)
 				return null;
 
-			var region = new DiffRegion()
+			var region = new MapRegion()
 			{
 				MinX = Int32.MaxValue,
 				MinY = Int32.MaxValue,
@@ -224,30 +248,6 @@ namespace MapDiffBot.Generator
 			}
 
 			return region;
-		}
-
-		/// <inheritdoc />
-		public async Task<IMapDiff> GenerateDiff(string mapPathA, string mapPathB, string workingDirectory, string outputDirectory, CancellationToken token)
-		{
-			var region = await GetDiffRegion(mapPathA, mapPathB, workingDirectory, token);
-
-			Directory.CreateDirectory(Path.Combine(workingDirectory, "data", "minimaps"));
-			
-			var mA = RenderMap(mapPathA, workingDirectory, region, token);
-			var mB = RenderMap(mapPathB, workingDirectory, region, token);
-
-			var mapName = Path.GetFileNameWithoutExtension(mapPathA.Length > mapPathB.Length ? mapPathB : mapPathA);
-
-			var outputA = Path.Combine(workingDirectory, await mA);
-			var outputB = Path.Combine(workingDirectory, await mB);
-
-			var movedA = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.before.png", mapName));
-			var movedB = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.after.png", mapName));
-
-			File.Move(outputA, movedA);
-			File.Move(outputB, movedB);
-
-			return new MapDiff(mapName, movedA, movedB);
 		}
 	}
 }

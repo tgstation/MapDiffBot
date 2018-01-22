@@ -83,6 +83,10 @@
       <Project>{ff7e833c-d4aa-48fd-9d9c-cedc4481ceef}</Project>
       <Name>MapDiffBot.Generator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MapDiffBot.Webhook\MapDiffBot.WebHook.csproj">
+      <Project>{f4fb75ed-543f-4ff0-bd41-f4b9ad120575}</Project>
+      <Name>MapDiffBot.WebHook</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

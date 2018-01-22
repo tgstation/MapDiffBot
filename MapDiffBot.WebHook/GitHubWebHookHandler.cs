@@ -23,7 +23,7 @@ namespace MapDiffBot.WebHook
 		/// <summary>
 		/// Construct a <see cref="GitHubWebHookHandler"/>
 		/// </summary>
-		public GitHubWebHookHandler() : this(new ResolvingIOManager(new DefaultIOManager(), AppDomain.CurrentDomain.GetData("DataDirectory").ToString())) { }
+		public GitHubWebHookHandler() : this(new ResolvingIOManager(new DefaultIOManager(), Application.DataDirectory)) { }
 
 		/// <summary>
 		/// Construct a <see cref="GitHubWebHookHandler"/>
@@ -45,6 +45,7 @@ namespace MapDiffBot.WebHook
 		GitHubWebHookHandler(IPayloadDelegator _payloadDelegator)
 		{
 			payloadDelegator = _payloadDelegator ?? throw new ArgumentNullException(nameof(_payloadDelegator));
+			Receiver = GitHubWebHookReceiver.ReceiverName;
 		}
 
 		/// <summary>
@@ -55,6 +56,8 @@ namespace MapDiffBot.WebHook
 		/// <returns>A <see cref="Task"/> representing the operation</returns>
 		public override async Task ExecuteAsync(string receiver, WebHookHandlerContext context)
 		{
+			LocalFileUploader.LastKnownHost = String.Concat(HttpContext.Current.Request.Url.Host, context.RequestContext.VirtualPathRoot);
+			LocalFileUploader.LastKnownHostIsHttps = HttpContext.Current.Request.Url.IsHttps();
 			try
 			{
 				var config = context.Request.GetConfiguration().DependencyResolver.GetReceiverConfig();

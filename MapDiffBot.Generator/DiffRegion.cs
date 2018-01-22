@@ -1,9 +1,9 @@
 ﻿namespace MapDiffBot.Generator
 {
 	/// <summary>
-	/// Represents a region on a .dmm map to create a diff for
+	/// Represents a region on a .dmm map
 	/// </summary>
-	sealed class DiffRegion
+	public sealed class MapRegion
 	{
 		/// <summary>
 		/// The X coordinate of the bottom left turf
