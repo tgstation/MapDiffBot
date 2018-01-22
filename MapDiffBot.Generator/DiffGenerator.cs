@@ -136,7 +136,7 @@ namespace MapDiffBot.Generator
 		}
 
 		/// <inheritdoc />
-		public async Task<string> RenderMap(string mapPath, MapRegion region, string workingDirectory, string outputDirectory, string postFix, CancellationToken token)
+		public async Task<string> RenderMap(string mapPath, MapRegion region, string workingDirectory, string outputDirectory, string postfix, CancellationToken token)
 		{
 			if (mapPath == null)
 				throw new ArgumentNullException(nameof(mapPath));
@@ -179,7 +179,7 @@ namespace MapDiffBot.Generator
 			if (result == null)
 				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find .png file in dmm-tools output!{1}Command line: {3}{1}Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString(), args));
 
-			var outFile = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.{1}png", mapName, postFix != null ? String.Concat(postFix, '.') : null));
+			var outFile = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.{1}png", mapName, postfix != null ? String.Concat(postfix, '.') : null));
 			File.Move(result, outFile);
 			return outFile;
 		}

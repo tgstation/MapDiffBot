@@ -26,9 +26,9 @@ namespace MapDiffBot.Generator
 		/// <param name="diffRegion">Optional region of the map to render</param>
 		/// <param name="workingDirectory">The path that contains the .dme for the .dmm</param>
 		/// <param name="outputDirectory">The path to the directory in which to store the output file</param>
-		/// <param name="postFix">If not <see langword="null"/>, applies this in between output file map name and extension delimited by a "."</param>
+		/// <param name="postfix">If not <see langword="null"/>, applies this in between output file map name and extension delimited by a "."</param>
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A path to the rendered .png in the output directory</returns>
-		Task<string> RenderMap(string mapPath, MapRegion diffRegion, string workingDirectory, string outputDirectory, string postFix, CancellationToken token);
+		Task<string> RenderMap(string mapPath, MapRegion diffRegion, string workingDirectory, string outputDirectory, string postfix, CancellationToken token);
 	}
 }
