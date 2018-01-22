@@ -147,6 +147,7 @@ namespace MapDiffBot.WebHook
 			{
 				token = cts.Token;
 
+				//cancel what was running before for this PR and restart
 				lock (mapDiffOperations)
 				{
 					if (mapDiffOperations.TryGetValue(requestIdentifier, out CancellationTokenSource oldOperation))
@@ -157,86 +158,169 @@ namespace MapDiffBot.WebHook
 					else
 						mapDiffOperations.Add(requestIdentifier, cts);
 				}
+
 				try
 				{
+					//load the github API key
 					gitHub.AccessToken = await config.GetReceiverConfigAsync(GitHubWebHookReceiver.ReceiverName, AccessTokenConfigKey);
 
+					//check if the PR is mergeable, if not, don't render it
 					bool? mergeable = payload.PullRequest.Mergeable;
-
 					for (var I = 0; mergeable == null && I < 5; ++I)
 					{
 						await Task.Delay(5000);
 						mergeable = await gitHub.CheckPullRequestMergeable(payload.Repository, payload.PullRequest.Number);
 						token.ThrowIfCancellationRequested();
 					}
-
 					if (mergeable == null || !mergeable.Value)
 						return;
-
+					
 					const string ErrorLogFile = "error_log.txt";
 					var outputDirectory = currentIOManager.ResolvePath(".");
 					var results = new List<IMapDiff>();
 					var errors = new List<Exception>();
 					try
 					{
+						List<Task<string>> beforeRenderings, afterRenderings;
+						List<string> changedMaps;
+
+						//get the list of files changed by the PR
+						var changedMapsTask = gitHub.GetChangedMapFiles(payload.Repository, payload.PullRequest.Number);
+
+						//lock the repository the PR belongs to
 						using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, token))
 						{
+							//fetch base commit if necessary and check it out, fetch pull request
 							var baseSha = payload.PullRequest.Base.Sha;
 							if (!await repo.ContainsCommit(baseSha, token))
 								await repo.Fetch(token);
-
 							await repo.FetchPullRequest(payload.PullRequest.Number, token);
+							var checkoutTask = repo.Checkout(baseSha, token);
 
-							Task cdt = null;
+							//prep the outputDirectory
+							await currentIOManager.DeleteDirectory(".", token);
+							await currentIOManager.CreateDirectory(".", token);
 
-							var mapDiffer = generatorFactory.CreateGenerator();
-
-							foreach (var path in await gitHub.GetChangedMapFiles(payload.Repository, payload.PullRequest.Number))
+							await checkoutTask;
+							changedMaps = await changedMapsTask;
+							var oldMapPaths = new List<string>()
 							{
-								await repo.Checkout(baseSha, token);
+								Capacity = changedMaps.Count
+							};
 
-								async Task handleCreateDirectory()
-								{
-									await currentIOManager.DeleteDirectory(".", token);
-									await currentIOManager.CreateDirectory(".", token);
-								};
-
-								if (cdt == null)
-									cdt = handleCreateDirectory();
-
+							//first copy all modified/deleted maps to the same location with the .old_map_diff_bot extension
+							foreach (var path in changedMaps)
+							{
 								var originalPath = currentIOManager.ConcatPath(repo.Path, path);
-								string oldMapPath;
 								if (await currentIOManager.FileExists(originalPath, token))
 								{
-									oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}.old_map_diff_bot", originalPath);
-									await cdt;
+									var oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}.old_map_diff_bot", originalPath);
 									await currentIOManager.CopyFile(originalPath, oldMapPath, token);
+									oldMapPaths.Add(oldMapPath);
 								}
 								else
-									oldMapPath = null;
-
-								await repo.Merge(payload.PullRequest.Head.Sha, token);
-
-								try
-								{
-									results.Add(await mapDiffer.GenerateDiff(oldMapPath, originalPath, repo.Path, outputDirectory, token));
-								}
-								catch (GeneratorException e)
-								{
-									results.Add(new MapDiff(currentIOManager.GetFileNameWithoutExtension(originalPath ?? oldMapPath), null, null));
-									errors.Add(e);
-								}
+									oldMapPaths.Add(null);
 							}
+
+							//generate the merge commit ourselves since we can't get it from GitHub
+							await repo.Merge(payload.PullRequest.Head.Sha, token);
+
+							afterRenderings = new List<Task<string>>()
+							{
+								Capacity = changedMaps.Count
+							};
+							var mapRegions = Enumerable.Repeat<MapRegion>(null, changedMaps.Count).ToList();
+							var mapDiffer = generatorFactory.CreateGenerator();
+
+							//Generate MapRegions for modified maps and render all new maps
+							async Task<string> DiffAndRenderNewMap(int I)
+							{
+								var originalPath = currentIOManager.ConcatPath(repo.Path, changedMaps[I]);
+								if (!await currentIOManager.FileExists(originalPath, token))
+									return null;
+								if (oldMapPaths[I] != null)
+									mapRegions[I] = await mapDiffer.GetDifferences(oldMapPaths[I], originalPath, repo.Path, token);
+								return await mapDiffer.RenderMap(originalPath, mapRegions[I], repo.Path, outputDirectory, "after", token);
+							};
+							for (var I = 0; I < changedMaps.Count; ++I)
+								afterRenderings.Add(DiffAndRenderNewMap(I));
+
+							//finish up before we go back to the base branch
+							try
+							{
+								await Task.WhenAll(afterRenderings);
+							}
+							catch (GeneratorException)
+							{
+								//at this point everything is done but some have failed
+								//we'll handle it later
+							}
+							await repo.Checkout(baseSha, token);
+
+							beforeRenderings = new List<Task<string>>()
+							{
+								Capacity = changedMaps.Count
+							};
+
+							//render all old maps using the MapRegions we got if they exist
+							for (var I = 0; I < changedMaps.Count; ++I)
+							{
+								Task<string> oldTask;
+								var oldPath = oldMapPaths[I];
+								if (oldMapPaths != null)
+									oldTask = mapDiffer.RenderMap(oldPath, mapRegions[I], repo.Path, outputDirectory, "before", token);
+								else
+									oldTask = Task.FromResult<string>(null);
+								beforeRenderings.Add(oldTask);
+							}
+
+							//finish up rendering
+							try
+							{
+								await Task.WhenAll(beforeRenderings);
+							}
+							catch (GeneratorException)
+							{
+								//see above
+							}
+							//done with the repo at this point
+						}
+						
+						//collect results and errors
+						for (var I = 0; I < changedMaps.Count; ++I)
+						{
+							var beforeTask = beforeRenderings[I];
+							var afterTask = afterRenderings[I];
+
+							string GetRenderingResult(Task<string> task)
+							{
+								if (task.Exception != null)
+								{
+									errors.Add(task.Exception);
+									return null;
+								}
+								return task.Result;
+							};
+
+							var r1 = GetRenderingResult(beforeTask);
+							var r2 = GetRenderingResult(afterTask);
+							if (r1 != null || r2 != null)
+								results.Add(new MapDiff(currentIOManager.GetFileNameWithoutExtension(changedMaps[I]), r1, r2));
+							else
+								results.Add(null);
 						}
 
+						//nothing to do if nothing
 						if (results.Count == 0 || errors.Count == results.Count)
 							return;
 
+						//and the finishers
 						var comment = await UploadDiffsAndGenerateMarkdown(results, config, payload.PullRequest, token);
 						await gitHub.CreateSingletonComment(payload.Repository, payload.Number, comment);
 					}
 					catch (Exception e)
 					{
+						//if this is the only exception, throw it directly, otherwise pile it in the exception collection
 						if (errors.Count == 0)
 						{
 							e.Data[Logger.OutputFileExceptionKey] = currentIOManager.ConcatPath(outputDirectory, ErrorLogFile);
@@ -246,6 +330,7 @@ namespace MapDiffBot.WebHook
 					}
 					finally
 					{
+						//throw all generator errors at once, because we can allow things to continue if some fail
 						if (errors.Count > 0)
 						{
 							var e = new AggregateException(String.Format(CultureInfo.CurrentCulture, "Generation errors occurred! Repo: {0}/{1}, PR: {2} (#{3}) Base: {4} ({5}), HEAD: {6}", payload.Repository.Owner.Login, payload.Repository.Name, payload.PullRequest.Title, payload.PullRequest.Number, payload.PullRequest.Base.Sha, payload.PullRequest.Base.Label, payload.PullRequest.Head.Sha), errors);
@@ -256,6 +341,7 @@ namespace MapDiffBot.WebHook
 				}
 				finally
 				{
+					//allow the next thing in queue to proceed
 					lock (mapDiffOperations)
 						if (mapDiffOperations.TryGetValue(requestIdentifier, out CancellationTokenSource maybeOurOperation) && maybeOurOperation == cts)
 							mapDiffOperations.Remove(requestIdentifier);
