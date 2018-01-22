@@ -45,6 +45,7 @@ namespace MapDiffBot.WebHook
 		GitHubWebHookHandler(IPayloadDelegator _payloadDelegator)
 		{
 			payloadDelegator = _payloadDelegator ?? throw new ArgumentNullException(nameof(_payloadDelegator));
+			Receiver = GitHubWebHookReceiver.ReceiverName;
 		}
 
 		/// <summary>
