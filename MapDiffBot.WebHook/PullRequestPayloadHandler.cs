@@ -182,27 +182,32 @@ namespace MapDiffBot.WebHook
 					try
 					{
 						List<Task<string>> beforeRenderings, afterRenderings;
-						List<string> changedMaps;
 
 						//get the list of files changed by the PR
-						var changedMapsTask = gitHub.GetChangedMapFiles(payload.Repository, payload.PullRequest.Number);
+						var changedMaps = await gitHub.GetChangedMapFiles(payload.Repository, payload.PullRequest.Number);
+						if (changedMaps.Count == 0)
+							return;
 
 						//lock the repository the PR belongs to
 						using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, token))
 						{
+							//prep the outputDirectory
+							async Task DirectoryPrep()
+							{
+								await currentIOManager.DeleteDirectory(".", token);
+								await currentIOManager.CreateDirectory(".", token);
+							};
+
 							//fetch base commit if necessary and check it out, fetch pull request
 							var baseSha = payload.PullRequest.Base.Sha;
+							var dirPrepTask = DirectoryPrep();
 							if (!await repo.ContainsCommit(baseSha, token))
 								await repo.Fetch(token);
 							await repo.FetchPullRequest(payload.PullRequest.Number, token);
 							var checkoutTask = repo.Checkout(baseSha, token);
 
-							//prep the outputDirectory
-							await currentIOManager.DeleteDirectory(".", token);
-							await currentIOManager.CreateDirectory(".", token);
-
 							await checkoutTask;
-							changedMaps = await changedMapsTask;
+							await dirPrepTask;
 							var oldMapPaths = new List<string>()
 							{
 								Capacity = changedMaps.Count
@@ -250,7 +255,7 @@ namespace MapDiffBot.WebHook
 							{
 								await Task.WhenAll(afterRenderings);
 							}
-							catch (GeneratorException)
+							catch (Exception)
 							{
 								//at this point everything is done but some have failed
 								//we'll handle it later
@@ -279,7 +284,7 @@ namespace MapDiffBot.WebHook
 							{
 								await Task.WhenAll(beforeRenderings);
 							}
-							catch (GeneratorException)
+							catch (Exception)
 							{
 								//see above
 							}
@@ -325,6 +330,7 @@ namespace MapDiffBot.WebHook
 							throw;
 						}
 						errors.Add(e);
+						cts.Cancel();
 					}
 					finally
 					{

@@ -193,7 +193,8 @@ namespace MapDiffBot.Generator
 				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find .png file in dmm-tools output!{1}Command line: {3}{1}Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString(), args));
 
 			var outFile = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.{1}png", mapName, postfix != null ? String.Concat(postfix, '.') : null));
-			File.Move(Path.Combine(workingDirectory, result), outFile);
+			var sourceFile = Path.Combine(workingDirectory, result);
+			File.Move(sourceFile, outFile);
 			return outFile;
 		}
 
