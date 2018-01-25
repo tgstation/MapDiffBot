@@ -201,9 +201,28 @@ namespace MapDiffBot.WebHook
 							//fetch base commit if necessary and check it out, fetch pull request
 							var baseSha = payload.PullRequest.Base.Sha;
 							var dirPrepTask = DirectoryPrep();
+
+							async Task<string> FindDME()
+							{
+								var dmes = await currentIOManager.GetFilesWithExtension(repo.Path, "dme", token);
+								if (dmes.Count < 2)
+									return null;
+								var lowerRepo = payload.Repository.Name.ToLower(CultureInfo.InvariantCulture);
+								foreach (var I in dmes)
+									if (I.ToLower(CultureInfo.InvariantCulture).Contains(lowerRepo))
+										return I;
+								//meh
+								return dmes.First();
+							};
+
+							var dmeToUseTask = FindDME();
+
 							if (!await repo.ContainsCommit(baseSha, token))
 								await repo.Fetch(token);
 							await repo.FetchPullRequest(payload.PullRequest.Number, token);
+
+							var dmeToUse = await dmeToUseTask;
+
 							var checkoutTask = repo.Checkout(baseSha, token);
 
 							await checkoutTask;
@@ -235,7 +254,7 @@ namespace MapDiffBot.WebHook
 								Capacity = changedMaps.Count
 							};
 							var mapRegions = Enumerable.Repeat<MapRegion>(null, changedMaps.Count).ToList();
-							var mapDiffer = generatorFactory.CreateGenerator();
+							var mapDiffer = generatorFactory.CreateGenerator(dmeToUse);
 
 							//Generate MapRegions for modified maps and render all new maps
 							async Task<string> DiffAndRenderNewMap(int I)

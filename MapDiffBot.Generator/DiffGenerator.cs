@@ -13,6 +13,11 @@ namespace MapDiffBot.Generator
 	sealed class DiffGenerator : IGenerator
 	{
 		/// <summary>
+		/// Path to the .dme to pass to dmm-tools
+		/// </summary>
+		readonly string dmeArgument;
+
+		/// <summary>
 		/// Used as a lock for accessing <see cref="pathToDmmTools"/>
 		/// </summary>
 		SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
@@ -22,15 +27,12 @@ namespace MapDiffBot.Generator
 		string pathToDmmTools;
 
 		/// <summary>
-		/// Generate the dmm-tools.exe command line arguments with the exception of the .dmm paramter which can be formatted in for rendering a map
+		/// Construct a <see cref="DiffGenerator"/>
 		/// </summary>
-		/// <param name="region">The <see cref="MapRegion"/> to put on the command line, if any</param>
-		/// <returns>The dmm-tools.exe command line arguments</returns>
-		static string GenerateRenderCommandLine(MapRegion region)
+		/// <param name="dmePath">Used for creating the <see cref="dmeArgument"/></param>
+		public DiffGenerator(string dmePath)
 		{
-			if (region == null)
-				return "minimap --disable hide-space \"{0}\"";
-			return String.Format(CultureInfo.InvariantCulture, "minimap --disable hide-space --min {0},{1},{2} --max {3},{4},{5} \"{{0}}\"", region.MinX, region.MinY, region.MinZ, region.MaxX, region.MaxY, region.MaxZ);
+			dmeArgument = dmePath != null ? String.Format(CultureInfo.InvariantCulture, "-e \"{0}\" ", Path.GetFileName(dmePath)) : null;
 		}
 
 		/// <summary>
@@ -45,6 +47,18 @@ namespace MapDiffBot.Generator
 				}
 				catch (IOException) { /* well we tried */ }
 			semaphore.Dispose();
+		}
+
+		/// <summary>
+		/// Generate the dmm-tools.exe command line arguments with the exception of the .dmm paramter which can be formatted in for rendering a map
+		/// </summary>
+		/// <param name="region">The <see cref="MapRegion"/> to put on the command line, if any</param>
+		/// <returns>The dmm-tools.exe command line arguments</returns>
+		string GenerateRenderCommandLine(MapRegion region)
+		{
+			if (region == null)
+				return String.Format(CultureInfo.InvariantCulture, "{0}minimap --disable hide-space \"{{0}}\"", dmeArgument);
+			return String.Format(CultureInfo.InvariantCulture, "{6}minimap --disable hide-space --min {0},{1},{2} --max {3},{4},{5} \"{{0}}\"", region.MinX, region.MinY, region.MinZ, region.MaxX, region.MaxY, region.MaxZ, dmeArgument);
 		}
 
 		/// <summary>
@@ -212,7 +226,7 @@ namespace MapDiffBot.Generator
 			var errorOutput = new StringBuilder();
 			using (var P = await CreateDMMToolsProcess(workingDirectory, output, errorOutput))
 			{
-				P.StartInfo.Arguments = String.Format(CultureInfo.InvariantCulture, "diff-maps \"{0}\" \"{1}\"", mapPathA, mapPathB);
+				P.StartInfo.Arguments = String.Format(CultureInfo.InvariantCulture, "{2}diff-maps \"{0}\" \"{1}\"", mapPathA, mapPathB, dmeArgument);
 
 				await StartAndWaitForProcessExit(P, output, errorOutput, token);
 			}

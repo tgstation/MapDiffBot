@@ -4,9 +4,9 @@
 	public sealed class GeneratorFactory : IGeneratorFactory
 	{
 		/// <inheritdoc />
-		public IGenerator CreateGenerator()
+		public IGenerator CreateGenerator(string dmePath)
 		{
-			return new DiffGenerator();
+			return new DiffGenerator(dmePath);
 		}
 	}
 }

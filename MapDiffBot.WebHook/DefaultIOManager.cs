@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-#if LARGE_FILE_SUPPORT
 using System.Linq;
-#endif
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -138,6 +137,23 @@ namespace MapDiffBot.WebHook
 			if (path == null)
 				throw new ArgumentNullException(nameof(path));
 			return Path.GetDirectoryName(path);
+		}
+		
+		/// <inheritdoc />
+		public Task<List<string>> GetFilesWithExtension(string path, string extension, CancellationToken token)
+		{
+			if (extension == null)
+				throw new ArgumentNullException(nameof(extension));
+			return Task.Factory.StartNew(() =>
+			{
+				path = ResolvePath(path);
+
+				var di = new DirectoryInfo(path);
+				if (!di.Exists)
+					return new List<string>();
+
+				return di.GetFiles(String.Format(CultureInfo.InvariantCulture, "*.{0}", extension)).Select((fi) => fi.FullName).ToList();
+			}, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 		}
 
 		/// <inheritdoc />

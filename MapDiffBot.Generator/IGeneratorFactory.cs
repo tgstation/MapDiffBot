@@ -8,7 +8,8 @@
 		/// <summary>
 		/// Create a <see cref="IGenerator"/>
 		/// </summary>
+		/// <param name="dmePath">Path to the .dme the created <see cref="IGenerator"/> will be using</param>
 		/// <returns>A new <see cref="IGenerator"/></returns>
-		IGenerator CreateGenerator();
+		IGenerator CreateGenerator(string dmePath);
 	}
 }
