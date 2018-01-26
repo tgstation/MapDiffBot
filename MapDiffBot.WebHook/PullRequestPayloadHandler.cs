@@ -284,7 +284,7 @@ namespace MapDiffBot.WebHook
 														region.MinX = Math.Max(region.MinX - 1, 1);
 													increaseMax = !increaseMax;
 												}
-											if (ydiam < 5 && ((fullRegion.MaxY - fullRegion.MinY) >= minDiffDimensions))
+											if (ydiam < minDiffDimensions && ((fullRegion.MaxY - fullRegion.MinY) >= minDiffDimensions))
 												while ((region.MaxY - region.MinY) < minDiffDimensions)
 												{
 													if (increaseMax)
