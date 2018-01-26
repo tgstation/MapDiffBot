@@ -13,15 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapDiffBot.Tests", "MapDiffBot.Tests\MapDiffBot.Tests.csproj", "{B2589134-1CF3-44EB-BCA3-E61028C4326D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{1BDB56DB-C472-4214-80A8-07E64B1184C1}"
 	ProjectSection(SolutionItems) = preProject
 		Tools\BuildDox.ps1 = Tools\BuildDox.ps1
-		Tools\CoverageExclusions.runsettings = Tools\CoverageExclusions.runsettings
 		Tools\Doxyfile = Tools\Doxyfile
 		Tools\PostCIBuild.ps1 = Tools\PostCIBuild.ps1
-		Tools\UploadCoverage.ps1 = Tools\UploadCoverage.ps1
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapDiffBot.Generator", "MapDiffBot.Generator\MapDiffBot.Generator.csproj", "{FF7E833C-D4AA-48FD-9D9C-CEDC4481CEEF}"
@@ -39,10 +35,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B2589134-1CF3-44EB-BCA3-E61028C4326D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B2589134-1CF3-44EB-BCA3-E61028C4326D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B2589134-1CF3-44EB-BCA3-E61028C4326D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B2589134-1CF3-44EB-BCA3-E61028C4326D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FF7E833C-D4AA-48FD-9D9C-CEDC4481CEEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FF7E833C-D4AA-48FD-9D9C-CEDC4481CEEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF7E833C-D4AA-48FD-9D9C-CEDC4481CEEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
