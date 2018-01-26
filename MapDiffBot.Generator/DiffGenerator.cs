@@ -149,6 +149,7 @@ namespace MapDiffBot.Generator
 			};
 
 			process.Start();
+			process.PriorityClass = ProcessPriorityClass.BelowNormal;
 			process.BeginOutputReadLine();
 			process.BeginErrorReadLine();
 			using (var reg = token.Register(() =>
