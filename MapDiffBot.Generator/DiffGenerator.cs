@@ -220,6 +220,8 @@ namespace MapDiffBot.Generator
 			if (outputDirectory == null)
 				throw new ArgumentNullException(nameof(outputDirectory));
 
+			Directory.CreateDirectory(Path.Combine(workingDirectory, "data", "minimaps"));
+
 			string mapName;
 			var output = new StringBuilder();
 			var errorOutput = new StringBuilder();

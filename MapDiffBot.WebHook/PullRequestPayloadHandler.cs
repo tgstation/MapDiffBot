@@ -419,6 +419,9 @@ namespace MapDiffBot.WebHook
 			{
 				case "opened":
 				case "synchronize":
+#if DEBUG
+				case "edited":
+#endif
 					await GenerateMapDiff(truePayload, config, token);
 					break;
 				default:
