@@ -189,7 +189,7 @@ namespace MapDiffBot.WebHook
 							return;
 
 						//lock the repository the PR belongs to
-						using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, token))
+						using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, () => gitHub.CreateSingletonComment(payload.Repository, payload.PullRequest.Number, "Cloning your repository, this may take a while..."), token))
 						{
 							//prep the outputDirectory
 							async Task DirectoryPrep()

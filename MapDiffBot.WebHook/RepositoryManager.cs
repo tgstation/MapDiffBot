@@ -82,7 +82,7 @@ namespace MapDiffBot.WebHook
 		}
 	
 		/// <inheritdoc />
-		public async Task<IRepository> GetRepository(string owner, string name, CancellationToken token)
+		public async Task<IRepository> GetRepository(string owner, string name, Func<Task> onCloneRequired, CancellationToken token)
 		{
 			if (owner == null)
 				throw new ArgumentNullException(nameof(owner));
@@ -98,6 +98,9 @@ namespace MapDiffBot.WebHook
 				return await TryLoadRepository(repoPath, token);
 			}
 			catch (RepositoryNotFoundException) { }
+
+			if (onCloneRequired != null)
+				await onCloneRequired.Invoke();
 
 			await ioManager.DeleteDirectory(repoPath, token);
 			await ioManager.CreateDirectory(repoPath, token);
