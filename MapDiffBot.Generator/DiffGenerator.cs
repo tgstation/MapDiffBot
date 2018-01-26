@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -160,6 +163,50 @@ namespace MapDiffBot.Generator
 
 			if (process.ExitCode != 0)
 				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "dmm-tools.exe exited with error code {0}!{1}Command line: {4}{1}Output:{1}{2}{1}Error:{1}{3}", process.ExitCode, Environment.NewLine, output, errorOutput, process.StartInfo.Arguments));
+		}
+
+		/// <inheritdoc />
+		public async Task<MapRegion> GetMapSize(string mapPath, string workingDirectory, CancellationToken token)
+		{
+			if (mapPath == null)
+				throw new ArgumentNullException(nameof(mapPath));
+			if (workingDirectory == null)
+				throw new ArgumentNullException(nameof(workingDirectory));
+
+			string mapName;
+			var output = new StringBuilder();
+			var errorOutput = new StringBuilder();
+			var args = String.Format(CultureInfo.InvariantCulture, "{0}map-info -j \"{1}\"", dmeArgument, mapPath);
+			using (var P = await CreateDMMToolsProcess(workingDirectory, output, errorOutput))
+			{
+				P.StartInfo.Arguments = args;
+
+				var processTask = StartAndWaitForProcessExit(P, output, errorOutput, token);
+
+				mapName = Path.GetFileNameWithoutExtension(mapPath);
+
+				await processTask;
+			}
+			
+			try
+			{
+				var json = JsonConvert.DeserializeObject<IDictionary<string, IDictionary<string, object>>>(output.ToString());
+				var map = json[mapPath];
+				var size = (JArray)map["size"];
+				return new MapRegion
+				{
+					MinX = 1,
+					MinY = 1,
+					MinZ = 1,
+					MaxX = (int)size[0],
+					MaxY = (int)size[1],
+					MaxZ = (int)size[2]
+				};
+			}
+			catch (Exception e)
+			{
+				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find map dimensions in dmm-tools output!{1}Command line: {3}{1}Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString(), args), e);
+			}
 		}
 
 		/// <inheritdoc />

@@ -263,7 +263,40 @@ namespace MapDiffBot.WebHook
 								if (!await currentIOManager.FileExists(originalPath, token))
 									return null;
 								if (oldMapPaths[I] != null)
-									mapRegions[I] = await mapDiffer.GetDifferences(oldMapPaths[I], originalPath, repo.Path, token);
+								{
+									var region = await mapDiffer.GetDifferences(oldMapPaths[I], originalPath, repo.Path, token);
+									if (region != null)
+									{
+										var xdiam = region.MaxX - region.MinX;
+										var ydiam = region.MaxY - region.MinY;
+										const int minDiffDimensions = 5 - 1;
+										if (xdiam < minDiffDimensions || ydiam < minDiffDimensions)
+										{
+											//need to expand
+											var fullRegion = await mapDiffer.GetMapSize(originalPath, repo.Path, token);
+											bool increaseMax = true;
+											if (xdiam < minDiffDimensions && ((fullRegion.MaxX - fullRegion.MinX) >= minDiffDimensions))
+												while ((region.MaxX - region.MinX) < minDiffDimensions)
+												{
+													if (increaseMax)
+														region.MaxX = Math.Min(region.MaxX + 1, fullRegion.MaxX);
+													else
+														region.MinX = Math.Max(region.MinX - 1, 1);
+													increaseMax = !increaseMax;
+												}
+											if (ydiam < 5 && ((fullRegion.MaxY - fullRegion.MinY) >= minDiffDimensions))
+												while ((region.MaxY - region.MinY) < minDiffDimensions)
+												{
+													if (increaseMax)
+														region.MaxY = Math.Min(region.MaxY + 1, fullRegion.MaxY);
+													else
+														region.MinY = Math.Max(region.MinY - 1, 1);
+													increaseMax = !increaseMax;
+												}
+										}
+										mapRegions[I] = region;
+									}
+								}
 								return await mapDiffer.RenderMap(originalPath, mapRegions[I], repo.Path, outputDirectory, "after", token);
 							};
 							for (var I = 0; I < changedMaps.Count; ++I)
