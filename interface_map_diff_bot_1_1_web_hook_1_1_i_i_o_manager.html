@@ -135,6 +135,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab219742ec27c678acbdaca26e3740b89"><td class="memItemLeft" align="right" valign="top">Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html#ab219742ec27c678acbdaca26e3740b89">WriteAllBytes</a> (string path, byte[] contents, CancellationToken token)</td></tr>
 <tr class="memdesc:ab219742ec27c678acbdaca26e3740b89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes some <em>contents</em>  to a file at <em>path</em>  overwriting previous content  <a href="#ab219742ec27c678acbdaca26e3740b89">More...</a><br /></td></tr>
 <tr class="separator:ab219742ec27c678acbdaca26e3740b89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad81492ab140f8eb85b914511fd00de8e"><td class="memItemLeft" align="right" valign="top">Task&lt; List&lt; string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html#ad81492ab140f8eb85b914511fd00de8e">GetFilesWithExtension</a> (string path, string extension, CancellationToken token)</td></tr>
+<tr class="memdesc:ad81492ab140f8eb85b914511fd00de8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a list of files in <em>path</em>  with the given <em>extension</em>   <a href="#ad81492ab140f8eb85b914511fd00de8e">More...</a><br /></td></tr>
+<tr class="separator:ad81492ab140f8eb85b914511fd00de8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a249d4e1991bfbf3223aea37325f2e44f"><td class="memItemLeft" align="right" valign="top">Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_i_o_manager.html#a249d4e1991bfbf3223aea37325f2e44f">DeleteFile</a> (string path, CancellationToken token)</td></tr>
 <tr class="memdesc:a249d4e1991bfbf3223aea37325f2e44f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a file at <em>path</em>   <a href="#a249d4e1991bfbf3223aea37325f2e44f">More...</a><br /></td></tr>
 <tr class="separator:a249d4e1991bfbf3223aea37325f2e44f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -157,7 +160,7 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Interface for using filesystems </p>
 
-<p>Definition at line <a class="el" href="_i_i_o_manager_8cs_source.html#l00009">9</a> of file <a class="el" href="_i_i_o_manager_8cs_source.html">IIOManager.cs</a>.</p>
+<p>Definition at line <a class="el" href="_i_i_o_manager_8cs_source.html#l00010">10</a> of file <a class="el" href="_i_i_o_manager_8cs_source.html">IIOManager.cs</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a65073e00ab8212c88464fd0ed988e635"></a>
 <div class="memitem">
@@ -544,6 +547,51 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The file name portion of <em>path</em> </dd></dl>
 
 <p>Implemented in <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_default_i_o_manager.html#a3a75b000884f43ac96dac0934809afe3">MapDiffBot.WebHook.DefaultIOManager</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad81492ab140f8eb85b914511fd00de8e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Task&lt;List&lt;string&gt; &gt; MapDiffBot.WebHook.IIOManager.GetFilesWithExtension </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>extension</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>token</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets a list of files in <em>path</em>  with the given <em>extension</em>  </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>The directory which contains the files</td></tr>
+    <tr><td class="paramname">extension</td><td>The extension to look for without the preceeding "."</td></tr>
+    <tr><td class="paramname">token</td><td>A CancellationToken for the operation</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task resulting in a list of paths to files in <em>path</em>  with the given <em>extension</em> </dd></dl>
+
+<p>Implemented in <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_default_i_o_manager.html#afcac73aabc9e212016550618375b5a67">MapDiffBot.WebHook.DefaultIOManager</a>.</p>
 
 </div>
 </div>

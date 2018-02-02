@@ -110,16 +110,16 @@ Inheritance diagram for MapDiffBot.WebHook.IRepositoryManager:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a882b73e05f5f61445620cf7d47eeefce"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html">IRepository</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_repository_manager.html#a882b73e05f5f61445620cf7d47eeefce">GetRepository</a> (string owner, string name, CancellationToken token)</td></tr>
-<tr class="memdesc:a882b73e05f5f61445620cf7d47eeefce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_git_hub.html">GitHub</a> <a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html" title="A local git repository ">IRepository</a> that is represented by <em>owner</em>  and <em>name</em>   <a href="#a882b73e05f5f61445620cf7d47eeefce">More...</a><br /></td></tr>
-<tr class="separator:a882b73e05f5f61445620cf7d47eeefce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32bd6d52103f4dbd6358af3747e1e346"><td class="memItemLeft" align="right" valign="top">Task&lt; <a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html">IRepository</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_repository_manager.html#a32bd6d52103f4dbd6358af3747e1e346">GetRepository</a> (string owner, string name, Func&lt; Task &gt; onCloneRequired, CancellationToken token)</td></tr>
+<tr class="memdesc:a32bd6d52103f4dbd6358af3747e1e346"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_git_hub.html">GitHub</a> <a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html" title="A local git repository ">IRepository</a> that is represented by <em>owner</em>  and <em>name</em>   <a href="#a32bd6d52103f4dbd6358af3747e1e346">More...</a><br /></td></tr>
+<tr class="separator:a32bd6d52103f4dbd6358af3747e1e346"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Manages access to a set of <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_git_hub.html">GitHub</a> repositories </p>
 
-<p>Definition at line <a class="el" href="_i_repository_manager_8cs_source.html#l00009">9</a> of file <a class="el" href="_i_repository_manager_8cs_source.html">IRepositoryManager.cs</a>.</p>
+<p>Definition at line <a class="el" href="_i_repository_manager_8cs_source.html#l00010">10</a> of file <a class="el" href="_i_repository_manager_8cs_source.html">IRepositoryManager.cs</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a882b73e05f5f61445620cf7d47eeefce"></a>
+<a class="anchor" id="a32bd6d52103f4dbd6358af3747e1e346"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -134,6 +134,12 @@ Public Member Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">string&#160;</td>
           <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Func&lt; Task &gt;&#160;</td>
+          <td class="paramname"><em>onCloneRequired</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -154,13 +160,14 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">owner</td><td>The <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_git_hub.html">GitHub</a> user that owns the <a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html" title="A local git repository ">IRepository</a></td></tr>
     <tr><td class="paramname">name</td><td>The name of the <a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html" title="A local git repository ">IRepository</a></td></tr>
+    <tr><td class="paramname">onCloneRequired</td><td>Action to take if this initiates a cloning operation</td></tr>
     <tr><td class="paramname">token</td><td>The CancellationToken for the operation</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A Task resulting in the <a class="el" href="interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html" title="A local git repository ">IRepository</a> represented by <em>owner</em>  and <em>name</em> </dd></dl>
 
-<p>Implemented in <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_repository_manager.html#acad1964d513269a930129d237636e041">MapDiffBot.WebHook.RepositoryManager</a>.</p>
+<p>Implemented in <a class="el" href="class_map_diff_bot_1_1_web_hook_1_1_repository_manager.html#a18a1e7f8a128041db86253b86b77b328">MapDiffBot.WebHook.RepositoryManager</a>.</p>
 
 </div>
 </div>

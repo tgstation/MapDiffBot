@@ -110,22 +110,23 @@ Inheritance diagram for MapDiffBot.Generator.GeneratorFactory:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab288f82f3a268959fddd9bbdf752638b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator.html">IGenerator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_generator_1_1_generator_factory.html#ab288f82f3a268959fddd9bbdf752638b">CreateGenerator</a> ()</td></tr>
-<tr class="memdesc:ab288f82f3a268959fddd9bbdf752638b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator.html" title="Used for generating cropped comparison images of .dmm files ">IGenerator</a>   <a href="#ab288f82f3a268959fddd9bbdf752638b">More...</a><br /></td></tr>
-<tr class="separator:ab288f82f3a268959fddd9bbdf752638b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54ec7646b18c2a43b28a575baafbba81"><td class="memItemLeft" align="right" valign="top"><a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator.html">IGenerator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_generator_1_1_generator_factory.html#a54ec7646b18c2a43b28a575baafbba81">CreateGenerator</a> (string dmePath)</td></tr>
+<tr class="memdesc:a54ec7646b18c2a43b28a575baafbba81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator.html" title="Used for generating cropped comparison images of .dmm files ">IGenerator</a>   <a href="#a54ec7646b18c2a43b28a575baafbba81">More...</a><br /></td></tr>
+<tr class="separator:a54ec7646b18c2a43b28a575baafbba81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
 <p>Definition at line <a class="el" href="_generator_factory_8cs_source.html#l00004">4</a> of file <a class="el" href="_generator_factory_8cs_source.html">GeneratorFactory.cs</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="ab288f82f3a268959fddd9bbdf752638b"></a>
+<a class="anchor" id="a54ec7646b18c2a43b28a575baafbba81"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator.html">IGenerator</a> MapDiffBot.Generator.GeneratorFactory.CreateGenerator </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>dmePath</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -133,10 +134,10 @@ Public Member Functions</h2></td></tr>
 
 <p>Create a <a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator.html" title="Used for generating cropped comparison images of .dmm files ">IGenerator</a>  </p>
 
-<p>Implements <a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator_factory.html#ac5f824c158ba3593d979353dd09eaaea">MapDiffBot.Generator.IGeneratorFactory</a>.</p>
+<p>Implements <a class="el" href="interface_map_diff_bot_1_1_generator_1_1_i_generator_factory.html#acdaa9c0328ae4ad4efc1143716bf3453">MapDiffBot.Generator.IGeneratorFactory</a>.</p>
 
 <p>Definition at line <a class="el" href="_generator_factory_8cs_source.html#l00007">7</a> of file <a class="el" href="_generator_factory_8cs_source.html">GeneratorFactory.cs</a>.</p>
-<div class="fragment"><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;        {</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">new</span> DiffGenerator();</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;        }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;        {</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">new</span> DiffGenerator(dmePath);</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;        }</div></div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
