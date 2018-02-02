@@ -13,7 +13,7 @@ cache:
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
 install:
   - git submodule update --init --recursive
-  - choco install fciv doxygen.portable codecov
+  - choco install fciv doxygen.portable
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
   - curl -sSf -o rustup-init.exe https://win.rustup.rs
@@ -28,10 +28,5 @@ build:
   parallel: false
   verbosity: minimal
   publish_nuget: true
-test_script:
-  - set path=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\TestAgent\Common7\IDE\CommonExtensions\Microsoft\TestWindow;%path%
-  - copy "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Extensions\appveyor.*" "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\TestAgent\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Extensions" /y
-  - vstest.console /logger:Appveyor "MapDiffBot.Tests\bin\Release\MapDiffBot.Tests.dll" /Enablecodecoverage /Settings:"Tools/CoverageExclusions.runsettings" /inIsolation
 after_test:
-  - ps: Tools/UploadCoverage.ps1
   - ps: Tools/BuildDox.ps1

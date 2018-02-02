@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MapDiffBot.WebHook
@@ -13,8 +14,9 @@ namespace MapDiffBot.WebHook
 		/// </summary>
 		/// <param name="owner">The GitHub user that owns the <see cref="IRepository"/></param>
 		/// <param name="name">The name of the <see cref="IRepository"/></param>
+		/// <param name="onCloneRequired">Action to take if this initiates a cloning operation</param>
 		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in the <see cref="IRepository"/> represented by <paramref name="owner"/> and <paramref name="name"/></returns>
-		Task<IRepository> GetRepository(string owner, string name, CancellationToken token);
+		Task<IRepository> GetRepository(string owner, string name, Func<Task> onCloneRequired, CancellationToken token);
 	}
 }

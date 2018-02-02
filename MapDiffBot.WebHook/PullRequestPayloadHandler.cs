@@ -189,7 +189,7 @@ namespace MapDiffBot.WebHook
 							return;
 
 						//lock the repository the PR belongs to
-						using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, token))
+						using (var repo = await repositoryManager.GetRepository(payload.Repository.Owner.Login, payload.Repository.Name, () => gitHub.CreateSingletonComment(payload.Repository, payload.PullRequest.Number, "Cloning your repository, this may take a while..."), token))
 						{
 							//prep the outputDirectory
 							async Task DirectoryPrep()
@@ -201,9 +201,28 @@ namespace MapDiffBot.WebHook
 							//fetch base commit if necessary and check it out, fetch pull request
 							var baseSha = payload.PullRequest.Base.Sha;
 							var dirPrepTask = DirectoryPrep();
+
+							async Task<string> FindDME()
+							{
+								var dmes = await currentIOManager.GetFilesWithExtension(repo.Path, "dme", token);
+								if (dmes.Count < 2)
+									return null;
+								var lowerRepo = payload.Repository.Name.ToLower(CultureInfo.InvariantCulture);
+								foreach (var I in dmes)
+									if (I.ToLower(CultureInfo.InvariantCulture).Contains(lowerRepo))
+										return I;
+								//meh
+								return dmes.First();
+							};
+
+							var dmeToUseTask = FindDME();
+
 							if (!await repo.ContainsCommit(baseSha, token))
 								await repo.Fetch(token);
 							await repo.FetchPullRequest(payload.PullRequest.Number, token);
+
+							var dmeToUse = await dmeToUseTask;
+
 							var checkoutTask = repo.Checkout(baseSha, token);
 
 							await checkoutTask;
@@ -235,7 +254,7 @@ namespace MapDiffBot.WebHook
 								Capacity = changedMaps.Count
 							};
 							var mapRegions = Enumerable.Repeat<MapRegion>(null, changedMaps.Count).ToList();
-							var mapDiffer = generatorFactory.CreateGenerator();
+							var mapDiffer = generatorFactory.CreateGenerator(dmeToUse);
 
 							//Generate MapRegions for modified maps and render all new maps
 							async Task<string> DiffAndRenderNewMap(int I)
@@ -244,7 +263,40 @@ namespace MapDiffBot.WebHook
 								if (!await currentIOManager.FileExists(originalPath, token))
 									return null;
 								if (oldMapPaths[I] != null)
-									mapRegions[I] = await mapDiffer.GetDifferences(oldMapPaths[I], originalPath, repo.Path, token);
+								{
+									var region = await mapDiffer.GetDifferences(oldMapPaths[I], originalPath, repo.Path, token);
+									if (region != null)
+									{
+										var xdiam = region.MaxX - region.MinX;
+										var ydiam = region.MaxY - region.MinY;
+										const int minDiffDimensions = 5 - 1;
+										if (xdiam < minDiffDimensions || ydiam < minDiffDimensions)
+										{
+											//need to expand
+											var fullRegion = await mapDiffer.GetMapSize(originalPath, repo.Path, token);
+											bool increaseMax = true;
+											if (xdiam < minDiffDimensions && ((fullRegion.MaxX - fullRegion.MinX) >= minDiffDimensions))
+												while ((region.MaxX - region.MinX) < minDiffDimensions)
+												{
+													if (increaseMax)
+														region.MaxX = Math.Min(region.MaxX + 1, fullRegion.MaxX);
+													else
+														region.MinX = Math.Max(region.MinX - 1, 1);
+													increaseMax = !increaseMax;
+												}
+											if (ydiam < minDiffDimensions && ((fullRegion.MaxY - fullRegion.MinY) >= minDiffDimensions))
+												while ((region.MaxY - region.MinY) < minDiffDimensions)
+												{
+													if (increaseMax)
+														region.MaxY = Math.Min(region.MaxY + 1, fullRegion.MaxY);
+													else
+														region.MinY = Math.Max(region.MinY - 1, 1);
+													increaseMax = !increaseMax;
+												}
+										}
+										mapRegions[I] = region;
+									}
+								}
 								return await mapDiffer.RenderMap(originalPath, mapRegions[I], repo.Path, outputDirectory, "after", token);
 							};
 							for (var I = 0; I < changedMaps.Count; ++I)
@@ -367,6 +419,9 @@ namespace MapDiffBot.WebHook
 			{
 				case "opened":
 				case "synchronize":
+#if DEBUG
+				case "edited":
+#endif
 					await GenerateMapDiff(truePayload, config, token);
 					break;
 				default:

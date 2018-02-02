@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -13,6 +16,11 @@ namespace MapDiffBot.Generator
 	sealed class DiffGenerator : IGenerator
 	{
 		/// <summary>
+		/// Path to the .dme to pass to dmm-tools
+		/// </summary>
+		readonly string dmeArgument;
+
+		/// <summary>
 		/// Used as a lock for accessing <see cref="pathToDmmTools"/>
 		/// </summary>
 		SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
@@ -22,15 +30,12 @@ namespace MapDiffBot.Generator
 		string pathToDmmTools;
 
 		/// <summary>
-		/// Generate the dmm-tools.exe command line arguments with the exception of the .dmm paramter which can be formatted in for rendering a map
+		/// Construct a <see cref="DiffGenerator"/>
 		/// </summary>
-		/// <param name="region">The <see cref="MapRegion"/> to put on the command line, if any</param>
-		/// <returns>The dmm-tools.exe command line arguments</returns>
-		static string GenerateRenderCommandLine(MapRegion region)
+		/// <param name="dmePath">Used for creating the <see cref="dmeArgument"/></param>
+		public DiffGenerator(string dmePath)
 		{
-			if (region == null)
-				return "minimap --disable hide-space \"{0}\"";
-			return String.Format(CultureInfo.InvariantCulture, "minimap --disable hide-space --min {0},{1},{2} --max {3},{4},{5} \"{{0}}\"", region.MinX, region.MinY, region.MinZ, region.MaxX, region.MaxY, region.MaxZ);
+			dmeArgument = dmePath != null ? String.Format(CultureInfo.InvariantCulture, "-e \"{0}\" ", Path.GetFileName(dmePath)) : null;
 		}
 
 		/// <summary>
@@ -45,6 +50,18 @@ namespace MapDiffBot.Generator
 				}
 				catch (IOException) { /* well we tried */ }
 			semaphore.Dispose();
+		}
+
+		/// <summary>
+		/// Generate the dmm-tools.exe command line arguments with the exception of the .dmm paramter which can be formatted in for rendering a map
+		/// </summary>
+		/// <param name="region">The <see cref="MapRegion"/> to put on the command line, if any</param>
+		/// <returns>The dmm-tools.exe command line arguments</returns>
+		string GenerateRenderCommandLine(MapRegion region)
+		{
+			if (region == null)
+				return String.Format(CultureInfo.InvariantCulture, "{0}minimap --disable hide-space \"{{0}}\"", dmeArgument);
+			return String.Format(CultureInfo.InvariantCulture, "{6}minimap --disable hide-space --min {0},{1},{2} --max {3},{4},{5} \"{{0}}\"", region.MinX, region.MinY, region.MinZ, region.MaxX, region.MaxY, region.MaxZ, dmeArgument);
 		}
 
 		/// <summary>
@@ -132,6 +149,7 @@ namespace MapDiffBot.Generator
 			};
 
 			process.Start();
+			process.PriorityClass = ProcessPriorityClass.BelowNormal;
 			process.BeginOutputReadLine();
 			process.BeginErrorReadLine();
 			using (var reg = token.Register(() =>
@@ -149,6 +167,50 @@ namespace MapDiffBot.Generator
 		}
 
 		/// <inheritdoc />
+		public async Task<MapRegion> GetMapSize(string mapPath, string workingDirectory, CancellationToken token)
+		{
+			if (mapPath == null)
+				throw new ArgumentNullException(nameof(mapPath));
+			if (workingDirectory == null)
+				throw new ArgumentNullException(nameof(workingDirectory));
+
+			string mapName;
+			var output = new StringBuilder();
+			var errorOutput = new StringBuilder();
+			var args = String.Format(CultureInfo.InvariantCulture, "{0}map-info -j \"{1}\"", dmeArgument, mapPath);
+			using (var P = await CreateDMMToolsProcess(workingDirectory, output, errorOutput))
+			{
+				P.StartInfo.Arguments = args;
+
+				var processTask = StartAndWaitForProcessExit(P, output, errorOutput, token);
+
+				mapName = Path.GetFileNameWithoutExtension(mapPath);
+
+				await processTask;
+			}
+			
+			try
+			{
+				var json = JsonConvert.DeserializeObject<IDictionary<string, IDictionary<string, object>>>(output.ToString());
+				var map = json[mapPath];
+				var size = (JArray)map["size"];
+				return new MapRegion
+				{
+					MinX = 1,
+					MinY = 1,
+					MinZ = 1,
+					MaxX = (int)size[0],
+					MaxY = (int)size[1],
+					MaxZ = (int)size[2]
+				};
+			}
+			catch (Exception e)
+			{
+				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find map dimensions in dmm-tools output!{1}Command line: {3}{1}Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString(), args), e);
+			}
+		}
+
+		/// <inheritdoc />
 		public async Task<string> RenderMap(string mapPath, MapRegion region, string workingDirectory, string outputDirectory, string postfix, CancellationToken token)
 		{
 			if (mapPath == null)
@@ -157,6 +219,8 @@ namespace MapDiffBot.Generator
 				throw new ArgumentNullException(nameof(workingDirectory));
 			if (outputDirectory == null)
 				throw new ArgumentNullException(nameof(outputDirectory));
+
+			Directory.CreateDirectory(Path.Combine(workingDirectory, "data", "minimaps"));
 
 			string mapName;
 			var output = new StringBuilder();
@@ -212,7 +276,7 @@ namespace MapDiffBot.Generator
 			var errorOutput = new StringBuilder();
 			using (var P = await CreateDMMToolsProcess(workingDirectory, output, errorOutput))
 			{
-				P.StartInfo.Arguments = String.Format(CultureInfo.InvariantCulture, "diff-maps \"{0}\" \"{1}\"", mapPathA, mapPathB);
+				P.StartInfo.Arguments = String.Format(CultureInfo.InvariantCulture, "{2}diff-maps \"{0}\" \"{1}\"", mapPathA, mapPathB, dmeArgument);
 
 				await StartAndWaitForProcessExit(P, output, errorOutput, token);
 			}

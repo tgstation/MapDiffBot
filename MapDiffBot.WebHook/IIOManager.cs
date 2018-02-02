@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MapDiffBot.WebHook
@@ -69,6 +70,15 @@ namespace MapDiffBot.WebHook
 		/// <param name="token">A <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		Task WriteAllBytes(string path, byte[] contents, CancellationToken token);
+
+		/// <summary>
+		/// Gets a list of files in <paramref name="path"/> with the given <paramref name="extension"/>
+		/// </summary>
+		/// <param name="path">The directory which contains the files</param>
+		/// <param name="extension">The extension to look for without the preceeding "."</param>
+		/// <param name="token">A <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task"/> resulting in a list of paths to files in <paramref name="path"/> with the given <paramref name="extension"/></returns>
+		Task<List<string>> GetFilesWithExtension(string path, string extension, CancellationToken token);
 
 		/// <summary>
 		/// Deletes a file at <paramref name="path"/>
