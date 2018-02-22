@@ -205,8 +205,6 @@ namespace MapDiffBot.WebHook
 							async Task<string> FindDME()
 							{
 								var dmes = await currentIOManager.GetFilesWithExtension(repo.Path, "dme", token);
-								if (dmes.Count < 2)
-									return null;
 								var lowerRepo = payload.Repository.Name.ToLower(CultureInfo.InvariantCulture);
 								foreach (var I in dmes)
 									if (I.ToLower(CultureInfo.InvariantCulture).Contains(lowerRepo))

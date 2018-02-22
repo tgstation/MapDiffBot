@@ -163,7 +163,7 @@ namespace MapDiffBot.Generator
 				await tcs.Task;
 
 			if (process.ExitCode != 0)
-				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "dmm-tools.exe exited with error code {0}!{1}Working Directory: {4}{1}Command line: {4}{1}Output:{1}{2}{1}Error:{1}{3}", process.ExitCode, Environment.NewLine, output, errorOutput, process.StartInfo.Arguments, process.StartInfo.WorkingDirectory));
+				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "dmm-tools.exe exited with error code {0}!{1}Working Directory: {5}{1}Command line: {4}{1}Output:{1}{2}{1}Error:{1}{3}", process.ExitCode, Environment.NewLine, output, errorOutput, process.StartInfo.Arguments, process.StartInfo.WorkingDirectory));
 		}
 
 		/// <inheritdoc />
