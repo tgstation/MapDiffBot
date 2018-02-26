@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['localfileuploader_2ecs',['LocalFileUploader.cs',['../_local_file_uploader_8cs.html',1,'']]],
-  ['logger_2ecs',['Logger.cs',['../_logger_8cs.html',1,'']]]
+  ['fileresult_2ecs',['FileResult.cs',['../_file_result_8cs.html',1,'']]],
+  ['fixedbitset_2d1ff57cb9d2f7fac1_2ed',['fixedbitset-1ff57cb9d2f7fac1.d',['../fixedbitset-1ff57cb9d2f7fac1_8d.html',1,'']]]
 ];

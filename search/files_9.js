@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['readme_2emd',['README.md',['../_r_e_a_d_m_e_8md.html',1,'']]],
-  ['readme_2emd',['README.md',['../_spaceman_d_m_m_2_r_e_a_d_m_e_8md.html',1,'']]],
-  ['repository_2ecs',['Repository.cs',['../_repository_8cs.html',1,'']]],
-  ['repositorymanager_2ecs',['RepositoryManager.cs',['../_repository_manager_8cs.html',1,'']]],
-  ['resolvingiomanager_2ecs',['ResolvingIOManager.cs',['../_resolving_i_o_manager_8cs.html',1,'']]]
+  ['mapdiff_2ecs',['MapDiff.cs',['../_map_diff_8cs.html',1,'']]],
+  ['matrixmultiply_2da2ee630e914ef7d2_2ed',['matrixmultiply-a2ee630e914ef7d2.d',['../matrixmultiply-a2ee630e914ef7d2_8d.html',1,'']]]
 ];
