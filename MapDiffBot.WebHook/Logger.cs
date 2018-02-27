@@ -46,7 +46,7 @@ namespace MapDiffBot.WebHook
 		public async Task LogException(Exception exception)
 		{
 			var message = exception.ToString();
-			var errorLogMessage = String.Format(CultureInfo.CurrentCulture, "{0}: {1}{2}", DateTime.Now.ToLongTimeString(), message, Environment.NewLine);
+			var errorLogMessage = String.Format(CultureInfo.CurrentCulture, "{0}: {1}{2}", DateTime.UtcNow.ToLongTimeString(), message, Environment.NewLine);
 			var mainLogTask = WriteToMainLog(errorLogMessage, CancellationToken.None);
 			if (exception.Data.Contains(OutputFileExceptionKey))
 				await ioManager.AppendAllText(exception.Data[OutputFileExceptionKey].ToString(), errorLogMessage, CancellationToken.None);

@@ -219,20 +219,21 @@ namespace MapDiffBot.Generator
 				throw new ArgumentNullException(nameof(workingDirectory));
 			if (outputDirectory == null)
 				throw new ArgumentNullException(nameof(outputDirectory));
+			var mapName = Path.GetFileNameWithoutExtension(mapPath);
+			var outFile = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.{1}png", mapName, postfix != null ? String.Concat(postfix, '.') : null));
+			var args = String.Format(CultureInfo.InvariantCulture, GenerateRenderCommandLine(region), mapPath);
+
+			File.AppendAllText(Path.Combine(outputDirectory, "command_lines.txt"), String.Format("{3}{0}: {1}: {2}", DateTime.UtcNow.ToLongTimeString(), outFile, args, Environment.NewLine));
 
 			Directory.CreateDirectory(Path.Combine(workingDirectory, "data", "minimaps"));
-
-			string mapName;
+			
 			var output = new StringBuilder();
 			var errorOutput = new StringBuilder();
-			var args = String.Format(CultureInfo.InvariantCulture, GenerateRenderCommandLine(region), mapPath);
 			using (var P = await CreateDMMToolsProcess(workingDirectory, output, errorOutput))
 			{
 				P.StartInfo.Arguments = args;
 
 				var processTask = StartAndWaitForProcessExit(P, output, errorOutput, token);
-
-				mapName = Path.GetFileNameWithoutExtension(mapPath);
 
 				await processTask;
 			}
@@ -256,7 +257,6 @@ namespace MapDiffBot.Generator
 			if (result == null)
 				throw new GeneratorException(String.Format(CultureInfo.CurrentCulture, "Unable to find .png file in dmm-tools output!{1}Command line: {3}{1}Output:{0}{1}{0}Error:{0}{2}", Environment.NewLine, output.ToString(), errorOutput.ToString(), args));
 
-			var outFile = Path.Combine(outputDirectory, String.Format(CultureInfo.InvariantCulture, "{0}.{1}png", mapName, postfix != null ? String.Concat(postfix, '.') : null));
 			var sourceFile = Path.Combine(workingDirectory, result);
 			File.Move(sourceFile, outFile);
 			return outFile;
