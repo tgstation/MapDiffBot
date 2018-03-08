@@ -28,6 +28,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapDiffBot.Generator", "Map
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapDiffBot.WebHook", "MapDiffBot.Webhook\MapDiffBot.WebHook.csproj", "{F4FB75ED-543F-4FF0-BD41-F4B9AD120575}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapDiffBot", "MapDiffBot\MapDiffBot.csproj", "{28E38B55-8670-46F4-BF2E-6B15EA4C097D}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{B15465D9-9B38-4B07-91F0-5D57FF84245C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +50,14 @@ Global
 		{F4FB75ED-543F-4FF0-BD41-F4B9AD120575}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4FB75ED-543F-4FF0-BD41-F4B9AD120575}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4FB75ED-543F-4FF0-BD41-F4B9AD120575}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28E38B55-8670-46F4-BF2E-6B15EA4C097D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28E38B55-8670-46F4-BF2E-6B15EA4C097D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28E38B55-8670-46F4-BF2E-6B15EA4C097D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28E38B55-8670-46F4-BF2E-6B15EA4C097D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B15465D9-9B38-4B07-91F0-5D57FF84245C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B15465D9-9B38-4B07-91F0-5D57FF84245C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B15465D9-9B38-4B07-91F0-5D57FF84245C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B15465D9-9B38-4B07-91F0-5D57FF84245C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
