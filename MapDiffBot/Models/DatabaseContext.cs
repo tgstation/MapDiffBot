@@ -49,7 +49,7 @@ namespace MapDiffBot.Models
 		}
 
 		/// <inheritdoc />
-		public DbSet<MapDiff> MapDiffSets
+		public DbSet<MapDiff> MapDiffs
 		{
 			get
 			{
@@ -95,7 +95,7 @@ namespace MapDiffBot.Models
 		/// </summary>
 		DbSet<InstallationRepository> installationRepositories;
 		/// <summary>
-		/// Backing field for <see cref="MapDiffSets"/>
+		/// Backing field for <see cref="MapDiffs"/>
 		/// </summary>
 		DbSet<MapDiff> mapDiffSets;
 

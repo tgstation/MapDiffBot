@@ -56,31 +56,28 @@ namespace MapDiffBot.Core
 			IReadOnlyList<Octokit.Installation> gitHubInstalls;
 			List<Models.Installation> allKnownInstalls;
 			IGitHubClient client;
-			using (await databaseContext.LockToCallStack(cancellationToken).ConfigureAwait(false))
+			var installation = await databaseContext.Installations.Where(x => x.Repositories.Any(y => y.Id == repositoryId)).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
+
+			if (installation != default(Models.Installation))
 			{
-				var installation = await databaseContext.Installations.Where(x => x.Repositories.Any(y => y.Id == repositoryId)).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
-
-				if (installation != default(Models.Installation))
+				if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow)
 				{
-					if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow)
-					{
-						var newToken = await gitHubClientFactory.CreateAppClient().GitHubApps.CreateInstallationToken(installation.InstallationId).ConfigureAwait(false);
-						installation.AccessToken = newToken.Token;
-						installation.AccessTokenExpiry = newToken.ExpiresAt;
-						await databaseContext.Save(cancellationToken).ConfigureAwait(false);
-					}
-					return gitHubClientFactory.CreateOauthClient(installation.AccessToken);
+					var newToken = await gitHubClientFactory.CreateAppClient().GitHubApps.CreateInstallationToken(installation.InstallationId).ConfigureAwait(false);
+					installation.AccessToken = newToken.Token;
+					installation.AccessTokenExpiry = newToken.ExpiresAt;
+					await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 				}
-
-				//do a discovery
-				client = gitHubClientFactory.CreateAppClient();
-
-				//remove bad installs while we're here
-				var allKnownInstallsTask = databaseContext.Installations.ToAsyncEnumerable().ToList();
-				gitHubInstalls = await client.GitHubApps.GetAllInstallationsForCurrent().ConfigureAwait(false);
-				allKnownInstalls = await allKnownInstallsTask.ConfigureAwait(false);
-				databaseContext.Installations.RemoveRange(allKnownInstalls.Where(x => !gitHubInstalls.Any(y => y.Id == x.InstallationId)));
+				return gitHubClientFactory.CreateOauthClient(installation.AccessToken);
 			}
+
+			//do a discovery
+			client = gitHubClientFactory.CreateAppClient();
+
+			//remove bad installs while we're here
+			var allKnownInstallsTask = databaseContext.Installations.ToAsyncEnumerable().ToList();
+			gitHubInstalls = await client.GitHubApps.GetAllInstallationsForCurrent().ConfigureAwait(false);
+			allKnownInstalls = await allKnownInstallsTask.ConfigureAwait(false);
+			databaseContext.Installations.RemoveRange(allKnownInstalls.Where(x => !gitHubInstalls.Any(y => y.Id == x.InstallationId)));
 
 			//add new installs for those that aren't
 			var installsToAdd = gitHubInstalls.Where(x => !allKnownInstalls.Any(y => y.InstallationId == x.Id));
@@ -108,11 +105,8 @@ namespace MapDiffBot.Core
 
 			var newEntities = await Task.WhenAll(installsToAdd.Select(x => CreateAccessToken(x))).ConfigureAwait(false);
 
-			using (await databaseContext.LockToCallStack(cancellationToken).ConfigureAwait(false))
-			{
-				await databaseContext.Installations.AddRangeAsync(newEntities).ConfigureAwait(false);
-				await databaseContext.Save(cancellationToken).ConfigureAwait(false);
-			}
+			await databaseContext.Installations.AddRangeAsync(newEntities).ConfigureAwait(false);
+			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 			//its either in newEntities now or it doesn't exist
 			return gitHubClientFactory.CreateOauthClient(newEntities.First(x => x.Repositories.Any(y => y.Id == repositoryId)).AccessToken);
 		}

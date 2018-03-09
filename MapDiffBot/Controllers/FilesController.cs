@@ -53,9 +53,7 @@ namespace MapDiffBot.Controllers
 			if (!before && beforeOrAfter != "AFTER")
 				return BadRequest();
 
-			Image diff;
-			using (databaseContext.LockToCallStack(cancellationToken))
-				diff = await databaseContext.MapDiffSets.Where(x => x.RepositoryId == repositoryId && x.PullRequestNumber == prNumber && x.FileId == fileId).Select(x => before ? x.BeforeImage : x.AfterImage).ToAsyncEnumerable().FirstOrDefault().ConfigureAwait(false);
+			var diff = await databaseContext.MapDiffs.Where(x => x.RepositoryId == repositoryId && x.PullRequestNumber == prNumber && x.FileId == fileId).Select(x => before ? x.BeforeImage : x.AfterImage).ToAsyncEnumerable().FirstOrDefault().ConfigureAwait(false);
 
 			if (diff == default(Image))
 				return NotFound();
@@ -67,9 +65,7 @@ namespace MapDiffBot.Controllers
 		public async Task<IActionResult> HandleLogsGet(long repositoryId, int prNumber, int fileId, CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved GET: {0}/{1}/{2}.txt", repositoryId, prNumber, fileId);
-			string result;
-			using (databaseContext.LockToCallStack(cancellationToken))
-				result = await databaseContext.MapDiffSets.Where(x => x.RepositoryId == repositoryId && x.PullRequestNumber == prNumber && x.FileId == fileId).Select(x => x.ErrorMessage).ToAsyncEnumerable().FirstOrDefault().ConfigureAwait(false);
+			var	result = await databaseContext.MapDiffs.Where(x => x.RepositoryId == repositoryId && x.PullRequestNumber == prNumber && x.FileId == fileId).Select(x => x.ErrorMessage).ToAsyncEnumerable().FirstOrDefault().ConfigureAwait(false);
 			return result != null ? (IActionResult)Content(result) : NotFound();
 		}
 
@@ -77,11 +73,7 @@ namespace MapDiffBot.Controllers
 		public async Task<IActionResult> HandleAllLogsGet(long repositoryId, int prNumber, CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved GET: {0}/{1}/logs.txt", repositoryId, prNumber);
-			List<string> results;
-			using (databaseContext.LockToCallStack(cancellationToken))
-			{
-				results = await databaseContext.MapDiffSets.Where(x => x.RepositoryId == repositoryId && x.PullRequestNumber == prNumber).Select(x => x.ErrorMessage).ToAsyncEnumerable().ToList().ConfigureAwait(false);
-			}
+			var results = await databaseContext.MapDiffs.Where(x => x.RepositoryId == repositoryId && x.PullRequestNumber == prNumber).Select(x => x.ErrorMessage).ToAsyncEnumerable().ToList().ConfigureAwait(false);
 			return results.Count != 0 ? (IActionResult)Content(String.Join(Environment.NewLine, results)) : NotFound();
 		}
 	}
