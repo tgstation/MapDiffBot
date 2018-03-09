@@ -24,6 +24,13 @@ namespace MapDiffBot.Core
 		string GetFileName(string path);
 
 		/// <summary>
+		/// Gets the file name portion of a <paramref name="path"/> with
+		/// </summary>
+		/// <param name="path">The path to get the file name of</param>
+		/// <returns>The file name portion of <paramref name="path"/></returns>
+		string GetFileNameWithoutExtension(string path);
+
+		/// <summary>
 		/// Check that the file at <paramref name="path"/> exists
 		/// </summary>
 		/// <param name="path">The file to check for existence</param>
@@ -56,6 +63,15 @@ namespace MapDiffBot.Core
 		/// <param name="token">A <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		Task CopyFile(string src, string dest, CancellationToken token);
+
+		/// <summary>
+		/// Gets a list of files in <paramref name="path"/> with the given <paramref name="extension"/>
+		/// </summary>
+		/// <param name="path">The directory which contains the files</param>
+		/// <param name="extension">The extension to look for without the preceeding "."</param>
+		/// <param name="token">A <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task"/> resulting in a list of paths to files in <paramref name="path"/> with the given <paramref name="extension"/></returns>
+		Task<List<string>> GetFilesWithExtension(string path, string extension, CancellationToken token);
 
 		/// <summary>
 		/// Deletes a file at <paramref name="path"/>

@@ -13,5 +13,6 @@ packages/*
 *.user
 *.dmb
 *.int
+*.pubxml
 /TestResults
 /MapDiffBot/appsettings.Development.json
