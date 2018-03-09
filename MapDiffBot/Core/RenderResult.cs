@@ -7,7 +7,13 @@ namespace MapDiffBot.Core
 	/// </summary>
     public sealed class RenderResult : ToolResult
     {
+		/// <summary>
+		/// The original path of the map
+		/// </summary>
 		public string InputPath { get; set; }
+		/// <summary>
+		/// The path the output png was placed at
+		/// </summary>
 		public string OutputPath { get; set; }
 	}
 }

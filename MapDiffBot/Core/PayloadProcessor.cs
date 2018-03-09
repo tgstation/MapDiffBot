@@ -20,6 +20,11 @@ namespace MapDiffBot.Core
     sealed class PayloadProcessor : IPayloadProcessor
 	{
 		/// <summary>
+		/// The intermediate directory for operations
+		/// </summary>
+		public const string WorkingDirectory = "MapDiffs";
+
+		/// <summary>
 		/// The <see cref="IGeneratorFactory"/> for the <see cref="PayloadProcessor"/>
 		/// </summary>
 		readonly IGeneratorFactory generatorFactory;
@@ -55,7 +60,7 @@ namespace MapDiffBot.Core
 		
 		public PayloadProcessor(IGeneratorFactory generatorFactory, IServiceProvider serviceProvider, ILocalRepositoryManager repositoryManager, IIOManager ioManager, ILogger<PayloadProcessor> logger, IStringLocalizer<PayloadProcessor> stringLocalizer, IBackgroundJobClient backgroundJobClient)
 		{
-			this.ioManager = new ResolvingIOManager(ioManager ?? throw new ArgumentNullException(nameof(ioManager)), "MapDiffs");
+			this.ioManager = new ResolvingIOManager(ioManager ?? throw new ArgumentNullException(nameof(ioManager)), WorkingDirectory);
 			this.generatorFactory = generatorFactory ?? throw new ArgumentNullException(nameof(generatorFactory));
 			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			this.repositoryManager = repositoryManager ?? throw new ArgumentNullException(nameof(repositoryManager));
@@ -71,8 +76,9 @@ namespace MapDiffBot.Core
 		/// Generates a map diff comment for the specified <see cref="PullRequest"/>
 		/// </summary>
 		/// <param name="pullRequestNumber">The <see cref="PullRequest.Number"/></param>
-		/// <param name="pullRequestNumber">The <see cref="PullRequest.Base"/> <see cref="Repository.Id"/></param>
+		/// <param name="repositoryId">The <see cref="PullRequest.Base"/> <see cref="Repository.Id"/></param>
 		/// <param name="baseUrl">The URL to use as a link base</param>
+		/// <param name="jobCancellationToken">The <see cref="IJobCancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		public async Task ScanPullRequest(int pullRequestNumber, long repositoryId, string baseUrl, IJobCancellationToken jobCancellationToken)
 		{
@@ -118,7 +124,7 @@ namespace MapDiffBot.Core
 						if (changedDmms.Count == 0)
 							return;
 
-						await GenerateDiffs(pullRequest, changedMapsTask, changedDmms, baseUrl, cancellationToken).ConfigureAwait(false);
+						await GenerateDiffs(pullRequest, changedDmms, baseUrl, cancellationToken).ConfigureAwait(false);
 					}
 					catch (Exception e)
 					{
@@ -144,7 +150,7 @@ namespace MapDiffBot.Core
 			}
 		}
 
-		async Task GenerateDiffs(PullRequest pullRequest, Task<IReadOnlyList<PullRequestFile>> changedMapsTask, IReadOnlyList<string> changedDmms, string baseUrl, CancellationToken cancellationToken)
+		async Task GenerateDiffs(PullRequest pullRequest, IReadOnlyList<string> changedDmms, string baseUrl, CancellationToken cancellationToken)
 		{
 			var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
 			Task CreateCloneComment() => gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["Cloning repository..."], cancellationToken);
@@ -164,7 +170,7 @@ namespace MapDiffBot.Core
 				
 				var dirPrepTask = DirectoryPrep();
 				//get the dme to use
-				var dmeToUseTask = serviceProvider.GetRequiredService<IDatabaseContext>().InstallationRepositories.Where(x => x.Id == pullRequest.Base.Repository.Id).Select(x => x.TargetDme).ToAsyncEnumerable().FirstOrDefault();
+				var dmeToUseTask = serviceProvider.GetRequiredService<IDatabaseContext>().InstallationRepositories.Where(x => x.Id == pullRequest.Base.Repository.Id).Select(x => x.TargetDme).ToAsyncEnumerable().FirstOrDefault(cancellationToken);
 				try
 				{                  
 					//fetch base commit if necessary and check it out, fetch pull request
@@ -201,7 +207,7 @@ namespace MapDiffBot.Core
 				{
 					await dmeToUseTask.ConfigureAwait(false);
 				}
-
+				
 				//create empty array of map regions
 				var mapRegions = Enumerable.Repeat<MapRegion>(null, changedDmms.Count).ToList();
 				var dmeToUse = dmeToUseTask.Result;
@@ -313,7 +319,7 @@ namespace MapDiffBot.Core
 				{
 					if (task.Exception != null)
 					{
-						result.ErrorMessage = String.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", result.ErrorMessage, Environment.NewLine, task.Exception);
+						result.LogMessage = String.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", result.LogMessage, Environment.NewLine, task.Exception);
 						return null;
 					}
 					return task.Result;
@@ -328,7 +334,11 @@ namespace MapDiffBot.Core
 				async Task<byte[]> ReadMapImage(string path)
 				{
 					if (path != null && await currentIOManager.FileExists(path, cancellationToken).ConfigureAwait(false))
-						return await currentIOManager.ReadAllBytes(path, cancellationToken).ConfigureAwait(false);
+					{
+						var bytes = await currentIOManager.ReadAllBytes(path, cancellationToken).ConfigureAwait(false);
+						await currentIOManager.DeleteFile(path, cancellationToken).ConfigureAwait(false);
+						return bytes;
+					}
 					return null;
 				}
 
@@ -374,7 +384,7 @@ namespace MapDiffBot.Core
 			}
 
 			saveTask = databaseContext.Save(cancellationToken);
-			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {2} into {3}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs avaiabled [here]({0})", String.Concat(baseUrl, FilesController.RouteTo(pullRequest))]);
+			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {2} into {3}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs avaiabled [here]({0})", String.Concat(baseUrl, FilesController.RouteToLogs(pullRequest))]);
 			await serviceProvider.GetRequiredService<IGitHubManager>().CreateSingletonComment(pullRequest, comment, cancellationToken).ConfigureAwait(false);
 			await saveTask.ConfigureAwait(false);
 		}

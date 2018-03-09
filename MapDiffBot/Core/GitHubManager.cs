@@ -16,7 +16,7 @@ namespace MapDiffBot.Core
 	sealed class GitHubManager : IGitHubManager
 	{
 		/// <summary>
-		/// Cookie used to store <see cref="AccessTokenEntry"/>s
+		/// Cookie used to store <see cref="UserAccessToken"/>s
 		/// </summary>
 		const string AuthorizationCookie = "1df00c9b-be1a-4274-a8ab-db0e575ff589";
 

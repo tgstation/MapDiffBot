@@ -34,6 +34,7 @@ namespace MapDiffBot.Core
 		/// Construct a <see cref="Generator"/>
 		/// </summary>
 		/// <param name="dmePath">Used for creating the <see cref="dmeArgument"/></param>
+		/// <param name="ioManager">The value of <see cref="ioManager"/></param>
 		public Generator(string dmePath, IIOManager ioManager)
 		{
 			dmeArgument = dmePath != null ? String.Format(CultureInfo.InvariantCulture, "-e \"{0}\" ", Path.GetFileName(dmePath)) : null;
@@ -71,9 +72,9 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// Creates a pre-configured <see cref="Process"/> pointing to dmm-tools.exe
 		/// </summary>
-		/// <param name="workingDirectory">The path of the map to render. Must be among associated codebase files</param>
 		/// <param name="output">A <see cref="StringBuilder"/> used to accept stdout</param>
 		/// <param name="errorOutput">A <see cref="StringBuilder"/> used to accept stderr</param>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in a pre-configured <see cref="Process"/> pointing to dmm-tools.exe</returns>
 		async Task<Process> CreateDMMToolsProcess(StringBuilder output, StringBuilder errorOutput, CancellationToken cancellationToken)
 		{
@@ -114,17 +115,15 @@ namespace MapDiffBot.Core
 		/// Runs a <see cref="Process"/> asynchronously
 		/// </summary>
 		/// <param name="process">The <see cref="Process"/> to run</param>
-		/// <param name="output">The stdout <see cref="StringBuilder"/></param>
-		/// <param name="errorOutput">The stderr <see cref="StringBuilder"/></param>
-		/// <param name="token">The <see cref="CancellationToken"/> for the operation</param>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		static async Task<int> StartAndWaitForProcessExit(Process process, StringBuilder output, StringBuilder errorOutput, CancellationToken token)
+		static async Task<int> StartAndWaitForProcessExit(Process process, CancellationToken cancellationToken)
 		{
 			var tcs = new TaskCompletionSource<object>();
 			process.EnableRaisingEvents = true;
 			process.Exited += (a, b) =>
 			{
-				if (token.IsCancellationRequested)
+				if (cancellationToken.IsCancellationRequested)
 					tcs.SetCanceled();
 				else
 					tcs.SetResult(null);
@@ -134,7 +133,7 @@ namespace MapDiffBot.Core
 			process.PriorityClass = ProcessPriorityClass.BelowNormal;
 			process.BeginOutputReadLine();
 			process.BeginErrorReadLine();
-			using (var reg = token.Register(() =>
+			using (var reg = cancellationToken.Register(() =>
 			{
 				try
 				{
@@ -162,7 +161,7 @@ namespace MapDiffBot.Core
 			{
 				P.StartInfo.Arguments = args;
 
-				processTask = StartAndWaitForProcessExit(P, output, errorOutput, cancellationToken);
+				processTask = StartAndWaitForProcessExit(P, cancellationToken);
 
 				mapName = Path.GetFileNameWithoutExtension(mapPath);
 
@@ -217,7 +216,7 @@ namespace MapDiffBot.Core
 			{
 				P.StartInfo.Arguments = args;
 
-				processTask = StartAndWaitForProcessExit(P, output, errorOutput, cancellationToken);
+				processTask = StartAndWaitForProcessExit(P, cancellationToken);
 
 				await processTask.ConfigureAwait(false);
 			}
@@ -269,7 +268,7 @@ namespace MapDiffBot.Core
 			{
 				P.StartInfo.Arguments = args;
 
-				processTask = StartAndWaitForProcessExit(P, output, errorOutput, cancellationToken);
+				processTask = StartAndWaitForProcessExit(P, cancellationToken);
 				await processTask.ConfigureAwait(false);
 			}
 			var toolOutput = String.Format(CultureInfo.InvariantCulture, "Exit Code: {0}{1}StdOut:{1}{2}{1}StdErr{1}{3}", processTask.Result, Environment.NewLine, output, errorOutput);

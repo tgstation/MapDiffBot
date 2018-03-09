@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MapDiffBot.Core
 {
+	/// <summary>
+	/// Manages operations with GitHub.com
+	/// </summary>
 	public interface IGitHubManager
 	{
 		/// <summary>

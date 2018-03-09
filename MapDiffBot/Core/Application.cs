@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using Cyberboss.AspNetCore.AsyncInitializer;
+using Hangfire;
 using Hangfire.MySql;
 using Hangfire.SqlServer;
 using MapDiffBot.Configuration;
@@ -77,6 +78,8 @@ namespace MapDiffBot.Core
 			services.AddSingleton<IGeneratorFactory, GeneratorFactory>();
 			services.AddSingleton<IIOManager>(new ResolvingIOManager(new DefaultIOManager(), "App_Data"));
 			services.AddSingleton<IWebRequestManager, WebRequestManager>();
+			services.AddSingleton<IPayloadProcessor, PayloadProcessor>();
+			services.AddSingleton<ILocalRepositoryManager, LocalRepositoryManager>();
 		}
 
 		/// <summary>
@@ -103,6 +106,7 @@ namespace MapDiffBot.Core
 			//prevent telemetry from polluting the debug log
 			TelemetryConfiguration.Active.DisableTelemetry = true;
 
+			applicationBuilder.UseAsyncInitialization<IIOManager>((ioManager, cancellationToken) => ioManager.DeleteDirectory(PayloadProcessor.WorkingDirectory, cancellationToken));
 			databaseContext.Initialize(applicationLifetime.ApplicationStopping).GetAwaiter().GetResult();
 
 			loggerFactory.AddEntityFramework<DatabaseContext>(applicationBuilder.ApplicationServices);
