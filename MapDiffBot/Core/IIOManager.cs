@@ -104,7 +104,5 @@ namespace MapDiffBot.Core
 		/// <returns>The combined path</returns>
 		string ConcatPath(params string[] paths);
 		Task MoveFile(string source, string destination, CancellationToken cancellationToken);
-		string GetFileNameWithoutExtension(string path);
-		Task<List<string>> GetFilesWithExtension(string path, string extension, CancellationToken cancellationToken);
 	}
 }
