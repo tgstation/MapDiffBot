@@ -12,6 +12,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace MapDiffBot.Controllers
 {
@@ -95,9 +96,10 @@ namespace MapDiffBot.Controllers
 		/// <summary>
 		/// Handle a POST to the <see cref="PayloadsController"/>
 		/// </summary>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> of the POST</returns>
 		[HttpPost]
-		public async Task<IActionResult> Receive()
+		public async Task<IActionResult> Receive(CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved POST.");
 
@@ -120,8 +122,6 @@ namespace MapDiffBot.Controllers
 				logger.LogDebug("Payload rejected due to bad signature!");
 				return Unauthorized();
 			}
-
-
 
 			if (eventName == "pull_request")
 			{
@@ -155,7 +155,7 @@ namespace MapDiffBot.Controllers
 				}
 				logger.LogTrace("Queuing pull request payload processing job.");
 
-				await pullRequestProcessor.ProcessPayload(payload, gitHubManager, Url).ConfigureAwait(false);
+				await pullRequestProcessor.ProcessPayload(payload, Url).ConfigureAwait(false);
 			}
 
 			return Ok();

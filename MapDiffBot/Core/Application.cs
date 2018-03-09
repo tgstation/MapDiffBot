@@ -68,6 +68,7 @@ namespace MapDiffBot.Core
 			services.Configure<IISOptions>((options) => options.ForwardClientCertificate = false);
 			services.AddMvc();
 			services.AddOptions();
+			services.AddLocalization();
 
 			services.AddDbContext<DatabaseContext>();
 			services.AddScoped<IDatabaseContext>(x => x.GetRequiredService<DatabaseContext>());

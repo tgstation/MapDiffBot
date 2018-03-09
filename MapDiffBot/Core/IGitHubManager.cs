@@ -71,11 +71,5 @@ namespace MapDiffBot.Core
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in a <see cref="IReadOnlyList{T}"/> of <see cref="PullRequestFile"/>s</returns>
 		Task<IReadOnlyList<PullRequestFile>> GetPullRequestChangedFiles(PullRequest pullRequest, CancellationToken cancellationToken);
-
-		/// <summary>
-		/// Get the bot <see cref="User"/> the <see cref="IGitHubManager"/> acts as
-		/// </summary>
-		/// <returns>A <see cref="Task{TResult}"/> resulting in the bot <see cref="User"/> the <see cref="IGitHubManager"/> acts as</returns>
-		Task<User> GetUser();
 	}
 }

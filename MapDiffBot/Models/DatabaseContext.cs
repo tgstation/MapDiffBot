@@ -16,48 +16,16 @@ namespace MapDiffBot.Models
 #pragma warning restore CA1812
 	{
 		/// <inheritdoc />
-		public DbSet<UserAccessToken> UserAccessTokens
-		{
-			get
-			{
-				CheckSemaphoreLocked();
-				return userAccessTokens;
-			}
-			set => userAccessTokens = value;
-		}
+		public DbSet<UserAccessToken> UserAccessTokens { get; set; }
 
 		/// <inheritdoc />
-		public DbSet<Installation> Installations
-		{
-			get
-			{
-				CheckSemaphoreLocked();
-				return installations;
-			}
-			set => installations = value;
-		}
+		public DbSet<Installation> Installations { get; set; }
 
 		/// <inheritdoc />
-		public DbSet<InstallationRepository> InstallationRepositories
-		{
-			get
-			{
-				CheckSemaphoreLocked();
-				return installationRepositories;
-			}
-			set => installationRepositories = value;
-		}
+		public DbSet<InstallationRepository> InstallationRepositories { get; set; }
 
 		/// <inheritdoc />
-		public DbSet<MapDiff> MapDiffs
-		{
-			get
-			{
-				CheckSemaphoreLocked();
-				return mapDiffSets;
-			}
-			set => mapDiffSets = value;
-		}
+		public DbSet<MapDiff> MapDiffs { get; set; }
 
 		/// <summary>
 		/// The <see cref="DbSet{TEntity}"/> for <see cref="Log"/>s
@@ -77,43 +45,6 @@ namespace MapDiffBot.Models
 		/// The <see cref="ILoggerFactory"/> for the <see cref="DatabaseContext"/>
 		/// </summary>
 		readonly ILoggerFactory loggerFactory;
-		/// <summary>
-		/// The <see cref="SemaphoreSlim"/> for the <see cref="DatabaseContext"/>
-		/// </summary>
-		readonly SemaphoreSlim semaphore;
-
-		/// <summary>
-		/// Backing field for <see cref="UserAccessTokens"/>
-		/// </summary>
-		DbSet<UserAccessToken> userAccessTokens;
-		/// <summary>
-		/// Backing field for <see cref="Installations"/>
-		/// </summary>
-		DbSet<Installation> installations;
-		/// <summary>
-		/// Backing field for <see cref="InstallationRepositories"/>
-		/// </summary>
-		DbSet<InstallationRepository> installationRepositories;
-		/// <summary>
-		/// Backing field for <see cref="MapDiffs"/>
-		/// </summary>
-		DbSet<MapDiff> mapDiffSets;
-
-		/// <inheritdoc />
-		public override void Dispose()
-		{
-			base.Dispose();
-			semaphore.Dispose();
-		}
-
-		/// <summary>
-		/// Checks tha <see cref="semaphore"/> is locked
-		/// </summary>
-		void CheckSemaphoreLocked()
-		{
-			if (semaphore.CurrentCount > 0)
-				throw new InvalidOperationException("The DatabaseContext is not locked!");
-		}
 
 		/// <summary>
 		/// Construct a <see cref="DatabaseContext"/>
@@ -125,7 +56,6 @@ namespace MapDiffBot.Models
 		{
 			databaseConfiguration = databaseConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(databaseConfigurationOptions));
 			this.loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-			semaphore = new SemaphoreSlim(1);
 		}
 
 		/// <inheritdoc />
@@ -139,6 +69,7 @@ namespace MapDiffBot.Models
 			modelBuilder.Entity<Log>().ToTable(nameof(Log));
 
 			modelBuilder.Entity<MapDiff>().HasKey(x => new { x.RepositoryId, x.PullRequestNumber, x.FileId });
+			modelBuilder.Entity<InstallationRepository>().HasKey(x => new { x.ColumnId, x.Id });
 		}
 
 		/// <inheritdoc />
@@ -152,17 +83,9 @@ namespace MapDiffBot.Models
 		}
 
 		/// <inheritdoc />
-		public Task Save(CancellationToken cancellationToken)
-		{
-			CheckSemaphoreLocked();
-			return SaveChangesAsync(cancellationToken);
-		}
+		public Task Save(CancellationToken cancellationToken) => SaveChangesAsync(cancellationToken);
 
 		/// <inheritdoc />
 		public Task Initialize(CancellationToken cancellationToken) => Database.EnsureCreatedAsync(cancellationToken);
-
-
-		/// <inheritdoc />
-		public Task<SemaphoreSlimContext> LockToCallStack(CancellationToken cancellationToken) => SemaphoreSlimContext.Lock(semaphore, cancellationToken);
 	}
 }

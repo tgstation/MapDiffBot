@@ -74,7 +74,7 @@ namespace MapDiffBot.Core
 		/// <inheritdoc />
 		public async Task<IReadOnlyList<Repository>> GetInstallationRepositories(string installationToken, CancellationToken cancellationToken)
 		{
-			var json = await webRequestManager.RunGet(new Uri("https://api.github.com/installation/repositories"), new List<string> { "Accept: application/vnd.github.machine-man-preview+json", string.Format(CultureInfo.InvariantCulture, "User-Agent: {0}", userAgent) , String.Format(CultureInfo.InvariantCulture, "Authorization: token {0}", installationToken) }, cancellationToken).ConfigureAwait(false);
+			var json = await webRequestManager.RunGet(new Uri("https://api.github.com/installation/repositories"), new List<string> { "Accept: application/vnd.github.machine-man-preview+json", string.Format(CultureInfo.InvariantCulture, "User-Agent: {0}", userAgent) , String.Format(CultureInfo.InvariantCulture, "Authorization: bearer {0}", installationToken) }, cancellationToken).ConfigureAwait(false);
 			var jsonObj = JObject.Parse(json);
 			var array = jsonObj["repositories"];
 			return new SimpleJsonSerializer().Deserialize<List<Repository>>(array.ToString());

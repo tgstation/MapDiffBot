@@ -64,7 +64,6 @@ namespace MapDiffBot.Core
 			this.generatorFactory = generatorFactory ?? throw new ArgumentNullException(nameof(generatorFactory));
 			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			this.repositoryManager = repositoryManager ?? throw new ArgumentNullException(nameof(repositoryManager));
-			this.ioManager = ioManager ?? throw new ArgumentNullException(nameof(ioManager));
 			this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			this.stringLocalizer = stringLocalizer ?? throw new ArgumentNullException(nameof(stringLocalizer));
 			this.backgroundJobClient = backgroundJobClient ?? throw new ArgumentNullException(nameof(backgroundJobClient));
@@ -80,6 +79,7 @@ namespace MapDiffBot.Core
 		/// <param name="baseUrl">The URL to use as a link base</param>
 		/// <param name="jobCancellationToken">The <see cref="IJobCancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
+		[AutomaticRetry(Attempts = 0)]
 		public async Task ScanPullRequest(int pullRequestNumber, long repositoryId, string baseUrl, IJobCancellationToken jobCancellationToken)
 		{
 			using (serviceProvider.CreateScope())
@@ -150,6 +150,14 @@ namespace MapDiffBot.Core
 			}
 		}
 
+		/// <summary>
+		/// Generate map diffs for a given <paramref name="pullRequest"/>
+		/// </summary>
+		/// <param name="pullRequest">The <see cref="PullRequest"/></param>
+		/// <param name="changedDmms">Paths to changed .dmm files</param>
+		/// <param name="baseUrl">The base URL of the request</param>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		async Task GenerateDiffs(PullRequest pullRequest, IReadOnlyList<string> changedDmms, string baseUrl, CancellationToken cancellationToken)
 		{
 			var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
@@ -356,6 +364,14 @@ namespace MapDiffBot.Core
 			await HandleResults(pullRequest, results.Select(x => x.Result).ToList(), baseUrl, cancellationToken).ConfigureAwait(false);
 		}
 
+		/// <summary>
+		/// Publish a <see cref="List{T}"/> of <paramref name="diffResults"/>s to <paramref name="baseUrl"/>
+		/// </summary>
+		/// <param name="pullRequest">The <see cref="PullRequest"/> the <paramref name="diffResults"/> are for</param>
+		/// <param name="diffResults">The <see cref="MapDiff"/>s</param>
+		/// <param name="baseUrl">The base URL of the request</param>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		async Task HandleResults(PullRequest pullRequest, List<MapDiff> diffResults, string baseUrl, CancellationToken cancellationToken)
 		{
 			//delete old renderings
@@ -397,12 +413,11 @@ namespace MapDiffBot.Core
 				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.PullRequest.Number, payload.Repository.Id, basePath, JobCancellationToken.Null));
 			}
 		}
-		public async Task ProcessPayload(IssueCommentPayload payload, IGitHubManager gitHubManager, IUrlHelper urlHelper)
+		public async Task ProcessPayload(IssueCommentPayload payload, IUrlHelper urlHelper)
 		{
-			if (payload.Action != "created" || payload.Comment.Body != null)
+			if (payload.Action != "created" || payload.Comment.Body == null)
 				return;
-			var user = await gitHubManager.GetUser().ConfigureAwait(false);
-			if (payload.Comment.Body.Contains(String.Format(CultureInfo.InvariantCulture, "@{0}", user.Login)))
+			if (payload.Comment.Body.Split(' ').Any(x => x == "@MapDiffBot"))
 			{
 				var basePath = urlHelper.ActionContext.HttpContext.Request.Host + urlHelper.ActionContext.HttpContext.Request.PathBase;
 				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Issue.Number, payload.Repository.Id, basePath, JobCancellationToken.Null));

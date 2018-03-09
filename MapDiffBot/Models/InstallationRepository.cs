@@ -9,11 +9,17 @@ namespace MapDiffBot.Models
 	public sealed class InstallationRepository
 	{
 		/// <summary>
-		/// The <see cref="Octokit.Repository.Id"/>
+		/// The Column ID
 		/// </summary>
 		[Key, Column(Order = 0)]
+		public long ColumnId { get; set; }
+
+		/// <summary>
+		/// The <see cref="Octokit.Repository.Id"/>
+		/// </summary>
+		[Key, Column(Order = 1)]
 		public long Id { get; set; }
-		
+
 		/// <summary>
 		/// Path to the .dme for the generator to run on
 		/// </summary>

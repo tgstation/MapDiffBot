@@ -74,7 +74,7 @@ namespace MapDiffBot.Core
 			client = gitHubClientFactory.CreateAppClient();
 
 			//remove bad installs while we're here
-			var allKnownInstallsTask = databaseContext.Installations.ToAsyncEnumerable().ToList();
+			var allKnownInstallsTask = databaseContext.Installations.ToAsyncEnumerable().ToList(cancellationToken);
 			gitHubInstalls = await client.GitHubApps.GetAllInstallationsForCurrent().ConfigureAwait(false);
 			allKnownInstalls = await allKnownInstallsTask.ConfigureAwait(false);
 			databaseContext.Installations.RemoveRange(allKnownInstalls.Where(x => !gitHubInstalls.Any(y => y.Id == x.InstallationId)));
@@ -173,19 +173,20 @@ namespace MapDiffBot.Core
 
 
 			var client = await CreateInstallationClient(pullRequest.Base.Repository.Id, cancellationToken).ConfigureAwait(false);
+			//var client = gitHubClientFactory.CreateAppClient();
 
 			var openCommentsTask = client.Issue.Comment.GetAllForIssue(pullRequest.Base.Repository.Id, pullRequest.Number);
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			var ourUser = await GetUser().ConfigureAwait(false);
+			//var ourUser = await client.User.Current().ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			var openComments = await openCommentsTask.ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			foreach (var I in openComments)
-				if (I.User.Id == ourUser.Id)
+				if (I.User.Login == "MapDiffBot")
 				{
 					logger.LogTrace("Update comment on {1}/{2} #{3}. Old: {4}. New: {0}", body, pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Owner.Name, pullRequest.Number, I.Body);
 					await client.Issue.Comment.Update(pullRequest.Base.Repository.Id, I.Id, body).ConfigureAwait(false);
@@ -193,7 +194,7 @@ namespace MapDiffBot.Core
 				}
 
 			logger.LogTrace("Create comment on {1}/{2} #{3}: {0}", body, pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Owner.Name, pullRequest.Number);
-			await client.Issue.Comment.Create(pullRequest.Base.Repository.Id, pullRequest.Number, body).ConfigureAwait(false);
+			await gitHubClientFactory.CreateAppClient().Issue.Comment.Create(pullRequest.Base.Repository.Id, pullRequest.Number, body).ConfigureAwait(false);
 		}
 
 		/// <inheritdoc />
@@ -218,13 +219,6 @@ namespace MapDiffBot.Core
 			logger.LogTrace("Get pull request #{0} on repository {1}", pullRequestNumber, repositoryId);
 			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
 			return await client.PullRequest.Get(repositoryId, pullRequestNumber).ConfigureAwait(false);
-		}
-
-		/// <inheritdoc />
-		public Task<User> GetUser()
-		{
-			logger.LogTrace("Get current user");
-			return gitHubClientFactory.CreateAppClient().User.Current();
 		}
 	}
 }

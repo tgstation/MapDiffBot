@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Octokit;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MapDiffBot.Core
@@ -20,9 +21,8 @@ namespace MapDiffBot.Core
 		/// Process a <see cref="IssueCommentPayload"/>
 		/// </summary>
 		/// <param name="payload">The <see cref="IssueCommentPayload"/> to process</param>
-		/// <param name="gitHubManager">The <see cref="IGitHubManager"/> for the operation</param>
 		/// <param name="urlHelper">The <see cref="IUrlHelper"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		Task ProcessPayload(IssueCommentPayload payload, IGitHubManager gitHubManager, IUrlHelper urlHelper);
+		Task ProcessPayload(IssueCommentPayload payload, IUrlHelper urlHelper);
 	}
 }

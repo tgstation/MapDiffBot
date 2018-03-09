@@ -30,13 +30,25 @@ namespace MapDiffBot.Core
 			activeRepositories = new Dictionary<string, Task>();
 		}
 
+		static async Task<ILocalRepository> CreateRepositoryObject(string repoPath, TaskCompletionSource<object> usageTask, CancellationToken cancellationToken)
+		{
+			Repository repoLib = null;
+			await Task.Factory.StartNew(() =>
+			{
+				repoLib = new Repository(repoPath);
+				cancellationToken.ThrowIfCancellationRequested();
+				repoLib.RemoveUntrackedFiles();
+			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
+			return new LocalRepository(repoLib, usageTask);
+		}
+
 		/// <summary>
 		/// Attempt to load the <see cref="ILocalRepository"/> at <paramref name="repoPath"/>. Awaits until all <see cref="ILocalRepository"/>'s referencing <paramref name="repoPath"/> created by <see langword="this"/> are disposed
 		/// </summary>
 		/// <param name="repoPath">The path to the <see cref="ILocalRepository"/></param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> token for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in the <see cref="ILocalRepository"/> at <paramref name="repoPath"/></returns>
-		async Task<ILocalRepository> TryLoadRepository(string repoPath, CancellationToken cancellationToken)
+		async Task<ILocalRepository> TryLoadRepository(string repoPath, Action<TaskCompletionSource<object>> recieveUsageTask, CancellationToken cancellationToken)
 		{
 			var tcs1 = new TaskCompletionSource<bool>();
 			var tcs2 = new TaskCompletionSource<object>();
@@ -64,24 +76,25 @@ namespace MapDiffBot.Core
 				}))
 				needsNewKey = await tcs1.Task.ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
-
-			Repository repoObj = null;
-			await Task.Factory.StartNew(() =>
+			
+			try
 			{
-				repoObj = new Repository(ioManager.ResolvePath(repoPath));
-				cancellationToken.ThrowIfCancellationRequested();
-				repoObj.RemoveUntrackedFiles();
-			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
-
-			var res = new LocalRepository(repoObj, tcs2);
-
-			lock (this)
+				return await CreateRepositoryObject(repoPath, tcs2, cancellationToken).ConfigureAwait(false);
+			}
+			catch (LibGit2SharpException)
 			{
-				if (needsNewKey)
-					activeRepositories.Add(repoPath, tcs2.Task);
-				else
-					activeRepositories[repoPath] = tcs2.Task;
-				return res;
+				recieveUsageTask(tcs2);
+				throw;
+			}
+			finally
+			{
+				lock (this)
+				{
+					if (needsNewKey)
+						activeRepositories.Add(repoPath, tcs2.Task);
+					else
+						activeRepositories[repoPath] = tcs2.Task;
+				}
 			}
 		}
 	
@@ -95,40 +108,49 @@ namespace MapDiffBot.Core
 
 			var repoPath = ioManager.ConcatPath(repository.Owner.Login, repository.Name);
 
+			TaskCompletionSource<object> usageTask = null;
 			try
 			{
-				return await TryLoadRepository(repoPath, cancellationToken).ConfigureAwait(false);
+				return await TryLoadRepository(repoPath, tcs => usageTask = tcs, cancellationToken).ConfigureAwait(false);
 			}
-			catch (RepositoryNotFoundException) { }
+			catch (LibGit2SharpException) { }
 
-			var cloneRequiredTask = onCloneRequired?.Invoke();
-
-			await ioManager.DeleteDirectory(repoPath, cancellationToken).ConfigureAwait(false);
-			await ioManager.CreateDirectory(repoPath, cancellationToken).ConfigureAwait(false);
-
-			var gitHubURL = String.Format(CultureInfo.InvariantCulture, "https://github.com/{0}/{1}", repository.Owner.Login, repository.Name);
-			await Task.Factory.StartNew(() =>
+			try
 			{
-				try
+				var cloneRequiredTask = onCloneRequired?.Invoke();
+
+				await ioManager.DeleteDirectory(repoPath, cancellationToken).ConfigureAwait(false);
+				await ioManager.CreateDirectory(repoPath, cancellationToken).ConfigureAwait(false);
+
+				var gitHubURL = String.Format(CultureInfo.InvariantCulture, "https://github.com/{0}/{1}", repository.Owner.Login, repository.Name);
+				await Task.Factory.StartNew(() =>
 				{
-					Repository.Clone(gitHubURL, ioManager.ResolvePath(repoPath), new CloneOptions
+					try
 					{
-						Checkout = true,
-						OnProgress = (m) => !cancellationToken.IsCancellationRequested,
-						OnTransferProgress = (p) => !cancellationToken.IsCancellationRequested,
-						OnUpdateTips = (a, b, c) => !cancellationToken.IsCancellationRequested
-					});
-				}
-				catch (UserCancelledException)
-				{
-					cancellationToken.ThrowIfCancellationRequested();
-				}
-			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
-			
-			var result = await TryLoadRepository(repoPath, cancellationToken).ConfigureAwait(false);
-			if (cloneRequiredTask != null)
-				await cloneRequiredTask.ConfigureAwait(false);
-			return result;
+						Repository.Clone(gitHubURL, ioManager.ResolvePath(repoPath), new CloneOptions
+						{
+							Checkout = true,
+							OnProgress = (m) => !cancellationToken.IsCancellationRequested,
+							OnTransferProgress = (p) => !cancellationToken.IsCancellationRequested,
+							OnUpdateTips = (a, b, c) => !cancellationToken.IsCancellationRequested
+						});
+					}
+					catch (UserCancelledException)
+					{
+						cancellationToken.ThrowIfCancellationRequested();
+					}
+				}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
+
+				var result = await CreateRepositoryObject(repoPath, usageTask, cancellationToken).ConfigureAwait(false);
+				if (cloneRequiredTask != null)
+					await cloneRequiredTask.ConfigureAwait(false);
+				return result;
+			}
+			catch
+			{
+				usageTask.SetResult(null);
+				throw;
+			}
 		}
 	}
 }
