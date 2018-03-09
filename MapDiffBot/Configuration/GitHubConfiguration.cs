@@ -3,7 +3,7 @@
 	/// <summary>
 	/// GitHub configuration settings
 	/// </summary>
-	sealed class GitHubConfiguration
+	public sealed class GitHubConfiguration
 	{
 		/// <summary>
 		/// The configuration section the <see cref="GitHubConfiguration"/> resides in

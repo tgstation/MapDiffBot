@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using MapDiffBot.Core;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Threading.Tasks;

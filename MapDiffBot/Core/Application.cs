@@ -2,6 +2,7 @@
 using Hangfire.MySql;
 using Hangfire.SqlServer;
 using MapDiffBot.Configuration;
+using MapDiffBot.Models;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,12 +11,9 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using ZNetCS.AspNetCore.Logging.EntityFrameworkCore;
 
 namespace MapDiffBot.Core
@@ -25,11 +23,6 @@ namespace MapDiffBot.Core
 	/// </summary>
 	public class Application
 	{
-		/// <summary>
-		/// The user agent string to provide to various APIs
-		/// </summary>
-		public static readonly string UserAgent = String.Format(CultureInfo.InvariantCulture, "MapDiffBot-v{0}", Assembly.GetExecutingAssembly().GetName().Version);
-
 		/// <summary>
 		/// The <see cref="IConfiguration"/> for the <see cref="Application"/>
 		/// </summary>
@@ -43,7 +36,6 @@ namespace MapDiffBot.Core
 		{
 			this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 		}
-
 
 		/// <summary>
 		/// Configure dependency injected services
@@ -77,8 +69,14 @@ namespace MapDiffBot.Core
 			services.AddOptions();
 
 			services.AddDbContext<DatabaseContext>();
+			services.AddScoped<IDatabaseContext>(x => x.GetRequiredService<DatabaseContext>());
 			services.AddScoped<IGitHubClientFactory, GitHubClientFactory>();
 			services.AddScoped<IGitHubManager, GitHubManager>();
+			services.AddScoped<IWebRequestManager, WebRequestManager>();
+
+			services.AddSingleton<IGeneratorFactory, GeneratorFactory>();
+			services.AddSingleton<IIOManager>(new ResolvingIOManager(new DefaultIOManager(), "App_Data"));
+			services.AddSingleton<IWebRequestManager, WebRequestManager>();
 		}
 
 		/// <summary>
