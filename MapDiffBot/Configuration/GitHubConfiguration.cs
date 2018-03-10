@@ -11,6 +11,11 @@
 		public const string Section = "GitHub";
 
 		/// <summary>
+		/// The <see cref="Octokit.Account.Login"/> the bot will respond to when tagged
+		/// </summary>
+		public string TagUser { get; set; }
+
+		/// <summary>
 		/// The secret to use for hashing webhook payloads
 		/// </summary>
 		public string WebhookSecret { get; set; }

@@ -1,10 +1,12 @@
 ﻿using Hangfire;
+using MapDiffBot.Configuration;
 using MapDiffBot.Controllers;
 using MapDiffBot.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Octokit;
 using System;
 using System.Collections.Generic;
@@ -26,6 +28,10 @@ namespace MapDiffBot.Core
 		/// </summary>
 		public const string WorkingDirectory = "MapDiffs";
 
+		/// <summary>
+		/// The <see cref="GitHubConfiguration"/> for the <see cref="PayloadProcessor"/>
+		/// </summary>
+		readonly GitHubConfiguration gitHubConfiguration;
 		/// <summary>
 		/// The <see cref="IGeneratorFactory"/> for the <see cref="PayloadProcessor"/>
 		/// </summary>
@@ -60,8 +66,9 @@ namespace MapDiffBot.Core
 		/// </summary>
 		readonly Dictionary<string, CancellationTokenSource> mapDiffOperations;
 		
-		public PayloadProcessor(IGeneratorFactory generatorFactory, IServiceProvider serviceProvider, ILocalRepositoryManager repositoryManager, IIOManager ioManager, ILogger<PayloadProcessor> logger, IStringLocalizer<PayloadProcessor> stringLocalizer, IBackgroundJobClient backgroundJobClient)
+		public PayloadProcessor(IOptions<GitHubConfiguration> gitHubConfigurationOptions, IGeneratorFactory generatorFactory, IServiceProvider serviceProvider, ILocalRepositoryManager repositoryManager, IIOManager ioManager, ILogger<PayloadProcessor> logger, IStringLocalizer<PayloadProcessor> stringLocalizer, IBackgroundJobClient backgroundJobClient)
 		{
+			gitHubConfiguration = gitHubConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(gitHubConfigurationOptions));
 			this.ioManager = new ResolvingIOManager(ioManager ?? throw new ArgumentNullException(nameof(ioManager)), WorkingDirectory);
 			this.generatorFactory = generatorFactory ?? throw new ArgumentNullException(nameof(generatorFactory));
 			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -163,12 +170,12 @@ namespace MapDiffBot.Core
 		async Task GenerateDiffs(PullRequest pullRequest, IReadOnlyList<string> changedDmms, string baseUrl, CancellationToken cancellationToken)
 		{
 			var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
-			Task CreateCloneComment() => gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["Cloning repository..."], cancellationToken);
+			Task CreateComment(string commentKey) => gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer[commentKey], cancellationToken);
 
 			Task generatingCommentTask;
 			List<Task<RenderResult>> beforeRenderings, afterRenderings;
 			IIOManager currentIOManager = new ResolvingIOManager(ioManager, ioManager.ConcatPath(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number.ToString(CultureInfo.InvariantCulture)));
-			using (var repo = await repositoryManager.GetRepository(pullRequest.Base.Repository, CreateCloneComment, cancellationToken).ConfigureAwait(false))
+			using (var repo = await repositoryManager.GetRepository(pullRequest.Base.Repository, () => CreateComment("Cloning repository..."), () => CreateComment("Waiting for another operation on this repository to complete..."), cancellationToken).ConfigureAwait(false))
 			{
 				generatingCommentTask = gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["Generating diffs..."], cancellationToken);
 				//prep the outputDirectory
@@ -419,7 +426,7 @@ namespace MapDiffBot.Core
 		{
 			if (payload.Action != "created" || payload.Comment.Body == null)
 				return;
-			if (payload.Comment.Body.Split(' ').Any(x => x == "@MapDiffBot"))
+			if (payload.Comment.Body.Split(' ').Any(x => x == String.Format(CultureInfo.InvariantCulture, "@{0}", gitHubConfiguration.TagUser)))
 			{
 				var basePath = urlHelper.ActionContext.HttpContext.Request.Host + urlHelper.ActionContext.HttpContext.Request.PathBase;
 				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Issue.Number, payload.Repository.Id, basePath, JobCancellationToken.Null));

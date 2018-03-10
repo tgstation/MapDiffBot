@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Octokit;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -173,23 +174,21 @@ namespace MapDiffBot.Core
 			if (String.IsNullOrWhiteSpace(body))
 				throw new ArgumentOutOfRangeException(nameof(body), body, "Body must not be empty!");
 
-
+			var currentAppTask = gitHubClientFactory.CreateAppClient().GitHubApps.GetCurrent();
 			var client = await CreateInstallationClient(pullRequest.Base.Repository.Id, cancellationToken).ConfigureAwait(false);
-			//var client = gitHubClientFactory.CreateAppClient();
-
-			var currentUser = await client.User.Current().ConfigureAwait(false);
-			var openCommentsTask = client.Issue.Comment.GetAllForIssue(pullRequest.Base.Repository.Id, pullRequest.Number);
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			//var ourUser = await client.User.Current().ConfigureAwait(false);
+			var openComments = await client.Issue.Comment.GetAllForIssue(pullRequest.Base.Repository.Id, pullRequest.Number).ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			var openComments = await openCommentsTask.ConfigureAwait(false);
+			var currentApp = await currentAppTask.ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
+
+			var botName = String.Format(CultureInfo.InvariantCulture, "{0}[BOT]", currentApp.Name.ToUpperInvariant());
 
 			foreach (var I in openComments)
-				if (I.User.Login == "MapDiffBot")
+				if (I.User.Login.ToUpperInvariant() == botName)
 				{
 					logger.LogTrace("Update comment on {1}/{2} #{3}. Old: {4}. New: {0}", body, pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Owner.Name, pullRequest.Number, I.Body);
 					await client.Issue.Comment.Update(pullRequest.Base.Repository.Id, I.Id, body).ConfigureAwait(false);

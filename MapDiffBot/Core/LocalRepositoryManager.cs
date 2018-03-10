@@ -32,6 +32,13 @@ namespace MapDiffBot.Core
 			activeRepositories = new Dictionary<string, Task>();
 		}
 
+		/// <summary>
+		/// Creates a <see cref="ILocalRepository"/>
+		/// </summary>
+		/// <param name="repoPath">The path to the <see cref="ILocalRepository"/></param>
+		/// <param name="usageTask">The <see cref="TaskCompletionSource{TResult}"/> that indicates the lifetime of the resulting <see cref="ILocalRepository"/></param>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> token for the operation</param>
+		/// <returns>A <see cref="Task"/> resulting in the <see cref="ILocalRepository"/> at <paramref name="repoPath"/></returns>
 		static async Task<ILocalRepository> CreateRepositoryObject(string repoPath, TaskCompletionSource<object> usageTask, CancellationToken cancellationToken)
 		{
 			Repository repoLib = null;
@@ -48,10 +55,11 @@ namespace MapDiffBot.Core
 		/// Attempt to load the <see cref="ILocalRepository"/> at <paramref name="repoPath"/>. Awaits until all <see cref="ILocalRepository"/>'s referencing <paramref name="repoPath"/> created by <see langword="this"/> are disposed
 		/// </summary>
 		/// <param name="repoPath">The path to the <see cref="ILocalRepository"/></param>
+		/// <param name="onOperationBlocked">A <see cref="Func{TResult}"/> returning a <see cref="Task"/> to run if the operation is blocked by a repository lock</param>
 		/// <param name="recieveUsageTask">The <see cref="Action"/> with the current <see cref="TaskCompletionSource{TResult}"/> for <see cref="activeRepositories"/> to run if a clone is required</param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> token for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in the <see cref="ILocalRepository"/> at <paramref name="repoPath"/></returns>
-		async Task<ILocalRepository> TryLoadRepository(string repoPath, Action<TaskCompletionSource<object>> recieveUsageTask, CancellationToken cancellationToken)
+		async Task<ILocalRepository> TryLoadRepository(string repoPath, Func<Task> onOperationBlocked, Action<TaskCompletionSource<object>> recieveUsageTask, CancellationToken cancellationToken)
 		{
 			var tcs1 = new TaskCompletionSource<bool>();
 			var tcs2 = new TaskCompletionSource<object>();
@@ -79,7 +87,12 @@ namespace MapDiffBot.Core
 				}))
 				needsNewKey = await tcs1.Task.ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
-			
+
+			if (!needsNewKey && onOperationBlocked != null)
+				await onOperationBlocked().ConfigureAwait(false);
+
+			cancellationToken.ThrowIfCancellationRequested();
+
 			try
 			{
 				return await CreateRepositoryObject(repoPath, tcs2, cancellationToken).ConfigureAwait(false);
@@ -102,7 +115,7 @@ namespace MapDiffBot.Core
 		}
 	
 		/// <inheritdoc />
-		public async Task<ILocalRepository> GetRepository(Octokit.Repository repository, Func<Task> onCloneRequired, CancellationToken cancellationToken)
+		public async Task<ILocalRepository> GetRepository(Octokit.Repository repository, Func<Task> onCloneRequired, Func<Task> onOperationBlocked, CancellationToken cancellationToken)
 		{
 			if (repository == null)
 				throw new ArgumentNullException(nameof(repository));
@@ -114,7 +127,7 @@ namespace MapDiffBot.Core
 			TaskCompletionSource<object> usageTask = null;
 			try
 			{
-				return await TryLoadRepository(repoPath, tcs => usageTask = tcs, cancellationToken).ConfigureAwait(false);
+				return await TryLoadRepository(repoPath, onOperationBlocked, tcs => usageTask = tcs, cancellationToken).ConfigureAwait(false);
 			}
 			catch (LibGit2SharpException) { }
 

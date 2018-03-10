@@ -84,13 +84,19 @@ namespace MapDiffBot.Core
 		public Task<bool> ContainsCommit(string sha, CancellationToken cancellationToken) => Task.Factory.StartNew(() => repositoryLib.Lookup(sha) != null, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
 		/// <inheritdoc />
-		public Task Fetch(CancellationToken token) => Task.Factory.StartNew(() =>
+		public Task Fetch(CancellationToken cancellationToken) => Task.Factory.StartNew(() =>
 			{
 				var remote = repositoryLib.Network.Remotes.First();
 				var refSpecs = remote.FetchRefSpecs.Select(X => X.Specification);
-				Commands.Fetch(repositoryLib, remote.Name, refSpecs, GenerateFetchOptions(token), "Update of origin branch");
-				token.ThrowIfCancellationRequested();
-			}, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+				try
+				{
+					Commands.Fetch(repositoryLib, remote.Name, refSpecs, GenerateFetchOptions(cancellationToken), "Update of origin branch");
+				}
+				catch (UserCancelledException)
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+				}
+			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
 		/// <inheritdoc />
 		public Task FetchPullRequest(int prNumber, CancellationToken cancellationToken) => Task.Factory.StartNew(() =>
@@ -103,8 +109,14 @@ namespace MapDiffBot.Core
 				{
 					String.Format(CultureInfo.InvariantCulture, "pull/{0}/head:{1}", prNumber, prBranchName)
 				};
-				Commands.Fetch(repositoryLib, remote.Name, refSpecs, GenerateFetchOptions(cancellationToken), String.Format(CultureInfo.CurrentCulture, "Fetch of pull request #{0}", prNumber));
-				cancellationToken.ThrowIfCancellationRequested();
+				try
+				{
+					Commands.Fetch(repositoryLib, remote.Name, refSpecs, GenerateFetchOptions(cancellationToken), String.Format(CultureInfo.CurrentCulture, "Fetch of pull request #{0}", prNumber));
+				}
+				catch (UserCancelledException)
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+				}
 			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
 		/// <inheritdoc />
