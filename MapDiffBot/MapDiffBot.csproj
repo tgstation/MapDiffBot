@@ -44,6 +44,21 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resources\DmmTools.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DmmTools.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\DmmTools.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DmmTools.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="Powershell -File &quot;$(ProjectDir)/CompileDmmTools.ps1&quot;" />
   </Target>

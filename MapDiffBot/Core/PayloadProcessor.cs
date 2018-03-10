@@ -188,6 +188,11 @@ namespace MapDiffBot.Core
 				var dirPrepTask = DirectoryPrep();
 				//get the dme to use
 				var dmeToUseTask = serviceProvider.GetRequiredService<IDatabaseContext>().InstallationRepositories.Where(x => x.Id == pullRequest.Base.Repository.Id).Select(x => x.TargetDme).ToAsyncEnumerable().FirstOrDefault(cancellationToken);
+
+				var oldMapPaths = new List<string>()
+				{
+					Capacity = changedDmms.Count
+				};
 				try
 				{                  
 					//fetch base commit if necessary and check it out, fetch pull request
@@ -211,7 +216,9 @@ namespace MapDiffBot.Core
 							}
 							return null;
 						};
-						await Task.WhenAll(changedDmms.Select(x => CacheMap(x))).ConfigureAwait(false);
+						var tasks = changedDmms.Select(x => CacheMap(x)).ToList();
+						await Task.WhenAll(tasks).ConfigureAwait(false);
+						oldMapPaths.AddRange(tasks.Select(x => x.Result));
 					}
 					finally
 					{
@@ -231,12 +238,7 @@ namespace MapDiffBot.Core
 
 				using (var generator = generatorFactory.CreateGenerator(dmeToUse, new ResolvingIOManager(ioManager, repo.Path)))
 				{
-					var outputDirectory = ioManager.ResolvePath(".");
-
-					var oldMapPaths = new List<string>()
-					{
-						Capacity = changedDmms.Count
-					};
+					var outputDirectory = currentIOManager.ResolvePath(".");
 					//Generate MapRegions for modified maps and render all new maps
 					async Task<RenderResult> DiffAndRenderNewMap(int I)
 					{

@@ -39,12 +39,12 @@ namespace MapDiffBot.Core
 		/// <param name="usageTask">The <see cref="TaskCompletionSource{TResult}"/> that indicates the lifetime of the resulting <see cref="ILocalRepository"/></param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> token for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in the <see cref="ILocalRepository"/> at <paramref name="repoPath"/></returns>
-		static async Task<ILocalRepository> CreateRepositoryObject(string repoPath, TaskCompletionSource<object> usageTask, CancellationToken cancellationToken)
+		async Task<ILocalRepository> CreateRepositoryObject(string repoPath, TaskCompletionSource<object> usageTask, CancellationToken cancellationToken)
 		{
 			Repository repoLib = null;
 			await Task.Factory.StartNew(() =>
 			{
-				repoLib = new Repository(repoPath);
+				repoLib = new Repository(ioManager.ResolvePath(repoPath));
 				cancellationToken.ThrowIfCancellationRequested();
 				repoLib.RemoveUntrackedFiles();
 			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
@@ -63,10 +63,11 @@ namespace MapDiffBot.Core
 		{
 			var tcs1 = new TaskCompletionSource<bool>();
 			var tcs2 = new TaskCompletionSource<object>();
+			Task usageTask = null;
 
 			lock (activeRepositories)
 			{
-				if (activeRepositories.TryGetValue(repoPath, out Task usageTask))
+				if (activeRepositories.TryGetValue(repoPath, out usageTask))
 					activeRepositories[repoPath] = usageTask.ContinueWith(async (t) =>
 					{
 						tcs1.SetResult(false);
@@ -80,16 +81,26 @@ namespace MapDiffBot.Core
 					tcs1.SetResult(true);
 			}
 
+			Task operationBlockedTask = null;
+			if (usageTask != null && onOperationBlocked != null)
+				operationBlockedTask = onOperationBlocked();
+
 			bool needsNewKey;
-			using(cancellationToken.Register(() => {
+			try
+			{
+				using (cancellationToken.Register(() =>
+				{
 					tcs1.SetCanceled();
 					tcs2.SetCanceled();
 				}))
-				needsNewKey = await tcs1.Task.ConfigureAwait(false);
-			cancellationToken.ThrowIfCancellationRequested();
-
-			if (!needsNewKey && onOperationBlocked != null)
-				await onOperationBlocked().ConfigureAwait(false);
+					needsNewKey = await tcs1.Task.ConfigureAwait(false);
+				cancellationToken.ThrowIfCancellationRequested();
+			}
+			finally
+			{
+				if (operationBlockedTask != null)
+					await operationBlockedTask.ConfigureAwait(false);
+			}
 
 			cancellationToken.ThrowIfCancellationRequested();
 
