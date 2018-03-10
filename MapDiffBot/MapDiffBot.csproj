@@ -14,13 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\**" />
-    <Content Remove="wwwroot\**" />
-    <EmbeddedResource Remove="wwwroot\**" />
-    <None Remove="wwwroot\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Cyberboss.AspNetCore.AsyncInitializer" Version="1.0.2" />
     <PackageReference Include="GitHubJwt" Version="0.0.1" />
     <PackageReference Include="HangFire" Version="1.6.17" />
@@ -45,18 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Resources\DmmTools.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DmmTools.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\DmmTools.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>DmmTools.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

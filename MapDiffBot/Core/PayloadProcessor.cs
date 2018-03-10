@@ -3,6 +3,7 @@ using MapDiffBot.Configuration;
 using MapDiffBot.Controllers;
 using MapDiffBot.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -393,19 +394,22 @@ namespace MapDiffBot.Core
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		async Task HandleResults(PullRequest pullRequest, List<MapDiff> diffResults, string baseUrl, CancellationToken cancellationToken)
 		{
-			//delete old renderings
-			var deleter = new MapDiff
-			{
-				PullRequestNumber = pullRequest.Number,
-				RepositoryId = pullRequest.Base.Repository.Id
-			};
-
 			StringBuilder commentBuilder = null;
 			int formatterCount = 0;
 
 			Task saveTask;
 			var databaseContext = serviceProvider.GetRequiredService<IDatabaseContext>();
-			databaseContext.MapDiffs.Remove(deleter);
+
+			//delete outdated renderings if neccessary
+			if(await databaseContext.MapDiffs.CountAsync(x => x.RepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number, cancellationToken).ConfigureAwait(false) > 0)
+			{
+				databaseContext.MapDiffs.Remove(new MapDiff {
+					RepositoryId = pullRequest.Base.Repository.Id,
+					PullRequestNumber = pullRequest.Number
+				});
+				await databaseContext.Save(cancellationToken).ConfigureAwait(false);
+			}
+
 			foreach (var I in diffResults)
 			{
 				if (commentBuilder == null)
@@ -416,6 +420,7 @@ namespace MapDiffBot.Core
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "logs"));
 				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | ![]({2}) | ![]({3}) | {7} | {6} | [{4}]({5})", Environment.NewLine, I.MapPath, beforeUrl, afterUrl, stringLocalizer["Logs"], logsUrl, I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"], I.MapRegion?.ToString() ?? stringLocalizer["ALL"]));
 				databaseContext.MapDiffs.Add(I);
+				++formatterCount;
 			}
 
 			saveTask = databaseContext.Save(cancellationToken);

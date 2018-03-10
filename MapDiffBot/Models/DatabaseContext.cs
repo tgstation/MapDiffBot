@@ -1,5 +1,4 @@
-﻿using MapDiffBot.Core;
-using MapDiffBot.Configuration;
+﻿using MapDiffBot.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,6 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ZNetCS.AspNetCore.Logging.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace MapDiffBot.Models
 {
@@ -45,6 +45,10 @@ namespace MapDiffBot.Models
 		/// The <see cref="ILoggerFactory"/> for the <see cref="DatabaseContext"/>
 		/// </summary>
 		readonly ILoggerFactory loggerFactory;
+		/// <summary>
+		/// The <see cref="IHostingEnvironment"/> for the <see cref="DatabaseContext"/>
+		/// </summary>
+		readonly IHostingEnvironment hostingEnvironment;
 
 		/// <summary>
 		/// Construct a <see cref="DatabaseContext"/>
@@ -52,10 +56,12 @@ namespace MapDiffBot.Models
 		/// <param name="options">The <see cref="DbContextOptions{TContext}"/> for the <see cref="DatabaseContext"/></param>
 		/// <param name="databaseConfigurationOptions">The <see cref="IOptions{TOptions}"/> containing the value of <see cref="databaseConfiguration"/></param>
 		/// <param name="loggerFactory">The value of <see cref="loggerFactory"/></param>
-		public DatabaseContext(DbContextOptions<DatabaseContext> options, IOptions<DatabaseConfiguration> databaseConfigurationOptions, ILoggerFactory loggerFactory) : base(options)
+		/// <param name="hostingEnvironment">The value of <see cref="hostingEnvironment"/></param>
+		public DatabaseContext(DbContextOptions<DatabaseContext> options, IOptions<DatabaseConfiguration> databaseConfigurationOptions, ILoggerFactory loggerFactory, IHostingEnvironment hostingEnvironment) : base(options)
 		{
 			databaseConfiguration = databaseConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(databaseConfigurationOptions));
 			this.loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+			this.hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
 		}
 
 		/// <inheritdoc />
@@ -80,6 +86,8 @@ namespace MapDiffBot.Models
 			else
 				optionsBuilder.UseSqlServer(databaseConfiguration.ConnectionString);
 			optionsBuilder.UseLoggerFactory(loggerFactory);
+			if (hostingEnvironment.IsDevelopment())
+				optionsBuilder.EnableSensitiveDataLogging();
 		}
 
 		/// <inheritdoc />
