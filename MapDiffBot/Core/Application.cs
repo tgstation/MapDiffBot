@@ -130,11 +130,13 @@ namespace MapDiffBot.Core
 				SupportedUICultures = supportedCultures,
 			});
 
-			applicationBuilder.UseHangfireServer();
+			applicationBuilder.UseRewriter(new RewriteOptions().AddRedirectToHttpsPermanent());
 
 			applicationBuilder.UseStaticFiles();
 
-			applicationBuilder.UseRewriter(new RewriteOptions().AddRedirectToHttpsPermanent());
+			applicationBuilder.UseHangfireServer();
+
+			applicationBuilder.UseHangfireDashboard();
 
 			applicationBuilder.UseMvc();
         }
