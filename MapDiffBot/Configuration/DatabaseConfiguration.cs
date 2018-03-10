@@ -3,7 +3,9 @@
 	/// <summary>
 	/// Database configuration settings
 	/// </summary>
+#pragma warning disable CA1812
 	sealed class DatabaseConfiguration
+#pragma warning restore CA1812
 	{
 		/// <summary>
 		/// The configuration section the <see cref="DatabaseConfiguration"/> resides in

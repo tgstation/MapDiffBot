@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace MapDiffBot.Core
 {
 	/// <inheritdoc />
+#pragma warning disable CA1812
 	sealed class LocalRepositoryManager : ILocalRepositoryManager
+#pragma warning restore CA1812
 	{
 		/// <summary>
 		/// The <see cref="IIOManager"/> for the <see cref="LocalRepositoryManager"/>
@@ -46,6 +48,7 @@ namespace MapDiffBot.Core
 		/// Attempt to load the <see cref="ILocalRepository"/> at <paramref name="repoPath"/>. Awaits until all <see cref="ILocalRepository"/>'s referencing <paramref name="repoPath"/> created by <see langword="this"/> are disposed
 		/// </summary>
 		/// <param name="repoPath">The path to the <see cref="ILocalRepository"/></param>
+		/// <param name="recieveUsageTask">The <see cref="Action"/> with the current <see cref="TaskCompletionSource{TResult}"/> for <see cref="activeRepositories"/> to run if a clone is required</param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> token for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in the <see cref="ILocalRepository"/> at <paramref name="repoPath"/></returns>
 		async Task<ILocalRepository> TryLoadRepository(string repoPath, Action<TaskCompletionSource<object>> recieveUsageTask, CancellationToken cancellationToken)

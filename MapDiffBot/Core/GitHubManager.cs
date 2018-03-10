@@ -13,7 +13,9 @@ using System.Threading.Tasks;
 namespace MapDiffBot.Core
 {
 	/// <inheritdoc />
+#pragma warning disable CA1812
 	sealed class GitHubManager : IGitHubManager
+#pragma warning restore CA1812
 	{
 		/// <summary>
 		/// Cookie used to store <see cref="UserAccessToken"/>s
@@ -175,6 +177,7 @@ namespace MapDiffBot.Core
 			var client = await CreateInstallationClient(pullRequest.Base.Repository.Id, cancellationToken).ConfigureAwait(false);
 			//var client = gitHubClientFactory.CreateAppClient();
 
+			var currentUser = await client.User.Current().ConfigureAwait(false);
 			var openCommentsTask = client.Issue.Comment.GetAllForIssue(pullRequest.Base.Repository.Id, pullRequest.Number);
 
 			cancellationToken.ThrowIfCancellationRequested();
@@ -194,7 +197,7 @@ namespace MapDiffBot.Core
 				}
 
 			logger.LogTrace("Create comment on {1}/{2} #{3}: {0}", body, pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Owner.Name, pullRequest.Number);
-			await gitHubClientFactory.CreateAppClient().Issue.Comment.Create(pullRequest.Base.Repository.Id, pullRequest.Number, body).ConfigureAwait(false);
+			await client.Issue.Comment.Create(pullRequest.Base.Repository.Id, pullRequest.Number, body).ConfigureAwait(false);
 		}
 
 		/// <inheritdoc />

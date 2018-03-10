@@ -96,10 +96,9 @@ namespace MapDiffBot.Controllers
 		/// <summary>
 		/// Handle a POST to the <see cref="PayloadsController"/>
 		/// </summary>
-		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> of the POST</returns>
 		[HttpPost]
-		public async Task<IActionResult> Receive(CancellationToken cancellationToken)
+		public async Task<IActionResult> Receive()
 		{
 			logger.LogTrace("Recieved POST.");
 
@@ -155,7 +154,7 @@ namespace MapDiffBot.Controllers
 				}
 				logger.LogTrace("Queuing pull request payload processing job.");
 
-				await pullRequestProcessor.ProcessPayload(payload, Url).ConfigureAwait(false);
+				pullRequestProcessor.ProcessPayload(payload, Url);
 			}
 
 			return Ok();

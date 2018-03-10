@@ -15,7 +15,9 @@ using System.Threading.Tasks;
 namespace MapDiffBot.Core
 {
 	/// <inheritdoc />
+#pragma warning disable CA1812
 	sealed class GitHubClientFactory : IGitHubClientFactory, IPrivateKeySource
+#pragma warning restore CA1812
 	{
 		//TODO: make this private
 		/// <summary>

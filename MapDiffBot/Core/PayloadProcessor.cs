@@ -17,7 +17,9 @@ using System.Threading.Tasks;
 namespace MapDiffBot.Core
 {
 	/// <inheritdoc />
-    sealed class PayloadProcessor : IPayloadProcessor
+#pragma warning disable CA1812
+	sealed class PayloadProcessor : IPayloadProcessor
+#pragma warning restore CA1812
 	{
 		/// <summary>
 		/// The intermediate directory for operations
@@ -413,7 +415,7 @@ namespace MapDiffBot.Core
 				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.PullRequest.Number, payload.Repository.Id, basePath, JobCancellationToken.Null));
 			}
 		}
-		public async Task ProcessPayload(IssueCommentPayload payload, IUrlHelper urlHelper)
+		public void ProcessPayload(IssueCommentPayload payload, IUrlHelper urlHelper)
 		{
 			if (payload.Action != "created" || payload.Comment.Body == null)
 				return;

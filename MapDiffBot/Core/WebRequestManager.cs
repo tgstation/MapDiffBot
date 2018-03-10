@@ -10,7 +10,9 @@ using StreamReader = System.IO.StreamReader;
 namespace MapDiffBot.Core
 {
 	/// <inheritdoc />
+#pragma warning disable CA1812
 	sealed class WebRequestManager : IWebRequestManager
+#pragma warning restore CA1812
 	{
 		/// <summary>
 		/// The <see cref="ILogger{TCategoryName}"/> for the <see cref="WebRequestManager"/>
