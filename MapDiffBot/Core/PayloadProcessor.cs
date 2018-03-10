@@ -410,10 +410,10 @@ namespace MapDiffBot.Core
 			{
 				if (commentBuilder == null)
 					commentBuilder = new StringBuilder(String.Format(CultureInfo.InvariantCulture, "{0} | {1} | {2} | {3}{4}--- | --- | --- | ---", stringLocalizer["Map"], stringLocalizer["Old"], stringLocalizer["New"], stringLocalizer["Status"], Environment.NewLine));
-
-				var beforeUrl = String.Concat(baseUrl, FilesController.RouteTo(pullRequest, formatterCount, "before"));
-				var afterUrl = String.Concat(baseUrl, FilesController.RouteTo(pullRequest, formatterCount, "after"));
-				var logsUrl = String.Concat(baseUrl, FilesController.RouteTo(pullRequest, formatterCount, "logs"));
+				var prefix = String.Concat("https://", baseUrl);
+				var beforeUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "before"));
+				var afterUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "after"));
+				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "logs"));
 				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | ![]({2}) | ![]({3}) | {7} | {6} | [{4}]({5})", Environment.NewLine, I.MapPath, beforeUrl, afterUrl, stringLocalizer["Logs"], logsUrl, I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"], I.MapRegion?.ToString() ?? stringLocalizer["ALL"]));
 				databaseContext.MapDiffs.Add(I);
 			}

@@ -136,7 +136,7 @@ namespace MapDiffBot.Core
 
 			applicationBuilder.UseHangfireServer();
 
-			applicationBuilder.UseHangfireDashboard();
+			applicationBuilder.UseHangfireDashboard("/Jobs");
 
 			applicationBuilder.UseMvc();
         }
