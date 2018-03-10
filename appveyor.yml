@@ -3,7 +3,7 @@ pull_requests:
 environment:
   repo_token:
     secure: 2IfF4fXwHC6ix7KXkbvghzUT7zFzOjWWQKypfm/efc7XrUAHZdplFuLU08JJ37yk
-skip_branch_with_pr: true
+clone_depth: 1
 image: Visual Studio 2017
 configuration: 
   - Debug
