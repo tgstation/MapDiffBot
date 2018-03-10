@@ -245,7 +245,7 @@ namespace MapDiffBot.Core
 						await dirPrepTask.ConfigureAwait(false);
 						var originalPath = currentIOManager.ConcatPath(repo.Path, changedDmms[I]);
 						if (!await currentIOManager.FileExists(originalPath, cancellationToken).ConfigureAwait(false))
-							return new RenderResult { ToolOutput = stringLocalizer["Map missing!"] };
+							return new RenderResult { InputPath = changedDmms[I], ToolOutput = stringLocalizer["Map missing!"] };
 						if (oldMapPaths[I] != null)
 						{
 							var result = await generator.GetDifferences(oldMapPaths[I], originalPath, cancellationToken).ConfigureAwait(false);
@@ -260,25 +260,33 @@ namespace MapDiffBot.Core
 									//need to expand
 									var fullResult = await generator.GetMapSize(originalPath, cancellationToken).ConfigureAwait(false);
 									var fullRegion = fullResult.MapRegion;
-									bool increaseMax = true;
-									if (xdiam < minDiffDimensions && ((fullRegion.MaxX - fullRegion.MinX) >= minDiffDimensions))
-										while ((region.MaxX - region.MinX) < minDiffDimensions)
-										{
-											if (increaseMax)
-												region.MaxX = (short)Math.Min(region.MaxX + 1, fullRegion.MaxX);
-											else
-												region.MinX = (short)Math.Max(region.MinX - 1, 1);
-											increaseMax = !increaseMax;
-										}
-									if (ydiam < minDiffDimensions && ((fullRegion.MaxY - fullRegion.MinY) >= minDiffDimensions))
-										while ((region.MaxY - region.MinY) < minDiffDimensions)
-										{
-											if (increaseMax)
-												region.MaxY = (short)Math.Min(region.MaxY + 1, fullRegion.MaxY);
-											else
-												region.MinY = (short)Math.Max(region.MinY - 1, 1);
-											increaseMax = !increaseMax;
-										}
+									if (fullRegion == null)
+									{
+										//give up
+										region = null;
+									}
+									else
+									{
+										bool increaseMax = true;
+										if (xdiam < minDiffDimensions && ((fullRegion.MaxX - fullRegion.MinX) >= minDiffDimensions))
+											while ((region.MaxX - region.MinX) < minDiffDimensions)
+											{
+												if (increaseMax)
+													region.MaxX = (short)Math.Min(region.MaxX + 1, fullRegion.MaxX);
+												else
+													region.MinX = (short)Math.Max(region.MinX - 1, 1);
+												increaseMax = !increaseMax;
+											}
+										if (ydiam < minDiffDimensions && ((fullRegion.MaxY - fullRegion.MinY) >= minDiffDimensions))
+											while ((region.MaxY - region.MinY) < minDiffDimensions)
+											{
+												if (increaseMax)
+													region.MaxY = (short)Math.Min(region.MaxY + 1, fullRegion.MaxY);
+												else
+													region.MinY = (short)Math.Max(region.MinY - 1, 1);
+												increaseMax = !increaseMax;
+											}
+									}
 								}
 								mapRegions[I] = region;
 							}
@@ -304,7 +312,7 @@ namespace MapDiffBot.Core
 						var oldPath = oldMapPaths[i];
 						if (oldMapPaths != null)
 							return generator.RenderMap(oldPath, mapRegions[i], outputDirectory, "before", cancellationToken);
-						return Task.FromResult(new RenderResult { ToolOutput = stringLocalizer["Map missing!"] });
+						return Task.FromResult(new RenderResult { InputPath = changedDmms[i], ToolOutput = stringLocalizer["Map missing!"] });
 					}
 
 					//finish up rendering
@@ -361,8 +369,8 @@ namespace MapDiffBot.Core
 					return null;
 				}
 
-				var readBeforeTask = ReadMapImage(r1?.InputPath);
-				result.AfterImage = new Image { Data = await ReadMapImage(r2?.InputPath).ConfigureAwait(false) };
+				var readBeforeTask = ReadMapImage(r1?.OutputPath);
+				result.AfterImage = new Image { Data = await ReadMapImage(r2?.OutputPath).ConfigureAwait(false) };
 				result.BeforeImage = new Image { Data = await readBeforeTask.ConfigureAwait(false) };
 
 				return result;

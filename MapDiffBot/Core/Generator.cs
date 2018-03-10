@@ -63,7 +63,7 @@ namespace MapDiffBot.Core
 		async Task<string> GetDMMToolsPath(CancellationToken cancellationToken)
 		{
 			const string path = "dmm-tools.exe";
-			using (SemaphoreSlimContext.Lock(semaphore, cancellationToken))
+			using (await SemaphoreSlimContext.Lock(semaphore, cancellationToken).ConfigureAwait(false))
 				if (!await ioManager.FileExists(path, cancellationToken).ConfigureAwait(false))
 					await ioManager.WriteAllBytes(path, DmmTools.dmm_tools, cancellationToken).ConfigureAwait(false);
 			return ioManager.ResolvePath(path);
@@ -130,18 +130,23 @@ namespace MapDiffBot.Core
 			};
 
 			process.Start();
-			process.PriorityClass = ProcessPriorityClass.BelowNormal;
-			process.BeginOutputReadLine();
-			process.BeginErrorReadLine();
-			using (var reg = cancellationToken.Register(() =>
+			try
 			{
-				try
+				process.PriorityClass = ProcessPriorityClass.BelowNormal;
+				process.BeginOutputReadLine();
+				process.BeginErrorReadLine();
+				using (var reg = cancellationToken.Register(() =>
 				{
-					process.Kill();
-				}
-				catch (InvalidOperationException) { }
-			}))
-				await tcs.Task.ConfigureAwait(false);
+					try
+					{
+						process.Kill();
+					}
+					catch (InvalidOperationException) { }
+				}))
+					await tcs.Task.ConfigureAwait(false);
+			}
+			//process exited
+			catch (InvalidOperationException) { }
 
 			return process.ExitCode;
 		}
@@ -169,28 +174,22 @@ namespace MapDiffBot.Core
 			}
 
 			var toolOutput = String.Format(CultureInfo.InvariantCulture, "Exit Code: {0}{1}StdOut:{1}{2}{1}StdErr{1}{3}", processTask.Result, Environment.NewLine, output, errorOutput);
+			var result = new ToolResult { ToolOutput = toolOutput, CommandLine = args };
 			try
 			{
 				var json = JsonConvert.DeserializeObject<IDictionary<string, IDictionary<string, object>>>(output.ToString());
 				var map = json[mapPath];
 				var size = (JArray)map["size"];
-				return new ToolResult
+				result.MapRegion = new MapRegion
 				{
-					ToolOutput = toolOutput,
-					MapRegion = new MapRegion
-					{
-						MinX = 1,
-						MinY = 1,
-						MaxX = (short)size[0],
-						MaxY = (short)size[1]
-					},
-					CommandLine = args
+					MinX = 1,
+					MinY = 1,
+					MaxX = (short)size[0],
+					MaxY = (short)size[1]
 				};
 			}
-			catch
-			{
-				return new ToolResult { ToolOutput = toolOutput, CommandLine = args };
-			}
+			catch { }
+			return result;
 		}
 
 		/// <inheritdoc />
@@ -241,10 +240,12 @@ namespace MapDiffBot.Core
 			{
 				MapRegion = region,
 				CommandLine = args,
-				ToolOutput = toolOutput
+				ToolOutput = toolOutput,
+				InputPath = mapPath
 			};
 
-			if (result != null) {
+			if (result != null)
+			{
 				await ioManager.MoveFile(result, outFile, cancellationToken).ConfigureAwait(false);
 				rresult.OutputPath = ioManager.ResolvePath(outFile);
 			}

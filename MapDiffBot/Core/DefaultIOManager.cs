@@ -116,7 +116,14 @@ namespace MapDiffBot.Core
 		}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
 		/// <inheritdoc />
-		public Task MoveFile(string source, string destination, CancellationToken cancellationToken) => Task.Factory.StartNew(() => File.Move(source, destination), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+		public Task MoveFile(string source, string destination, CancellationToken cancellationToken) => Task.Factory.StartNew(() =>
+		{
+			if (destination == null)
+				throw new ArgumentNullException(nameof(destination));
+			source = ResolvePath(source ?? throw new ArgumentNullException(nameof(source)));
+			destination = ResolvePath(destination);
+			File.Move(source, destination);
+		}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
 		/// <inheritdoc />
 		public async Task<byte[]> ReadAllBytes(string path, CancellationToken cancellationToken)

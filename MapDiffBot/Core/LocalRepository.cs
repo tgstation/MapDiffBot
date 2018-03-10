@@ -78,7 +78,14 @@ namespace MapDiffBot.Core
 		}
 
 		/// <inheritdoc />
-		public Task Checkout(string commitish, CancellationToken cancellationToken) => Task.Factory.StartNew(() => Commands.Checkout(repositoryLib, commitish ?? throw new ArgumentNullException(nameof(commitish))), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+		public Task Checkout(string commitish, CancellationToken cancellationToken) => Task.Factory.StartNew(() => {
+			Commands.Checkout(repositoryLib, commitish ?? throw new ArgumentNullException(nameof(commitish)), new CheckoutOptions
+			{
+				CheckoutModifiers = CheckoutModifiers.Force
+			});
+			cancellationToken.ThrowIfCancellationRequested();
+			repositoryLib.Reset(ResetMode.Hard);
+		}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
 		/// <inheritdoc />
 		public Task<bool> ContainsCommit(string sha, CancellationToken cancellationToken) => Task.Factory.StartNew(() => repositoryLib.Lookup(sha) != null, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
