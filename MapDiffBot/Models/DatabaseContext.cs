@@ -80,6 +80,8 @@ namespace MapDiffBot.Models
 			//enable cascade deletion
 			modelBuilder.Entity<InstallationRepository>().HasOne<Installation>().WithMany(x => x.Repositories).OnDelete(DeleteBehavior.Cascade);
 			modelBuilder.Entity<MapDiff>().HasOne<InstallationRepository>().WithMany(x => x.MapDiffs).OnDelete(DeleteBehavior.Cascade);
+			modelBuilder.Entity<Image>().HasOne<MapDiff>().WithOne(x => x.BeforeImage).OnDelete(DeleteBehavior.Cascade);
+			modelBuilder.Entity<Image>().HasOne<MapDiff>().WithOne(x => x.AfterImage).OnDelete(DeleteBehavior.Cascade);
 		}
 
 		/// <inheritdoc />
