@@ -23,10 +23,7 @@ namespace MapDiffBot
 		/// <returns>A <see cref="Task"/> representing the scope of the <see cref="Program"/></returns>
 		public static async Task Main(string[] args)
 		{
-			var builder = GetWebHostBuilder(args);
-			builder.UseKestrel(options => options.Limits.MaxResponseBufferSize = null);
-			builder.UseStartup<Application>();
-			using (var webHost = builder.Build())
+			using (var webHost = GetWebHostBuilder(args).UseStartup<Application>().Build())
 				await webHost.RunAsync().ConfigureAwait(false);
 		}
 	}

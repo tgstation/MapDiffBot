@@ -64,6 +64,7 @@ namespace MapDiffBot.Controllers
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> of the operation</returns>
 		[HttpGet("{repositoryId}/{prNumber}/{fileId}/{beforeOrAfter}.png")]
+		[ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
 		public async Task<IActionResult> HandleMapGet(long repositoryId, int prNumber, int fileId, string beforeOrAfter, CancellationToken cancellationToken)
 		{
 			if (beforeOrAfter == null)
@@ -81,7 +82,7 @@ namespace MapDiffBot.Controllers
 			if (diff == default(Image))
 				return NotFound();
 			
-			return File(new MemoryStream(diff.Data), "image/png");
+			return File(diff.Data, "image/png");
 		}
 
 		/// <summary>

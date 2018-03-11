@@ -14,32 +14,32 @@ namespace MapDiffBot.Controllers
 	/// Handles configuring <see cref="InstallationRepository.TargetDme"/>s
 	/// </summary>
 	[Route(Route)]
-    public sealed class DmeCongfigurationController : Controller
+    public sealed class DmeConfigurationController : Controller
     {
 		/// <summary>
-		/// The route to the <see cref="DmeCongfigurationController"/>
+		/// The route to the <see cref="DmeConfigurationController"/>
 		/// </summary>
 		const string Route = "DmeConfiguration";
 		/// <summary>
-		/// The <see cref="IDatabaseContext"/> for the <see cref="DmeCongfigurationController"/>
+		/// The <see cref="IDatabaseContext"/> for the <see cref="DmeConfigurationController"/>
 		/// </summary>
 		readonly IDatabaseContext databaseContext;
 		/// <summary>
-		/// The <see cref="IGitHubManager"/> for the <see cref="DmeCongfigurationController"/>
+		/// The <see cref="IGitHubManager"/> for the <see cref="DmeConfigurationController"/>
 		/// </summary>
 		readonly IGitHubManager gitHubManager;
 		/// <summary>
-		/// The <see cref="IStringLocalizer"/> for the <see cref="DmeCongfigurationController"/>
+		/// The <see cref="IStringLocalizer"/> for the <see cref="DmeConfigurationController"/>
 		/// </summary>
-		readonly IStringLocalizer<DmeCongfigurationController> stringLocalizer;
+		readonly IStringLocalizer<DmeConfigurationController> stringLocalizer;
 
 		/// <summary>
-		/// Construct a <see cref="DmeCongfigurationController"/>
+		/// Construct a <see cref="DmeConfigurationController"/>
 		/// </summary>
 		/// <param name="databaseContext">The value of <see cref="databaseContext"/></param>
 		/// <param name="gitHubManager">The value of <see cref="gitHubManager"/></param>
 		/// <param name="stringLocalizer">The value of <see cref="stringLocalizer"/></param>
-		public DmeCongfigurationController(IDatabaseContext databaseContext, IGitHubManager gitHubManager, IStringLocalizer<DmeCongfigurationController> stringLocalizer)
+		public DmeConfigurationController(IDatabaseContext databaseContext, IGitHubManager gitHubManager, IStringLocalizer<DmeConfigurationController> stringLocalizer)
 		{
 			this.databaseContext = databaseContext ?? throw new ArgumentNullException(nameof(databaseContext));
 			this.gitHubManager = gitHubManager ?? throw new ArgumentNullException(nameof(gitHubManager));
@@ -92,7 +92,9 @@ namespace MapDiffBot.Controllers
         {
 			try
 			{
+				var loadRepoTask = gitHubManager.LoadInstallation(repositoryId, cancellationToken);
 				var authedTask = gitHubManager.CheckAuthorization(repositoryId, Request.Cookies, cancellationToken);
+				await loadRepoTask.ConfigureAwait(false);
 				ViewBag.ConfiguredDme = await databaseContext.InstallationRepositories.Where(x => x.Id == repositoryId).Select(x => x.TargetDme).ToAsyncEnumerable().First(cancellationToken).ConfigureAwait(false);
 				ViewBag.IsMaintainer = await authedTask.ConfigureAwait(false);
 				SetViewParameters(repositoryId);
@@ -117,22 +119,17 @@ namespace MapDiffBot.Controllers
         {
 			try
 			{
-				string dmePath;
-				throw new NotImplementedException();
+				string newDmePath = Request.Form[nameof(newDmePath)];
 				var authed = await gitHubManager.CheckAuthorization(repositoryId, Request.Cookies, cancellationToken).ConfigureAwait(false);
 				if (!authed)
 					return Unauthorized();
 				databaseContext.InstallationRepositories.Attach(new InstallationRepository
 				{
 					Id = repositoryId,
-					TargetDme = dmePath
+					TargetDme = newDmePath
 				}).Property(nameof(InstallationRepository.TargetDme)).IsModified = true;
 				await databaseContext.Save(cancellationToken).ConfigureAwait(false);
-				ViewBag.ConfiguredDme = dmePath;
-				ViewBag.IsMaintainer = true;
-				ViewBag.Authenticated = true;
-				SetViewParameters(repositoryId);
-				return View(nameof(Index));
+				return RedirectToAction(nameof(Index), new { repositoryId });
 			}
 			catch
 			{

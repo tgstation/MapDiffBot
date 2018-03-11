@@ -282,9 +282,10 @@ namespace MapDiffBot.Core
 						var originalPath = currentIOManager.ConcatPath(repoPath, changedDmms[I]);
 						if (!await currentIOManager.FileExists(originalPath, cancellationToken).ConfigureAwait(false))
 							return new RenderResult { InputPath = changedDmms[I], ToolOutput = stringLocalizer["Map missing!"] };
+						ToolResult result = null;
 						if (oldMapPaths[I] != null)
 						{
-							var result = await generator.GetDifferences(oldMapPaths[I], originalPath, cancellationToken).ConfigureAwait(false);
+							result = await generator.GetDifferences(oldMapPaths[I], originalPath, cancellationToken).ConfigureAwait(false);
 							var region = result.MapRegion;
 							if (region != null)
 							{
@@ -327,7 +328,10 @@ namespace MapDiffBot.Core
 								mapRegions[I] = region;
 							}
 						}
-						return await generator.RenderMap(originalPath, mapRegions[I], outputDirectory, "after", cancellationToken).ConfigureAwait(false);
+						var renderResult = await generator.RenderMap(originalPath, mapRegions[I], outputDirectory, "after", cancellationToken).ConfigureAwait(false);
+						if (result != null)
+							renderResult.ToolOutput = String.Format(CultureInfo.InvariantCulture, "Differences task:{0}{1}{0}Render task:{0}{2}", Environment.NewLine, result.ToolOutput, renderResult.ToolOutput);
+						return renderResult;
 					};
 
 					//finish up before we go back to the base branch
@@ -391,7 +395,7 @@ namespace MapDiffBot.Core
 				var r1 = GetRenderingResult(beforeTask);
 				var r2 = GetRenderingResult(afterTask);
 
-				result.MapRegion = r1?.MapRegion;
+				result.MapRegion = r2?.MapRegion;
 				result.MapPath = (r1?.InputPath ?? r2.InputPath).Replace(OldMapExtension, String.Empty, StringComparison.InvariantCulture);
 
 				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:{0}Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}Logs:{0}{7}{0}After:{0}Command Line: {3}{0}Output:{0}{4}{0}Logs:{0}{8}{0}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath, r1?.ToolOutput, r2?.ToolOutput);

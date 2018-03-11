@@ -30,11 +30,6 @@ namespace MapDiffBot.Models
 		public DateTimeOffset AccessTokenExpiry { get; set; }
 
 		/// <summary>
-		/// The .dme file to use for operations
-		/// </summary>
-		public string DefaultDme { get; set; }
-
-		/// <summary>
 		/// The <see cref="InstallationRepository"/>s in the <see cref="Installation"/>
 		/// </summary>
 #pragma warning disable CA2227 // Collection properties should be read only

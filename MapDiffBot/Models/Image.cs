@@ -10,6 +10,7 @@ namespace MapDiffBot.Models
 		/// <summary>
 		/// The column ID
 		/// </summary>
+		[Required]
 		public int Id { get; set; }
 
 		/// <summary>

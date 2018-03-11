@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Z.EntityFramework.Plus;
 
 namespace MapDiffBot.Core
 {
@@ -68,7 +69,7 @@ namespace MapDiffBot.Core
 
 			if (installation != null)
 			{
-				if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow)
+				if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow.AddMinutes(-10))
 				{
 					var newToken = await gitHubClientFactory.CreateAppClient().GitHubApps.CreateInstallationToken(installation.Id).ConfigureAwait(false);
 					var trackingContext = databaseContext.Installations.Attach(new Models.Installation
@@ -125,25 +126,25 @@ namespace MapDiffBot.Core
 			return gitHubClientFactory.CreateOauthClient(newEntities.First(x => x.Repositories.Any(y => y.Id == repositoryId)).AccessToken);
 		}
 
+
+		/// <inheritdoc />
+		public Task LoadInstallation(long repositoryId, CancellationToken cancellationToken) => CreateInstallationClient(repositoryId, cancellationToken);
+
 		/// <inheritdoc />
 		public async Task<bool> CheckAuthorization(long repositoryId, IRequestCookieCollection cookies, CancellationToken cancellationToken)
 		{
 			if (!cookies.TryGetValue(AuthorizationCookie, out string cookieGuid))
 				return false;
 
-			if (!Guid.TryParse(AuthorizationCookie, out Guid guid))
+			if (!Guid.TryParse(cookieGuid, out Guid guid))
 				return false;
 
 			logger.LogTrace("Check authorization");
 
 			//cleanup
 			var now = DateTimeOffset.Now;
-			var everything = await databaseContext.UserAccessTokens.ToAsyncEnumerable().ToList().ConfigureAwait(false);
-			var toRemove = everything.Where(x => x.Expiry < now);
-			databaseContext.UserAccessTokens.RemoveRange(toRemove);
-			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
-
-			var entry = everything.Where(x => x.Id == guid && x.Expiry >= now).FirstOrDefault();
+			var everything = await databaseContext.UserAccessTokens.Where(x => x.Expiry < DateTimeOffset.UtcNow).DeleteAsync(cancellationToken).ConfigureAwait(false);
+			var entry = await databaseContext.UserAccessTokens.Where(x => x.Id == guid).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
 			if (entry == default(UserAccessToken))
 				return false;
 			
@@ -188,6 +189,7 @@ namespace MapDiffBot.Core
 			var expiry = DateTimeOffset.Now.AddDays(AccessTokenExpiryDays);
 			var newEntry = new UserAccessToken
 			{
+				Id = Guid.NewGuid(),
 				AccessToken = result.AccessToken,
 				Expiry = expiry
 			};
@@ -195,7 +197,9 @@ namespace MapDiffBot.Core
 			await databaseContext.UserAccessTokens.AddAsync(newEntry, cancellationToken).ConfigureAwait(false);
 			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 
-			if (request.Query.TryGetValue("code", out stringValues) && stringValues.Count > 0)
+			cookies.Append(AuthorizationCookie, newEntry.Id.ToString());
+
+			if (request.Query.TryGetValue("state", out stringValues) && stringValues.Count > 0)
 				return stringValues.First();
 			return null;
 		}

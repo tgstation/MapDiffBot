@@ -281,7 +281,7 @@ namespace MapDiffBot.Core
 			};
 
 			var matches = Regex.Matches(output.ToString(), "\\(([1-9][0-9]*), ([1-9][0-9]*), ([1-9][0-9]*)\\)");
-			if (matches.Count != 1)
+			if (matches.Count == 0)
 				return result;
 
 			var region = new MapRegion()
