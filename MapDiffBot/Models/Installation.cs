@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MapDiffBot.Models
 {
@@ -12,14 +13,9 @@ namespace MapDiffBot.Models
 		/// <summary>
 		/// Primary key for the entity
 		/// </summary>
-		[Key]
-		public int ColumnId { get; set; }
-
-		/// <summary>
-		/// The <see cref="Octokit.Installation.Id"/>
-		/// </summary>
 		[Required]
-		public long InstallationId { get; set; }
+		[DatabaseGenerated(DatabaseGeneratedOption.None)]
+		public long Id { get; set; }
 
 		/// <summary>
 		/// The oauth access token for the <see cref="Installation"/>

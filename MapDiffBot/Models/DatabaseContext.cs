@@ -74,8 +74,12 @@ namespace MapDiffBot.Models
 			// real relation database can map table:
 			modelBuilder.Entity<Log>().ToTable(nameof(Log));
 
+			//enable multikeys
 			modelBuilder.Entity<MapDiff>().HasKey(x => new { x.RepositoryId, x.PullRequestNumber, x.FileId });
-			modelBuilder.Entity<InstallationRepository>().HasKey(x => new { x.ColumnId, x.Id });
+
+			//enable cascade deletion
+			modelBuilder.Entity<InstallationRepository>().HasOne<Installation>().WithMany(x => x.Repositories).OnDelete(DeleteBehavior.Cascade);
+			modelBuilder.Entity<MapDiff>().HasOne<InstallationRepository>().WithMany(x => x.MapDiffs).OnDelete(DeleteBehavior.Cascade);
 		}
 
 		/// <inheritdoc />

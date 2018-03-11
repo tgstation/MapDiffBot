@@ -3,6 +3,7 @@ using MapDiffBot.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Octokit;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,10 @@ namespace MapDiffBot.Core
 		/// Cookie used to store <see cref="UserAccessToken"/>s
 		/// </summary>
 		const string AuthorizationCookie = "1df00c9b-be1a-4274-a8ab-db0e575ff589";
+		/// <summary>
+		/// How long the <see cref="AuthorizationCookie"/> will last for
+		/// </summary>
+		const int AccessTokenExpiryDays = 3;
 
 		/// <summary>
 		/// The <see cref="GitHubConfiguration"/> for the <see cref="GitHubManager"/>
@@ -59,15 +64,21 @@ namespace MapDiffBot.Core
 			IReadOnlyList<Octokit.Installation> gitHubInstalls;
 			List<Models.Installation> allKnownInstalls;
 			IGitHubClient client;
-			var installation = await databaseContext.Installations.Where(x => x.Repositories.Any(y => y.Id == repositoryId)).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
+			var installation = await databaseContext.Installations.Where(x => x.Repositories.Any(y => y.Id == repositoryId)).Select(x => new { x.Id, x.AccessToken, x.AccessTokenExpiry }).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
 
-			if (installation != default(Models.Installation))
+			if (installation != null)
 			{
 				if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow)
 				{
-					var newToken = await gitHubClientFactory.CreateAppClient().GitHubApps.CreateInstallationToken(installation.InstallationId).ConfigureAwait(false);
-					installation.AccessToken = newToken.Token;
-					installation.AccessTokenExpiry = newToken.ExpiresAt;
+					var newToken = await gitHubClientFactory.CreateAppClient().GitHubApps.CreateInstallationToken(installation.Id).ConfigureAwait(false);
+					var trackingContext = databaseContext.Installations.Attach(new Models.Installation
+					{
+						Id = installation.Id,
+						AccessToken = newToken.Token,
+						AccessTokenExpiry = newToken.ExpiresAt
+					});
+					trackingContext.Property(nameof(Models.Installation.AccessToken)).IsModified = true;
+					trackingContext.Property(nameof(Models.Installation.AccessTokenExpiry)).IsModified = true;
 					await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 				}
 				return gitHubClientFactory.CreateOauthClient(installation.AccessToken);
@@ -80,10 +91,10 @@ namespace MapDiffBot.Core
 			var allKnownInstallsTask = databaseContext.Installations.ToAsyncEnumerable().ToList(cancellationToken);
 			gitHubInstalls = await client.GitHubApps.GetAllInstallationsForCurrent().ConfigureAwait(false);
 			allKnownInstalls = await allKnownInstallsTask.ConfigureAwait(false);
-			databaseContext.Installations.RemoveRange(allKnownInstalls.Where(x => !gitHubInstalls.Any(y => y.Id == x.InstallationId)));
+			databaseContext.Installations.RemoveRange(allKnownInstalls.Where(x => !gitHubInstalls.Any(y => y.Id == x.Id)));
 
 			//add new installs for those that aren't
-			var installsToAdd = gitHubInstalls.Where(x => !allKnownInstalls.Any(y => y.InstallationId == x.Id));
+			var installsToAdd = gitHubInstalls.Where(x => !allKnownInstalls.Any(y => y.Id == x.Id));
 
 			async Task<Models.Installation> CreateAccessToken(Octokit.Installation newInstallation)
 			{
@@ -93,7 +104,7 @@ namespace MapDiffBot.Core
 				var installationToken = await client.GitHubApps.CreateInstallationToken(newInstallation.Id).ConfigureAwait(false);
 				var entity = new Models.Installation
 				{
-					InstallationId = newInstallation.Id,
+					Id = newInstallation.Id,
 					AccessToken = installationToken.Token,
 					AccessTokenExpiry = installationToken.ExpiresAt,
 					Repositories = new List<InstallationRepository>()
@@ -149,9 +160,42 @@ namespace MapDiffBot.Core
 		}
 
 		/// <inheritdoc />
-		public Task<string> CompleteAuthorization(HttpRequest request, IResponseCookies cookies, CancellationToken cancellationToken)
+		public async Task<string> CompleteAuthorization(HttpRequest request, IResponseCookies cookies, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			if (request == null)
+				throw new ArgumentNullException(nameof(request));
+			if (cookies == null)
+				throw new ArgumentNullException(nameof(cookies));
+
+
+			string code;
+			if (!request.Query.TryGetValue("code", out StringValues stringValues) || stringValues.Count == 0)
+				return null;
+			code = stringValues.First();
+
+			logger.LogTrace("CompleteAuthorization for with code: {0}", code);
+
+
+			var otr = new OauthTokenRequest(gitHubConfiguration.OauthClientID, gitHubConfiguration.OauthSecret, code);
+			var gitHubClient = gitHubClientFactory.CreateAppClient();
+			var result = await gitHubClient.Oauth.CreateAccessToken(otr).ConfigureAwait(false);
+			if (result.AccessToken == null)
+				//user is fucking with us, don't even bother
+				return null;
+
+			var expiry = DateTimeOffset.Now.AddDays(AccessTokenExpiryDays);
+			var newEntry = new UserAccessToken
+			{
+				AccessToken = result.AccessToken,
+				Expiry = expiry
+			};
+
+			await databaseContext.UserAccessTokens.AddAsync(newEntry, cancellationToken).ConfigureAwait(false);
+			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
+
+			if (request.Query.TryGetValue("code", out stringValues) && stringValues.Count > 0)
+				return stringValues.First();
+			return null;
 		}
 
 		/// <inheritdoc />

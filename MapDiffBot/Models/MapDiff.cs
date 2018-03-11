@@ -13,6 +13,7 @@ namespace MapDiffBot.Models
 		/// </summary>
 		[Key, Column(Order = 0)]
 		[Required]
+		[DatabaseGenerated(DatabaseGeneratedOption.None)]
 		public long RepositoryId { get; set; }
 
 		/// <summary>
