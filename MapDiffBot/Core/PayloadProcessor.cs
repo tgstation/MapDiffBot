@@ -411,9 +411,9 @@ namespace MapDiffBot.Core
 			var deleteTask = databaseContext.MapDiffs.Where(x => x.RepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number).DeleteAsync(cancellationToken);
 
 			var commentBuilder = new StringBuilder();
+			var prefix = String.Concat("https://", baseUrl);
 			foreach (var I in diffResults)
 			{
-				var prefix = String.Concat("https://", baseUrl);
 				var beforeUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "before"));
 				var afterUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "after"));
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "logs"));
@@ -437,7 +437,7 @@ namespace MapDiffBot.Core
 				++formatterCount;
 			}
 			
-			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs available [here]({0})", String.Concat(baseUrl, FilesController.RouteToLogs(pullRequest))]);
+			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs available [here]({0})", String.Concat(prefix, FilesController.RouteToLogs(pullRequest))]);
 
 			await deleteTask.ConfigureAwait(false);
 			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
@@ -459,7 +459,7 @@ namespace MapDiffBot.Core
 			if (payload.Comment.Body.Split(' ').Any(x => x == String.Format(CultureInfo.InvariantCulture, "@{0}", gitHubConfiguration.TagUser)))
 			{
 				var basePath = urlHelper.ActionContext.HttpContext.Request.Host + urlHelper.ActionContext.HttpContext.Request.PathBase;
-				backgroundJobClient.Enqueue(() => ScanPullRequest(new JobSubmission(payload.Issue, basePath, stringLocalizer), JobCancellationToken.Null));
+				backgroundJobClient.Enqueue(() => ScanPullRequest(new JobSubmission(payload.Issue, payload.Repository, basePath, stringLocalizer), JobCancellationToken.Null));
 			}
 		}
 	}

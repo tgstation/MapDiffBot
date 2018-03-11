@@ -51,9 +51,10 @@ namespace MapDiffBot.Core
 		/// Construct a <see cref="JobSubmission"/>
 		/// </summary>
 		/// <param name="issue">The <see cref="Issue"/> being submitted</param>
+		/// <param name="repository">The <see cref="Issue.Repository"/></param>
 		/// <param name="baseUrl">The value of <see cref="BaseUrl"/></param>
 		/// <param name="stringLocalizer">The <see cref="IStringLocalizer"/> for formatting <see cref="HangfireDisplayName"/></param>
-		public JobSubmission(Issue issue, string baseUrl, IStringLocalizer<PayloadProcessor> stringLocalizer)
+		public JobSubmission(Issue issue, Repository repository, string baseUrl, IStringLocalizer<PayloadProcessor> stringLocalizer)
 		{
 			if (issue == null)
 				throw new ArgumentNullException(nameof(issue));
@@ -61,7 +62,7 @@ namespace MapDiffBot.Core
 				throw new ArgumentNullException(nameof(stringLocalizer));
 			BaseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
 			HangfireDisplayName = stringLocalizer["Generate Map Diffs for #{0} - \"{1}\" ({2})", issue.Number, issue.Title, issue.User.Login, issue.HtmlUrl];
-			RepositoryId = issue.Repository.Id;
+			RepositoryId = repository.Id;
 			PullRequestNumber = issue.Number;
 		}
 
