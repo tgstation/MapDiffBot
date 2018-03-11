@@ -126,7 +126,7 @@ namespace MapDiffBot.Core
 		}
 	
 		/// <inheritdoc />
-		public async Task<ILocalRepository> GetRepository(Octokit.Repository repository, Func<Task> onCloneRequired, Func<Task> onOperationBlocked, CancellationToken cancellationToken)
+		public async Task<ILocalRepository> GetRepository(Octokit.Repository repository, Func<int, Task> onCloneProgress, Func<Task> onOperationBlocked, CancellationToken cancellationToken)
 		{
 			if (repository == null)
 				throw new ArgumentNullException(nameof(repository));
@@ -144,7 +144,9 @@ namespace MapDiffBot.Core
 
 			try
 			{
-				var cloneRequiredTask = onCloneRequired?.Invoke();
+				List<Task> cloneTasks = null;
+				if(onCloneProgress != null)
+					cloneTasks = new List<Task>() { onCloneProgress(0) };
 
 				await ioManager.DeleteDirectory(repoPath, cancellationToken).ConfigureAwait(false);
 				await ioManager.CreateDirectory(repoPath, cancellationToken).ConfigureAwait(false);
@@ -158,7 +160,18 @@ namespace MapDiffBot.Core
 						{
 							Checkout = true,
 							OnProgress = (m) => !cancellationToken.IsCancellationRequested,
-							OnTransferProgress = (p) => !cancellationToken.IsCancellationRequested,
+							OnTransferProgress = (transferProgress) =>
+							{
+								if (cancellationToken.IsCancellationRequested)
+									return false;
+								if (cloneTasks != null)
+								{
+									var newTask = onCloneProgress((transferProgress.ReceivedObjects + transferProgress.IndexedObjects) / transferProgress.TotalObjects);
+									if (newTask != null)
+										cloneTasks.Add(newTask);
+								}
+								return true;
+							},
 							OnUpdateTips = (a, b, c) => !cancellationToken.IsCancellationRequested
 						});
 					}
@@ -169,8 +182,8 @@ namespace MapDiffBot.Core
 				}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
 
 				var result = await CreateRepositoryObject(repoPath, usageTask, cancellationToken).ConfigureAwait(false);
-				if (cloneRequiredTask != null)
-					await cloneRequiredTask.ConfigureAwait(false);
+				if(cloneTasks != null)
+					await Task.WhenAll(cloneTasks).ConfigureAwait(false);
 				return result;
 			}
 			catch

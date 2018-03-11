@@ -173,14 +173,32 @@ namespace MapDiffBot.Core
 			const string OldMapExtension = ".old_map_diff_bot";
 
 			var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
-			Task CreateComment(string commentKey) => gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer[commentKey], cancellationToken);
 
 			Task generatingCommentTask;
 			List<Task<RenderResult>> afterRenderings, beforeRenderings;
 			IIOManager currentIOManager = new ResolvingIOManager(ioManager, ioManager.ConcatPath(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number.ToString(CultureInfo.InvariantCulture)));
 			string repoPath;
 
-			using (var repo = await repositoryManager.GetRepository(pullRequest.Base.Repository, () => CreateComment("Cloning repository..."), () => CreateComment("Waiting for another operation on this repository to complete..."), cancellationToken).ConfigureAwait(false))
+			int lastProgress = -1;
+			Task lastProgressUpdate = Task.CompletedTask;
+			Task OnCloneProgress(int progress)
+			{
+				lock (gitHubManager)
+				{
+					if (lastProgress <= progress)
+						return null;
+					lastProgress = progress;
+				}
+				return lastProgressUpdate.ContinueWith(async (t) =>
+				{
+					if (t.Exception != null)
+						throw t.Exception;
+					await gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["Cloning repository... ({0}%)", progress], cancellationToken).ConfigureAwait(false);
+				}, cancellationToken, TaskContinuationOptions.None, TaskScheduler.Current);
+			};
+			Task CreateBlockedComment() => gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["Waiting for another operation on this repository to complete..."], cancellationToken);
+
+			using (var repo = await repositoryManager.GetRepository(pullRequest.Base.Repository, OnCloneProgress, CreateBlockedComment, cancellationToken).ConfigureAwait(false))
 			{
 				generatingCommentTask = gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["Generating diffs..."], cancellationToken);
 				//prep the outputDirectory
@@ -440,11 +458,12 @@ namespace MapDiffBot.Core
 			}
 			
 			var comment = String.Format(CultureInfo.CurrentCulture,
-				"{0}{3}{3}{3}{3}{1}{3}{3}{3}{3}{2}", 
+				"{4}<br>{0}{3}{3}{3}{3}<br>{1}{3}{3}{3}{3}{2}", 
 				commentBuilder,
 				stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha],
 				stringLocalizer["Full job logs available [here]({0})", String.Concat(prefix, FilesController.RouteToLogs(pullRequest))],
-				Environment.NewLine
+				Environment.NewLine,
+				stringLocalizer["Maps with diff:"]
 				);
 
 			await deleteTask.ConfigureAwait(false);
