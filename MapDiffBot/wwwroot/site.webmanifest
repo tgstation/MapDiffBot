@@ -1,6 +1,6 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "MapDiffBot",
+    "short_name": "MapDiffBot",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",

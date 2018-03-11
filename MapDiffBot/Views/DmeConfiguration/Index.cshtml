@@ -1,0 +1,7 @@
+﻿<div class="row">
+    <form asp-controller="DmeConfiguration" asp-action="Edit" method="post">
+        <h3>@ViewBag.EditHeader:</h3>
+        <input type="text" name="newDmePath" placeholder="@ViewBag.AutoDme" value="@ViewBag.TargetDme" />
+        <button type="submit" class="btn btn-primary">@ViewBag.Submit</button>
+    </form>
+</div>

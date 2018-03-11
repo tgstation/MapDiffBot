@@ -39,12 +39,11 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// Checks some <paramref name="cookies"/> for the oauth cookie
 		/// </summary>
-		/// <param name="repoOwner">The <see cref="Repository.Owner"/> for the operation</param>
-		/// <param name="repoName">The <see cref="Repository.Name"/> for the operation</param>
+		/// <param name="repositoryId">The <see cref="Repository.Id"/> for the operation</param>
 		/// <param name="cookies">The <see cref="IRequestCookieCollection"/> to check</param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in <see langword="true"/>, <see langword="false"/> on otherwise</returns>
-		Task<bool> CheckAuthorization(string repoOwner, string repoName, IRequestCookieCollection cookies, CancellationToken cancellationToken);
+		Task<bool> CheckAuthorization(long repositoryId, IRequestCookieCollection cookies, CancellationToken cancellationToken);
 
 		/// <summary>
 		/// Creates a comment on a given <paramref name="pullRequest"/>, or updates the first one if it has already done so

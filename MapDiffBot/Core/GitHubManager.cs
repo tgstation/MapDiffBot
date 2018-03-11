@@ -126,7 +126,7 @@ namespace MapDiffBot.Core
 		}
 
 		/// <inheritdoc />
-		public async Task<bool> CheckAuthorization(string repoOwner, string repoName, IRequestCookieCollection cookies, CancellationToken cancellationToken)
+		public async Task<bool> CheckAuthorization(long repositoryId, IRequestCookieCollection cookies, CancellationToken cancellationToken)
 		{
 			if (!cookies.TryGetValue(AuthorizationCookie, out string cookieGuid))
 				return false;
@@ -146,17 +146,19 @@ namespace MapDiffBot.Core
 			var entry = everything.Where(x => x.Id == guid && x.Expiry >= now).FirstOrDefault();
 			if (entry == default(UserAccessToken))
 				return false;
-
+			
 			try
 			{
-				await gitHubClientFactory.CreateOauthClient(entry.AccessToken).User.Current().ConfigureAwait(false);
+				var repoClientTask = CreateInstallationClient(repositoryId, cancellationToken);
+				var userClient = gitHubClientFactory.CreateOauthClient(entry.AccessToken);
+				var user = await userClient.User.Current().ConfigureAwait(false);
+				var repoClient = await repoClientTask.ConfigureAwait(false);
+				return await repoClient.Repository.Collaborator.IsCollaborator(repositoryId, user.Login).ConfigureAwait(false);
 			}
-			catch (ForbiddenException)
+			catch
 			{
 				return false;
 			}
-
-			return true;
 		}
 
 		/// <inheritdoc />
