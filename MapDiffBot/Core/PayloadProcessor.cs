@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using Octokit;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -85,17 +84,18 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// Generates a map diff comment for the specified <see cref="PullRequest"/>
 		/// </summary>
-		/// <param name="jobSubmission">The <see cref="JobSubmission"/> for the operation</param>
+		/// <param name="repositoryId">The <see cref="PullRequest.Base"/> <see cref="Repository.Id"/></param>
+		/// <param name="pullRequestNumber">The <see cref="PullRequest.Number"/></param>
+		/// <param name="baseUrl">The base path of the request URL that triggered the job</param>
 		/// <param name="jobCancellationToken">The <see cref="IJobCancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		[AutomaticRetry(Attempts = 0)]
-		[DisplayName("{0}")]
-		public async Task ScanPullRequest(JobSubmission jobSubmission, IJobCancellationToken jobCancellationToken)
+		public async Task ScanPullRequest(long repositoryId, int pullRequestNumber, string baseUrl, IJobCancellationToken jobCancellationToken)
 		{
 			using (serviceProvider.CreateScope())
 			{
 				var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
-				var pullRequest = await gitHubManager.GetPullRequest(jobSubmission.RepositoryId, jobSubmission.PullRequestNumber, jobCancellationToken.ShutdownToken).ConfigureAwait(false);
+				var pullRequest = await gitHubManager.GetPullRequest(repositoryId, pullRequestNumber, jobCancellationToken.ShutdownToken).ConfigureAwait(false);
 				
 				var changedMapsTask = gitHubManager.GetPullRequestChangedFiles(pullRequest, jobCancellationToken.ShutdownToken);
 				var requestIdentifier = String.Concat(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number);
@@ -134,7 +134,7 @@ namespace MapDiffBot.Core
 						if (changedDmms.Count == 0)
 							return;
 
-						await GenerateDiffs(pullRequest, changedDmms, jobSubmission.BaseUrl, cancellationToken).ConfigureAwait(false);
+						await GenerateDiffs(pullRequest, changedDmms, baseUrl, cancellationToken).ConfigureAwait(false);
 					}
 					catch (Exception e)
 					{
@@ -170,13 +170,16 @@ namespace MapDiffBot.Core
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		async Task GenerateDiffs(PullRequest pullRequest, IReadOnlyList<string> changedDmms, string baseUrl, CancellationToken cancellationToken)
 		{
+			const string OldMapExtension = ".old_map_diff_bot";
+
 			var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
 			Task CreateComment(string commentKey) => gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer[commentKey], cancellationToken);
 
 			Task generatingCommentTask;
-			List<Task<RenderResult>> beforeRenderings, afterRenderings;
+			List<Task<RenderResult>> afterRenderings, beforeRenderings;
 			IIOManager currentIOManager = new ResolvingIOManager(ioManager, ioManager.ConcatPath(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number.ToString(CultureInfo.InvariantCulture)));
 			string repoPath;
+
 			using (var repo = await repositoryManager.GetRepository(pullRequest.Base.Repository, () => CreateComment("Cloning repository..."), () => CreateComment("Waiting for another operation on this repository to complete..."), cancellationToken).ConfigureAwait(false))
 			{
 				generatingCommentTask = gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["Generating diffs..."], cancellationToken);
@@ -212,7 +215,7 @@ namespace MapDiffBot.Core
 							var originalPath = currentIOManager.ConcatPath(repoPath, mapPath);
 							if (await currentIOManager.FileExists(originalPath, cancellationToken).ConfigureAwait(false))
 							{
-								var oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}.old_map_diff_bot", originalPath);
+								var oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}{1}", originalPath, OldMapExtension);
 								await currentIOManager.CopyFile(originalPath, oldMapPath, cancellationToken).ConfigureAwait(false);
 								return oldMapPath;
 							}
@@ -300,10 +303,10 @@ namespace MapDiffBot.Core
 					};
 
 					//finish up before we go back to the base branch
-					beforeRenderings = Enumerable.Range(0, changedDmms.Count).Select(I => DiffAndRenderNewMap(I)).ToList();
+					afterRenderings = Enumerable.Range(0, changedDmms.Count).Select(I => DiffAndRenderNewMap(I)).ToList();
 					try
 					{
-						await Task.WhenAll(beforeRenderings).ConfigureAwait(false);
+						await Task.WhenAll(afterRenderings).ConfigureAwait(false);
 					}
 					catch (Exception)
 					{
@@ -321,10 +324,10 @@ namespace MapDiffBot.Core
 					}
 
 					//finish up rendering
-					afterRenderings = Enumerable.Range(0, changedDmms.Count).Select(I => RenderOldMap(I)).ToList();
+					beforeRenderings = Enumerable.Range(0, changedDmms.Count).Select(I => RenderOldMap(I)).ToList();
 					try
 					{
-						await Task.WhenAll(afterRenderings).ConfigureAwait(false);
+						await Task.WhenAll(beforeRenderings).ConfigureAwait(false);
 					}
 					catch (Exception)
 					{
@@ -360,13 +363,12 @@ namespace MapDiffBot.Core
 				var r1 = GetRenderingResult(beforeTask);
 				var r2 = GetRenderingResult(afterTask);
 
-				result.MapRegion = r1?.MapRegion ?? r2?.MapRegion;
-				result.MapPath = r1?.InputPath ?? r2.InputPath;
+				result.MapRegion = r1?.MapRegion;
+				result.MapPath = (r1?.InputPath ?? r2.InputPath).Replace(OldMapExtension, String.Empty, StringComparison.InvariantCulture);
 
-				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}After:{0}Command Line: {3}{0}Output:{4}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath);
+				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:{0}Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}Logs:{0}{7}{0}After:{0}Command Line: {3}{0}Output:{0}{4}{0}Logs:{0}{8}{0}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath, r1?.ToolOutput, r2?.ToolOutput);
 
-				result.MapPath = result.MapPath.Replace(repoPath, String.Empty, StringComparison.InvariantCultureIgnoreCase);
-				result.MapPath = result.MapPath.Substring(1);
+				result.MapPath = result.MapPath.Replace(repoPath, String.Empty, StringComparison.InvariantCultureIgnoreCase).Substring(1);
 
 				async Task<Image> ReadMapImage(string path)
 				{
@@ -419,25 +421,31 @@ namespace MapDiffBot.Core
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "logs"));
 
 				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture,
-					"<details><summary>{0}</summary><br>{1} | {2}<br>--- | ---<br>![]({3}) | ![]({4})<br><details><summary>{5}</summary><br>{6} | {7} | {8}<br>--- | --- | ---<br>{9} | {10} | ![{8}]({11})</details></details><br>",
+					"<details><summary>{0}</summary>{11}{11}{1} | {2}{11}--- | ---{11}![]({3}) | ![]({4}){11}{11}{5} | {6} | {7}{11}--- | --- | ---{11}{8} | {9} | [{7}]({10}){11}{11}</details>{11}{11}",
 					I.MapPath,
 					stringLocalizer["Old"],
 					stringLocalizer["New"],
 					beforeUrl,
 					afterUrl,
-					stringLocalizer["Details"],
 					stringLocalizer["Status"],
 					stringLocalizer["Region"],
 					stringLocalizer["Logs"],
 					I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"],
 					I.MapRegion?.ToString() ?? stringLocalizer["ALL"],
-					logsUrl
+					logsUrl,
+					Environment.NewLine
 					));
 				databaseContext.MapDiffs.Add(I);
 				++formatterCount;
 			}
 			
-			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs available [here]({0})", String.Concat(prefix, FilesController.RouteToLogs(pullRequest))]);
+			var comment = String.Format(CultureInfo.CurrentCulture,
+				"{0}{3}{3}{3}{3}{1}{3}{3}{3}{3}{2}", 
+				commentBuilder,
+				stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha],
+				stringLocalizer["Full job logs available [here]({0})", String.Concat(prefix, FilesController.RouteToLogs(pullRequest))],
+				Environment.NewLine
+				);
 
 			await deleteTask.ConfigureAwait(false);
 			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
@@ -449,7 +457,7 @@ namespace MapDiffBot.Core
 			if (payload.Action == "opened" || payload.Action == "synchronize")
 			{
 				var basePath = urlHelper.ActionContext.HttpContext.Request.Host + urlHelper.ActionContext.HttpContext.Request.PathBase;
-				backgroundJobClient.Enqueue(() => ScanPullRequest(new JobSubmission(payload.PullRequest, basePath, stringLocalizer), JobCancellationToken.Null));
+				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.PullRequest.Number, basePath, JobCancellationToken.Null));
 			}
 		}
 		public void ProcessPayload(IssueCommentPayload payload, IUrlHelper urlHelper)
@@ -459,7 +467,7 @@ namespace MapDiffBot.Core
 			if (payload.Comment.Body.Split(' ').Any(x => x == String.Format(CultureInfo.InvariantCulture, "@{0}", gitHubConfiguration.TagUser)))
 			{
 				var basePath = urlHelper.ActionContext.HttpContext.Request.Host + urlHelper.ActionContext.HttpContext.Request.PathBase;
-				backgroundJobClient.Enqueue(() => ScanPullRequest(new JobSubmission(payload.Issue, payload.Repository, basePath, stringLocalizer), JobCancellationToken.Null));
+				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.Issue.Number, basePath, JobCancellationToken.Null));
 			}
 		}
 	}

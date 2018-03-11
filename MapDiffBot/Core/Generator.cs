@@ -173,7 +173,7 @@ namespace MapDiffBot.Core
 				await processTask.ConfigureAwait(false);
 			}
 
-			var toolOutput = String.Format(CultureInfo.InvariantCulture, "Exit Code: {0}{1}StdOut:{1}{2}{1}StdErr{1}{3}", processTask.Result, Environment.NewLine, output, errorOutput);
+			var toolOutput = String.Format(CultureInfo.InvariantCulture, "Exit Code: {0}{1}StdOut:{1}{2}{1}StdErr:{1}{3}", processTask.Result, Environment.NewLine, output, errorOutput);
 			var result = new ToolResult { ToolOutput = toolOutput, CommandLine = args };
 			try
 			{
@@ -219,7 +219,7 @@ namespace MapDiffBot.Core
 
 				await processTask.ConfigureAwait(false);
 			}
-			var toolOutput = String.Format(CultureInfo.InvariantCulture, "Exit Code: {0}{1}StdOut:{1}{2}{1}StdErr{1}{3}", processTask.Result, Environment.NewLine, output, errorOutput);
+			var toolOutput = String.Format(CultureInfo.InvariantCulture, "Exit Code: {0}{1}StdOut:{1}{2}{1}StdErr:{1}{3}", processTask.Result, Environment.NewLine, output, errorOutput);
 
 			bool expectNext = false;
 			string result = null;
@@ -272,7 +272,7 @@ namespace MapDiffBot.Core
 				processTask = StartAndWaitForProcessExit(P, cancellationToken);
 				await processTask.ConfigureAwait(false);
 			}
-			var toolOutput = String.Format(CultureInfo.InvariantCulture, "Exit Code: {0}{1}StdOut:{1}{2}{1}StdErr{1}{3}", processTask.Result, Environment.NewLine, output, errorOutput);
+			var toolOutput = String.Format(CultureInfo.InvariantCulture, "Exit Code: {0}{1}StdOut:{1}{2}{1}StdErr:{1}{3}", processTask.Result, Environment.NewLine, output, errorOutput);
 
 			var result = new ToolResult
 			{
