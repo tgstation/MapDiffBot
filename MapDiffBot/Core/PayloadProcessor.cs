@@ -357,22 +357,27 @@ namespace MapDiffBot.Core
 				var r2 = GetRenderingResult(afterTask);
 
 				result.MapRegion = r1?.MapRegion ?? r2?.MapRegion;
-				result.MapPath = r1?.InputPath ?? r2.InputPath;
+				//r2 first because the new path is normalized
+				result.MapPath = r2?.InputPath ?? r1.InputPath;
 
-				async Task<byte[]> ReadMapImage(string path)
+				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}After:{0}Command Line: {3}{0}Output:{4}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath);
+
+				result.MapPath = currentIOManager.GetFileName(result.MapPath);
+
+				async Task<Image> ReadMapImage(string path)
 				{
 					if (path != null && await currentIOManager.FileExists(path, cancellationToken).ConfigureAwait(false))
 					{
 						var bytes = await currentIOManager.ReadAllBytes(path, cancellationToken).ConfigureAwait(false);
 						await currentIOManager.DeleteFile(path, cancellationToken).ConfigureAwait(false);
-						return bytes;
+						return new Image { Data = bytes };
 					}
 					return null;
 				}
 
 				var readBeforeTask = ReadMapImage(r1?.OutputPath);
-				result.AfterImage = new Image { Data = await ReadMapImage(r2?.OutputPath).ConfigureAwait(false) };
-				result.BeforeImage = new Image { Data = await readBeforeTask.ConfigureAwait(false) };
+				result.AfterImage = await ReadMapImage(r2?.OutputPath).ConfigureAwait(false);
+				result.BeforeImage = await readBeforeTask.ConfigureAwait(false);
 
 				return result;
 			}
@@ -396,37 +401,53 @@ namespace MapDiffBot.Core
 		{
 			StringBuilder commentBuilder = null;
 			int formatterCount = 0;
-
-			Task saveTask;
+			
 			var databaseContext = serviceProvider.GetRequiredService<IDatabaseContext>();
 
 			//delete outdated renderings if neccessary
-			if(await databaseContext.MapDiffs.CountAsync(x => x.RepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number, cancellationToken).ConfigureAwait(false) > 0)
-			{
-				databaseContext.MapDiffs.Remove(new MapDiff {
+			if (await databaseContext.MapDiffs.CountAsync(x => x.RepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number, cancellationToken).ConfigureAwait(false) > 0)
+				databaseContext.MapDiffs.Remove(new MapDiff
+				{
 					RepositoryId = pullRequest.Base.Repository.Id,
 					PullRequestNumber = pullRequest.Number
 				});
-				await databaseContext.Save(cancellationToken).ConfigureAwait(false);
-			}
 
 			foreach (var I in diffResults)
 			{
 				if (commentBuilder == null)
-					commentBuilder = new StringBuilder(String.Format(CultureInfo.InvariantCulture, "{0} | {1} | {2} | {3}{4}--- | --- | --- | ---", stringLocalizer["Map"], stringLocalizer["Old"], stringLocalizer["New"], stringLocalizer["Status"], Environment.NewLine));
+					commentBuilder = new StringBuilder(String.Format(CultureInfo.InvariantCulture,
+						"{0} | {1} | {2} | {3} | {4} | {5}{6}--- | --- | --- | --- | ---",
+						stringLocalizer["Map"],
+						stringLocalizer["Old"],
+						stringLocalizer["New"],
+						stringLocalizer["Region"],
+						stringLocalizer["Status"],
+						stringLocalizer["Logs"],
+						Environment.NewLine
+						));
 				var prefix = String.Concat("https://", baseUrl);
 				var beforeUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "before"));
 				var afterUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "after"));
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "logs"));
-				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture, "{0}{1} | ![]({2}) | ![]({3}) | {7} | {6} | [{4}]({5})", Environment.NewLine, I.MapPath, beforeUrl, afterUrl, stringLocalizer["Logs"], logsUrl, I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"], I.MapRegion?.ToString() ?? stringLocalizer["ALL"]));
+				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture,
+					"{0}{1} | ![]({2}) | ![]({3}) | {4} | {5} | [{6}]({7})",
+					Environment.NewLine,
+					I.MapPath,
+					beforeUrl,
+					afterUrl,
+					I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"],
+					I.MapRegion?.ToString() ?? stringLocalizer["ALL"],
+					stringLocalizer["Logs"],
+					logsUrl
+					));
 				databaseContext.MapDiffs.Add(I);
 				++formatterCount;
 			}
+			
+			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs avaiabled [here]({0})", String.Concat(baseUrl, FilesController.RouteToLogs(pullRequest))]);
 
-			saveTask = databaseContext.Save(cancellationToken);
-			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {2} into {3}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs avaiabled [here]({0})", String.Concat(baseUrl, FilesController.RouteToLogs(pullRequest))]);
+			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 			await serviceProvider.GetRequiredService<IGitHubManager>().CreateSingletonComment(pullRequest, comment, cancellationToken).ConfigureAwait(false);
-			await saveTask.ConfigureAwait(false);
 		}
 
 		public void ProcessPayload(PullRequestEventPayload payload, IUrlHelper urlHelper)

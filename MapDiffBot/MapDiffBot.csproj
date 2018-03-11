@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="Powershell -File &quot;$(ProjectDir)/CompileDmmTools.ps1&quot;" />
+    <Exec Command="Powershell -File &quot;$(ProjectDir)CompileDmmTools.ps1&quot;" />
   </Target>
 
 </Project>

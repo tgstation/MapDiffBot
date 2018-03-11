@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using MemoryStream = System.IO.MemoryStream;
+
 namespace MapDiffBot.Controllers
 {
 	/// <summary>
@@ -79,7 +81,7 @@ namespace MapDiffBot.Controllers
 			if (diff == default(Image))
 				return NotFound();
 
-			return new FileContentResult(diff.Data, "image/png");
+			return File(new MemoryStream(diff.Data), "image/png");
 		}
 
 		/// <summary>

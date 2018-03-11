@@ -53,6 +53,7 @@ namespace MapDiffBot.Models
 		/// <summary>
 		/// Logs of the operation
 		/// </summary>
+		[Required]
 		public string LogMessage { get; set; }
 	}
 }
