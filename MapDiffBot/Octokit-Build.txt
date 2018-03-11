@@ -1,0 +1,3 @@
+﻿Revision: 253c632bdfc6a2ccc06783b47033442b0eb0ed33
+Configuration: Release
+Toolchain: VS 15.5.7
