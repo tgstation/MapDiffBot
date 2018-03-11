@@ -8,7 +8,7 @@ namespace MapDiffBot.Models
 	/// <summary>
 	/// Represents a <see cref="Octokit.Installation"/>
 	/// </summary>
-    public sealed class Installation
+	public sealed class Installation
 	{
 		/// <summary>
 		/// Primary key for the entity
@@ -40,5 +40,5 @@ namespace MapDiffBot.Models
 #pragma warning disable CA2227 // Collection properties should be read only
 		public List<InstallationRepository> Repositories { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
-    }
+	}
 }

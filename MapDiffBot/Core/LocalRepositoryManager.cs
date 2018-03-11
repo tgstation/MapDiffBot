@@ -166,7 +166,7 @@ namespace MapDiffBot.Core
 									return false;
 								if (cloneTasks != null)
 								{
-									var newTask = onCloneProgress((transferProgress.ReceivedObjects + transferProgress.IndexedObjects) / transferProgress.TotalObjects);
+									var newTask = onCloneProgress((int)Math.Floor((100.0 * (transferProgress.ReceivedObjects + transferProgress.IndexedObjects)) / (transferProgress.TotalObjects * 2)));
 									if (newTask != null)
 										cloneTasks.Add(newTask);
 								}

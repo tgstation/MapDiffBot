@@ -80,7 +80,7 @@ namespace MapDiffBot.Controllers
 
 			if (diff == default(Image))
 				return NotFound();
-
+			
 			return File(new MemoryStream(diff.Data), "image/png");
 		}
 

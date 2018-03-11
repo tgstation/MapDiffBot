@@ -94,15 +94,16 @@ namespace MapDiffBot.Core
 		{
 			using (serviceProvider.CreateScope())
 			{
+				var serverCancellationToken = jobCancellationToken.ShutdownToken;
 				var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
-				var pullRequest = await gitHubManager.GetPullRequest(repositoryId, pullRequestNumber, jobCancellationToken.ShutdownToken).ConfigureAwait(false);
+				var pullRequest = await gitHubManager.GetPullRequest(repositoryId, pullRequestNumber, serverCancellationToken).ConfigureAwait(false);
 				
-				var changedMapsTask = gitHubManager.GetPullRequestChangedFiles(pullRequest, jobCancellationToken.ShutdownToken);
+				var changedMapsTask = gitHubManager.GetPullRequestChangedFiles(pullRequest, serverCancellationToken);
 				var requestIdentifier = String.Concat(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number);
 
 				//Generate our own cancellation token for rolling builds of the same PR
 				using (var cts = new CancellationTokenSource())
-				using (jobCancellationToken.ShutdownToken.Register(() => cts.Cancel()))
+				using (serverCancellationToken.Register(() => cts.Cancel()))
 				{
 					var cancellationToken = cts.Token;
 
@@ -117,7 +118,6 @@ namespace MapDiffBot.Core
 							mapDiffOperations.Add(requestIdentifier, cts);
 					}
 
-					var errors = new List<Exception>();
 					try
 					{
 						for (var I = 0; !pullRequest.Mergeable.HasValue && I < 5; cancellationToken.ThrowIfCancellationRequested(), cancellationToken.ThrowIfCancellationRequested(), ++I)
@@ -136,25 +136,32 @@ namespace MapDiffBot.Core
 
 						await GenerateDiffs(pullRequest, changedDmms, baseUrl, cancellationToken).ConfigureAwait(false);
 					}
+					catch (OperationCanceledException) { }
 					catch (Exception e)
 					{
-						//if this is the only exception, throw it directly, otherwise pile it in the exception collection
-						if (errors.Count == 0)
+						logger.LogError(e, "An error occurred while scanning PR {0}/{1}", repositoryId, pullRequestNumber);
+						try
+						{
+							//if this is the only exception, throw it directly, otherwise pile it in the exception collection
+							await gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["An error occurred during the operation:\n\n```{0}\n\n```", e], cancellationToken).ConfigureAwait(false);
 							throw;
-						errors.Add(e);
-						cts.Cancel();
+						}
+						catch (OperationCanceledException) { }
+						catch (Exception innerException)
+						{
+							logger.LogError(innerException, "An error occurred while creating an error comment about PR {0}/{1}", repositoryId, pullRequestNumber);
+							throw new AggregateException(innerException, e);
+						}
+						finally
+						{
+							cts.Cancel();
+						}
 					}
 					finally
 					{
 						lock (mapDiffOperations)
 							if (mapDiffOperations.TryGetValue(requestIdentifier, out CancellationTokenSource maybeOurOperation) && maybeOurOperation == cts)
 								mapDiffOperations.Remove(requestIdentifier);
-						//throw all generator errors at once, because we can allow things to continue if some fail
-						if (errors.Count > 0)
-						{
-							var e = new AggregateException(String.Format(CultureInfo.CurrentCulture, "Repo: {0}/{1}, PR: {2} (#{3}) Base: {4} ({5}), HEAD: {6}", pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Title, pullRequest.Number, pullRequest.Base.Sha, pullRequest.Base.Label, pullRequest.Head.Sha), errors);
-							logger.LogError(e, "Generation errors occurred!");
-						}
 					}
 				}
 			}
@@ -185,7 +192,7 @@ namespace MapDiffBot.Core
 			{
 				lock (gitHubManager)
 				{
-					if (lastProgress <= progress)
+					if (lastProgress >= progress)
 						return null;
 					lastProgress = progress;
 				}
