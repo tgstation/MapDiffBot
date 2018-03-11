@@ -136,7 +136,10 @@ namespace MapDiffBot.Core
 
 						await GenerateDiffs(pullRequest, changedDmms, baseUrl, cancellationToken).ConfigureAwait(false);
 					}
-					catch (OperationCanceledException) { }
+					catch (OperationCanceledException)
+					{
+						throw;
+					}
 					catch (Exception e)
 					{
 						logger.LogError(e, "An error occurred while scanning PR {0}/{1}", repositoryId, pullRequestNumber);
