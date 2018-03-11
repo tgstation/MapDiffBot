@@ -3,7 +3,6 @@ using MapDiffBot.Configuration;
 using MapDiffBot.Controllers;
 using MapDiffBot.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -16,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Z.EntityFramework.Plus;
 
 namespace MapDiffBot.Core
 {
@@ -176,6 +176,7 @@ namespace MapDiffBot.Core
 			Task generatingCommentTask;
 			List<Task<RenderResult>> beforeRenderings, afterRenderings;
 			IIOManager currentIOManager = new ResolvingIOManager(ioManager, ioManager.ConcatPath(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number.ToString(CultureInfo.InvariantCulture)));
+			string repoPath;
 			using (var repo = await repositoryManager.GetRepository(pullRequest.Base.Repository, () => CreateComment("Cloning repository..."), () => CreateComment("Waiting for another operation on this repository to complete..."), cancellationToken).ConfigureAwait(false))
 			{
 				generatingCommentTask = gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["Generating diffs..."], cancellationToken);
@@ -208,7 +209,7 @@ namespace MapDiffBot.Core
 						//first copy all modified maps to the same location with the .old_map_diff_bot extension
 						async Task<string> CacheMap(string mapPath)
 						{
-							var originalPath = currentIOManager.ConcatPath(repo.Path, mapPath);
+							var originalPath = currentIOManager.ConcatPath(repoPath, mapPath);
 							if (await currentIOManager.FileExists(originalPath, cancellationToken).ConfigureAwait(false))
 							{
 								var oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}.old_map_diff_bot", originalPath);
@@ -217,6 +218,9 @@ namespace MapDiffBot.Core
 							}
 							return null;
 						};
+
+						repoPath = repo.Path;
+
 						var tasks = changedDmms.Select(x => CacheMap(x)).ToList();
 						await Task.WhenAll(tasks).ConfigureAwait(false);
 						oldMapPaths.AddRange(tasks.Select(x => x.Result));
@@ -237,14 +241,14 @@ namespace MapDiffBot.Core
 				var mapRegions = Enumerable.Repeat<MapRegion>(null, changedDmms.Count).ToList();
 				var dmeToUse = dmeToUseTask.Result;
 
-				using (var generator = generatorFactory.CreateGenerator(dmeToUse, new ResolvingIOManager(ioManager, repo.Path)))
+				using (var generator = generatorFactory.CreateGenerator(dmeToUse, new ResolvingIOManager(ioManager, repoPath)))
 				{
 					var outputDirectory = currentIOManager.ResolvePath(".");
 					//Generate MapRegions for modified maps and render all new maps
 					async Task<RenderResult> DiffAndRenderNewMap(int I)
 					{
 						await dirPrepTask.ConfigureAwait(false);
-						var originalPath = currentIOManager.ConcatPath(repo.Path, changedDmms[I]);
+						var originalPath = currentIOManager.ConcatPath(repoPath, changedDmms[I]);
 						if (!await currentIOManager.FileExists(originalPath, cancellationToken).ConfigureAwait(false))
 							return new RenderResult { InputPath = changedDmms[I], ToolOutput = stringLocalizer["Map missing!"] };
 						if (oldMapPaths[I] != null)
@@ -362,7 +366,8 @@ namespace MapDiffBot.Core
 
 				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}After:{0}Command Line: {3}{0}Output:{4}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath);
 
-				result.MapPath = currentIOManager.GetFileName(result.MapPath);
+				result.MapPath = result.MapPath.Replace(repoPath, String.Empty, StringComparison.InvariantCultureIgnoreCase);
+				result.MapPath = result.MapPath.Substring(1);
 
 				async Task<Image> ReadMapImage(string path)
 				{
@@ -405,12 +410,7 @@ namespace MapDiffBot.Core
 			var databaseContext = serviceProvider.GetRequiredService<IDatabaseContext>();
 
 			//delete outdated renderings if neccessary
-			if (await databaseContext.MapDiffs.CountAsync(x => x.RepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number, cancellationToken).ConfigureAwait(false) > 0)
-				databaseContext.MapDiffs.Remove(new MapDiff
-				{
-					RepositoryId = pullRequest.Base.Repository.Id,
-					PullRequestNumber = pullRequest.Number
-				});
+			var deleteTask = databaseContext.MapDiffs.Where(x => x.RepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number).DeleteAsync(cancellationToken);
 
 			foreach (var I in diffResults)
 			{
@@ -446,6 +446,7 @@ namespace MapDiffBot.Core
 			
 			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs avaiabled [here]({0})", String.Concat(baseUrl, FilesController.RouteToLogs(pullRequest))]);
 
+			await deleteTask.ConfigureAwait(false);
 			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 			await serviceProvider.GetRequiredService<IGitHubManager>().CreateSingletonComment(pullRequest, comment, cancellationToken).ConfigureAwait(false);
 		}
