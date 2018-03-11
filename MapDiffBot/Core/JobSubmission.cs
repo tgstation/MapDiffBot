@@ -61,7 +61,7 @@ namespace MapDiffBot.Core
 			if (stringLocalizer == null)
 				throw new ArgumentNullException(nameof(stringLocalizer));
 			BaseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
-			HangfireDisplayName = stringLocalizer["Generate Map Diffs for #{0} - \"{1}\" ({2})", issue.Number, issue.Title, issue.User.Login, issue.HtmlUrl];
+			HangfireDisplayName = stringLocalizer["Generate Map Diffs for #{0} - \"{1}\" ({2}) - {3}", issue.Number, issue.Title, issue.User.Login, issue.HtmlUrl];
 			RepositoryId = repository.Id;
 			PullRequestNumber = issue.Number;
 		}
