@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Octokit;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -84,18 +85,17 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// Generates a map diff comment for the specified <see cref="PullRequest"/>
 		/// </summary>
-		/// <param name="pullRequestNumber">The <see cref="PullRequest.Number"/></param>
-		/// <param name="repositoryId">The <see cref="PullRequest.Base"/> <see cref="Repository.Id"/></param>
-		/// <param name="baseUrl">The URL to use as a link base</param>
+		/// <param name="jobSubmission">The <see cref="JobSubmission"/> for the operation</param>
 		/// <param name="jobCancellationToken">The <see cref="IJobCancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		[AutomaticRetry(Attempts = 0)]
-		public async Task ScanPullRequest(int pullRequestNumber, long repositoryId, string baseUrl, IJobCancellationToken jobCancellationToken)
+		[DisplayName("{0}")]
+		public async Task ScanPullRequest(JobSubmission jobSubmission, IJobCancellationToken jobCancellationToken)
 		{
 			using (serviceProvider.CreateScope())
 			{
 				var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
-				var pullRequest = await gitHubManager.GetPullRequest(repositoryId, pullRequestNumber, jobCancellationToken.ShutdownToken).ConfigureAwait(false);
+				var pullRequest = await gitHubManager.GetPullRequest(jobSubmission.RepositoryId, jobSubmission.PullRequestNumber, jobCancellationToken.ShutdownToken).ConfigureAwait(false);
 				
 				var changedMapsTask = gitHubManager.GetPullRequestChangedFiles(pullRequest, jobCancellationToken.ShutdownToken);
 				var requestIdentifier = String.Concat(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number);
@@ -134,7 +134,7 @@ namespace MapDiffBot.Core
 						if (changedDmms.Count == 0)
 							return;
 
-						await GenerateDiffs(pullRequest, changedDmms, baseUrl, cancellationToken).ConfigureAwait(false);
+						await GenerateDiffs(pullRequest, changedDmms, jobSubmission.BaseUrl, cancellationToken).ConfigureAwait(false);
 					}
 					catch (Exception e)
 					{
@@ -361,8 +361,7 @@ namespace MapDiffBot.Core
 				var r2 = GetRenderingResult(afterTask);
 
 				result.MapRegion = r1?.MapRegion ?? r2?.MapRegion;
-				//r2 first because the new path is normalized
-				result.MapPath = r2?.InputPath ?? r1.InputPath;
+				result.MapPath = r1?.InputPath ?? r2.InputPath;
 
 				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}After:{0}Command Line: {3}{0}Output:{4}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath);
 
@@ -404,7 +403,6 @@ namespace MapDiffBot.Core
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		async Task HandleResults(PullRequest pullRequest, List<MapDiff> diffResults, string baseUrl, CancellationToken cancellationToken)
 		{
-			StringBuilder commentBuilder = null;
 			int formatterCount = 0;
 			
 			var databaseContext = serviceProvider.GetRequiredService<IDatabaseContext>();
@@ -412,39 +410,34 @@ namespace MapDiffBot.Core
 			//delete outdated renderings if neccessary
 			var deleteTask = databaseContext.MapDiffs.Where(x => x.RepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number).DeleteAsync(cancellationToken);
 
+			var commentBuilder = new StringBuilder();
 			foreach (var I in diffResults)
 			{
-				if (commentBuilder == null)
-					commentBuilder = new StringBuilder(String.Format(CultureInfo.InvariantCulture,
-						"{0} | {1} | {2} | {3} | {4} | {5}{6}--- | --- | --- | --- | ---",
-						stringLocalizer["Map"],
-						stringLocalizer["Old"],
-						stringLocalizer["New"],
-						stringLocalizer["Region"],
-						stringLocalizer["Status"],
-						stringLocalizer["Logs"],
-						Environment.NewLine
-						));
 				var prefix = String.Concat("https://", baseUrl);
 				var beforeUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "before"));
 				var afterUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "after"));
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "logs"));
+
 				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture,
-					"{0}{1} | ![]({2}) | ![]({3}) | {4} | {5} | [{6}]({7})",
-					Environment.NewLine,
+					"<details><summary>{0}</summary><br>{1} | {2}<br>--- | ---<br>![]({3}) | ![]({4})<br><details><summary>{5}</summary><br>{6} | {7} | {8}<br>--- | --- | ---<br>{9} | {10} | ![{8}]({11})</details></details><br>",
 					I.MapPath,
+					stringLocalizer["Old"],
+					stringLocalizer["New"],
 					beforeUrl,
 					afterUrl,
+					stringLocalizer["Details"],
+					stringLocalizer["Status"],
+					stringLocalizer["Region"],
+					stringLocalizer["Logs"],
 					I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"],
 					I.MapRegion?.ToString() ?? stringLocalizer["ALL"],
-					stringLocalizer["Logs"],
 					logsUrl
 					));
 				databaseContext.MapDiffs.Add(I);
 				++formatterCount;
 			}
 			
-			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs avaiabled [here]({0})", String.Concat(baseUrl, FilesController.RouteToLogs(pullRequest))]);
+			var comment = String.Format(CultureInfo.CurrentCulture, "{0}<br>{1}<br>{2}", commentBuilder, stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha], stringLocalizer["Full job logs available [here]({0})", String.Concat(baseUrl, FilesController.RouteToLogs(pullRequest))]);
 
 			await deleteTask.ConfigureAwait(false);
 			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
@@ -456,7 +449,7 @@ namespace MapDiffBot.Core
 			if (payload.Action == "opened" || payload.Action == "synchronize")
 			{
 				var basePath = urlHelper.ActionContext.HttpContext.Request.Host + urlHelper.ActionContext.HttpContext.Request.PathBase;
-				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.PullRequest.Number, payload.Repository.Id, basePath, JobCancellationToken.Null));
+				backgroundJobClient.Enqueue(() => ScanPullRequest(new JobSubmission(payload.PullRequest, basePath, stringLocalizer), JobCancellationToken.Null));
 			}
 		}
 		public void ProcessPayload(IssueCommentPayload payload, IUrlHelper urlHelper)
@@ -466,7 +459,7 @@ namespace MapDiffBot.Core
 			if (payload.Comment.Body.Split(' ').Any(x => x == String.Format(CultureInfo.InvariantCulture, "@{0}", gitHubConfiguration.TagUser)))
 			{
 				var basePath = urlHelper.ActionContext.HttpContext.Request.Host + urlHelper.ActionContext.HttpContext.Request.PathBase;
-				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Issue.Number, payload.Repository.Id, basePath, JobCancellationToken.Null));
+				backgroundJobClient.Enqueue(() => ScanPullRequest(new JobSubmission(payload.Issue, basePath, stringLocalizer), JobCancellationToken.Null));
 			}
 		}
 	}
