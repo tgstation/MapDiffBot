@@ -363,7 +363,7 @@ namespace MapDiffBot.Core
 
 				var result = new MapDiff
 				{
-					RepositoryId = pullRequest.Base.Repository.Id,
+					InstallationRepositoryId = pullRequest.Base.Repository.Id,
 					PullRequestNumber = pullRequest.Number,
 					FileId = i,
 				};
@@ -428,7 +428,7 @@ namespace MapDiffBot.Core
 			var databaseContext = serviceProvider.GetRequiredService<IDatabaseContext>();
 
 			//delete outdated renderings if neccessary
-			var deleteTask = databaseContext.MapDiffs.Where(x => x.RepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number).DeleteAsync(cancellationToken);
+			var deleteTask = databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number).DeleteAsync(cancellationToken);
 
 			var commentBuilder = new StringBuilder();
 			var prefix = String.Concat("https://", baseUrl);

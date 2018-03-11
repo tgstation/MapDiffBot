@@ -57,7 +57,7 @@ namespace MapDiffBot.Controllers
 		/// <summary>
 		/// Handle a GET of a <see cref="MapDiff"/>
 		/// </summary>
-		/// <param name="repositoryId">The <see cref="MapDiff.RepositoryId"/></param>
+		/// <param name="repositoryId">The <see cref="MapDiff.InstallationRepositoryId"/></param>
 		/// <param name="prNumber">The <see cref="MapDiff.PullRequestNumber"/></param>
 		/// <param name="fileId">The <see cref="MapDiff.FileId"/></param>
 		/// <param name="beforeOrAfter">"before" or "after"</param>
@@ -76,7 +76,7 @@ namespace MapDiffBot.Controllers
 			if (!before && beforeOrAfter != "AFTER")
 				return BadRequest();
 
-			var diff = await databaseContext.MapDiffs.Where(x => x.RepositoryId == repositoryId && x.PullRequestNumber == prNumber && x.FileId == fileId).Select(x => before ? x.BeforeImage : x.AfterImage).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
+			var diff = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.PullRequestNumber == prNumber && x.FileId == fileId).Select(x => before ? x.BeforeImage : x.AfterImage).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
 
 			if (diff == default(Image))
 				return NotFound();
@@ -87,7 +87,7 @@ namespace MapDiffBot.Controllers
 		/// <summary>
 		/// Get the <see cref="MapDiff.LogMessage"/> of a <see cref="MapDiff"/>
 		/// </summary>
-		/// <param name="repositoryId">The <see cref="MapDiff.RepositoryId"/></param>
+		/// <param name="repositoryId">The <see cref="MapDiff.InstallationRepositoryId"/></param>
 		/// <param name="prNumber">The <see cref="MapDiff.PullRequestNumber"/></param>
 		/// <param name="fileId">The <see cref="MapDiff.FileId"/></param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
@@ -96,14 +96,14 @@ namespace MapDiffBot.Controllers
 		public async Task<IActionResult> HandleLogsGet(long repositoryId, int prNumber, int fileId, CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved GET: {0}/{1}/{2}.txt", repositoryId, prNumber, fileId);
-			var	result = await databaseContext.MapDiffs.Where(x => x.RepositoryId == repositoryId && x.PullRequestNumber == prNumber && x.FileId == fileId).Select(x => x.LogMessage).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
+			var	result = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.PullRequestNumber == prNumber && x.FileId == fileId).Select(x => x.LogMessage).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
 			return result != null ? (IActionResult)Content(result) : NotFound();
 		}
 
 		/// <summary>
 		/// Get the <see cref="MapDiff.LogMessage"/> of all <see cref="MapDiff"/>s in a <see cref="PullRequest"/>
 		/// </summary>
-		/// <param name="repositoryId">The <see cref="MapDiff.RepositoryId"/></param>
+		/// <param name="repositoryId">The <see cref="MapDiff.InstallationRepositoryId"/></param>
 		/// <param name="prNumber">The <see cref="MapDiff.PullRequestNumber"/></param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> of the operation</returns>
@@ -111,7 +111,7 @@ namespace MapDiffBot.Controllers
 		public async Task<IActionResult> HandleAllLogsGet(long repositoryId, int prNumber, CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved GET: {0}/{1}/logs.txt", repositoryId, prNumber);
-			var results = await databaseContext.MapDiffs.Where(x => x.RepositoryId == repositoryId && x.PullRequestNumber == prNumber).Select(x => x.LogMessage).ToAsyncEnumerable().ToList(cancellationToken).ConfigureAwait(false);
+			var results = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.PullRequestNumber == prNumber).Select(x => x.LogMessage).ToAsyncEnumerable().ToList(cancellationToken).ConfigureAwait(false);
 			return results.Count != 0 ? (IActionResult)Content(String.Join(Environment.NewLine, results)) : NotFound();
 		}
 	}

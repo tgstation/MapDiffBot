@@ -75,7 +75,7 @@ namespace MapDiffBot.Models
 			modelBuilder.Entity<Log>().ToTable(nameof(Log));
 
 			//enable multikeys
-			modelBuilder.Entity<MapDiff>().HasKey(x => new { x.RepositoryId, x.PullRequestNumber, x.FileId });
+			modelBuilder.Entity<MapDiff>().HasKey(x => new { x.InstallationRepositoryId, x.PullRequestNumber, x.FileId });
 
 			//enable cascade deletion
 			modelBuilder.Entity<InstallationRepository>().HasOne<Installation>().WithMany(x => x.Repositories).OnDelete(DeleteBehavior.Cascade);

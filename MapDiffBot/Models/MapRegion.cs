@@ -23,11 +23,7 @@ namespace MapDiffBot.Models
 		/// The Y coordinate of the bottom left turf
 		/// </summary>
 		public short MinY { get; set; }
-
-		/// <summary>
-		/// The Y coordinate of the bottom left turf
-		/// </summary>
-		public int MinZ { get; set; }
+		
 		/// <summary>
 		/// The X coordinate of the top right turf
 		/// </summary>

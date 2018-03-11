@@ -14,7 +14,7 @@ namespace MapDiffBot.Models
 		[Key, Column(Order = 0)]
 		[Required]
 		[DatabaseGenerated(DatabaseGeneratedOption.None)]
-		public long RepositoryId { get; set; }
+		public long InstallationRepositoryId { get; set; }
 
 		/// <summary>
 		/// The <see cref="Octokit.PullRequest.Number"/>
