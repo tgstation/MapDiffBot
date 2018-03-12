@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace MapDiffBot.Core
 {
+	/// <summary>
+	/// Constructs <see cref="IGitHubClient"/>s
+	/// </summary>
     interface IGitHubClientFactory
 	{
 		/// <summary>

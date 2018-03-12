@@ -69,7 +69,7 @@ namespace MapDiffBot.Core
 
 			if (installation != null)
 			{
-				if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow.AddMinutes(-10))
+				if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow.AddMinutes(-1))
 				{
 					var newToken = await gitHubClientFactory.CreateAppClient().GitHubApps.CreateInstallationToken(installation.Id).ConfigureAwait(false);
 					var trackingContext = databaseContext.Installations.Attach(new Models.Installation
@@ -99,9 +99,6 @@ namespace MapDiffBot.Core
 
 			async Task<Models.Installation> CreateAccessToken(Octokit.Installation newInstallation)
 			{
-				//TODO: Implement this in octokit
-				//If you're here and wondering why we're not using pagination, it's because YOU HAVEN'T PORTED THIS TO OCTOKIT YET
-
 				var installationToken = await client.GitHubApps.CreateInstallationToken(newInstallation.Id).ConfigureAwait(false);
 				var entity = new Models.Installation
 				{
@@ -186,7 +183,7 @@ namespace MapDiffBot.Core
 				//user is fucking with us, don't even bother
 				return null;
 
-			var expiry = DateTimeOffset.Now.AddDays(AccessTokenExpiryDays);
+			var expiry = DateTimeOffset.UtcNow.AddDays(AccessTokenExpiryDays);
 			var newEntry = new UserAccessToken
 			{
 				Id = Guid.NewGuid(),

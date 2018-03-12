@@ -19,11 +19,10 @@ namespace MapDiffBot.Core
 	sealed class GitHubClientFactory : IGitHubClientFactory, IPrivateKeySource
 #pragma warning restore CA1812
 	{
-		//TODO: make this private
 		/// <summary>
 		/// The user agent string to provide to various APIs
 		/// </summary>
-		public static readonly string userAgent = String.Format(CultureInfo.InvariantCulture, "MapDiffBot-v{0}", Assembly.GetExecutingAssembly().GetName().Version);
+		static readonly string userAgent = String.Format(CultureInfo.InvariantCulture, "MapDiffBot-v{0}", Assembly.GetExecutingAssembly().GetName().Version);
 
 		/// <summary>
 		/// Creates a <see cref="GitHubClient"/> with the correct <see cref="ProductHeaderValue"/>
@@ -72,7 +71,7 @@ namespace MapDiffBot.Core
 
 		/// <inheritdoc />
 		public TextReader GetPrivateKeyReader() => new StringReader(gitHubConfiguration.PemData);
-
+		
 		/// <inheritdoc />
 		public async Task<IReadOnlyList<Repository>> GetInstallationRepositories(string installationToken, CancellationToken cancellationToken)
 		{
