@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['mapdiff',['MapDiff',['../class_map_diff_bot_1_1_generator_1_1_map_diff.html',1,'MapDiffBot::Generator']]],
-  ['mapregion',['MapRegion',['../class_map_diff_bot_1_1_generator_1_1_map_region.html',1,'MapDiffBot::Generator']]]
+  ['payloadprocessor',['PayloadProcessor',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html',1,'MapDiffBot::Core']]],
+  ['payloadscontroller',['PayloadsController',['../class_map_diff_bot_1_1_controllers_1_1_payloads_controller.html',1,'MapDiffBot::Controllers']]],
+  ['program',['Program',['../class_map_diff_bot_1_1_program.html',1,'MapDiffBot']]]
 ];

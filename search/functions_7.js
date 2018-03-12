@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['mapdiff',['MapDiff',['../class_map_diff_bot_1_1_generator_1_1_map_diff.html#a6a2ccee2f5bca9375a1dfc24615b0155',1,'MapDiffBot::Generator::MapDiff']]],
-  ['merge',['Merge',['../interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html#a0a62c8310d06afc9de1e80f76028c307',1,'MapDiffBot.WebHook.IRepository.Merge()'],['../class_map_diff_bot_1_1_web_hook_1_1_repository.html#afc7a934b07a3a04ab3a2d2ba8067ec0d',1,'MapDiffBot.WebHook.Repository.Merge()']]]
+  ['handlealllogsget',['HandleAllLogsGet',['../class_map_diff_bot_1_1_controllers_1_1_files_controller.html#a10c97aa9cadb37004aeb40ca24df8b10',1,'MapDiffBot::Controllers::FilesController']]],
+  ['handlelogsget',['HandleLogsGet',['../class_map_diff_bot_1_1_controllers_1_1_files_controller.html#aa07cd15038ee63cb21307f156b8229a1',1,'MapDiffBot::Controllers::FilesController']]],
+  ['handlemapget',['HandleMapGet',['../class_map_diff_bot_1_1_controllers_1_1_files_controller.html#aab1d1ca18896ee9ff1a85efcfa7f78b4',1,'MapDiffBot::Controllers::FilesController']]],
+  ['handleresults',['HandleResults',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#a3e360f52f06ddc384ab20e863b1bdf29',1,'MapDiffBot::Core::PayloadProcessor']]]
 ];

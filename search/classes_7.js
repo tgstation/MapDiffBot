@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['localfileuploader',['LocalFileUploader',['../class_map_diff_bot_1_1_web_hook_1_1_local_file_uploader.html',1,'MapDiffBot::WebHook']]],
-  ['logger',['Logger',['../class_map_diff_bot_1_1_web_hook_1_1_logger.html',1,'MapDiffBot::WebHook']]]
+  ['mapdiff',['MapDiff',['../class_map_diff_bot_1_1_models_1_1_map_diff.html',1,'MapDiffBot::Models']]],
+  ['mapregion',['MapRegion',['../class_map_diff_bot_1_1_core_1_1_map_region.html',1,'MapDiffBot::Core']]]
 ];

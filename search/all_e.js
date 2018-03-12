@@ -1,16 +1,5 @@
 var searchData=
 [
-  ['path',['Path',['../interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html#ae77e15194afd716a06225e5e25a93667',1,'MapDiffBot.WebHook.IRepository.Path()'],['../class_map_diff_bot_1_1_web_hook_1_1_repository.html#aaf660dc08390503d782c75f113fa9f5b',1,'MapDiffBot.WebHook.Repository.Path()']]],
-  ['pathtodmmtools',['pathToDmmTools',['../class_map_diff_bot_1_1_generator_1_1_diff_generator.html#a77699705ae3e2a541c28f6066b24a364',1,'MapDiffBot::Generator::DiffGenerator']]],
-  ['payloaddelegator',['PayloadDelegator',['../class_map_diff_bot_1_1_web_hook_1_1_payload_delegator.html#a378735226cd83dc29799fe2121ec216c',1,'MapDiffBot.WebHook.PayloadDelegator.PayloadDelegator()'],['../class_map_diff_bot_1_1_web_hook_1_1_git_hub_web_hook_handler.html#adfc574796abe33cd78459899b3f726b9',1,'MapDiffBot.WebHook.GitHubWebHookHandler.payloadDelegator()']]],
-  ['payloaddelegator',['PayloadDelegator',['../class_map_diff_bot_1_1_web_hook_1_1_payload_delegator.html',1,'MapDiffBot::WebHook']]],
-  ['payloaddelegator_2ecs',['PayloadDelegator.cs',['../_payload_delegator_8cs.html',1,'']]],
-  ['payloadmappings',['payloadMappings',['../class_map_diff_bot_1_1_web_hook_1_1_payload_delegator.html#a8f2cc92a6eb8fab95daed69b5b33a923',1,'MapDiffBot::WebHook::PayloadDelegator']]],
-  ['petgraph_2dc3a41e66d76e8839_2ed',['petgraph-c3a41e66d76e8839.d',['../petgraph-c3a41e66d76e8839_8d.html',1,'']]],
-  ['png_2ddc919bbf9f6a4ee4_2ed',['png-dc919bbf9f6a4ee4.d',['../png-dc919bbf9f6a4ee4_8d.html',1,'']]],
-  ['processpayload',['ProcessPayload',['../interface_map_diff_bot_1_1_web_hook_1_1_i_payload_delegator.html#af754faedb2116ce9c82747a2ecca2cc9',1,'MapDiffBot.WebHook.IPayloadDelegator.ProcessPayload()'],['../class_map_diff_bot_1_1_web_hook_1_1_payload_delegator.html#a5a9ff8ac3de277290a598df304e686d1',1,'MapDiffBot.WebHook.PayloadDelegator.ProcessPayload()']]],
-  ['productheader',['ProductHeader',['../class_map_diff_bot_1_1_web_hook_1_1_definitions.html#afde807885920c6c8cec4e9432a8de595',1,'MapDiffBot::WebHook::Definitions']]],
-  ['pullrequestpayloadhandler',['PullRequestPayloadHandler',['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html#a200a084f8d12b695da34fb0686d41af8',1,'MapDiffBot::WebHook::PullRequestPayloadHandler']]],
-  ['pullrequestpayloadhandler',['PullRequestPayloadHandler',['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html',1,'MapDiffBot::WebHook']]],
-  ['pullrequestpayloadhandler_2ecs',['PullRequestPayloadHandler.cs',['../_pull_request_payload_handler_8cs.html',1,'']]]
+  ['quote_2d5c58767b87b0ec2a_2ed',['quote-5c58767b87b0ec2a.d',['../quote-5c58767b87b0ec2a_8d.html',1,'']]],
+  ['quote_2de5782cf659184ce0_2ed',['quote-e5782cf659184ce0.d',['../quote-e5782cf659184ce0_8d.html',1,'']]]
 ];

@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['payloaddelegator',['PayloadDelegator',['../class_map_diff_bot_1_1_web_hook_1_1_payload_delegator.html#a378735226cd83dc29799fe2121ec216c',1,'MapDiffBot::WebHook::PayloadDelegator']]],
-  ['processpayload',['ProcessPayload',['../interface_map_diff_bot_1_1_web_hook_1_1_i_payload_delegator.html#af754faedb2116ce9c82747a2ecca2cc9',1,'MapDiffBot.WebHook.IPayloadDelegator.ProcessPayload()'],['../class_map_diff_bot_1_1_web_hook_1_1_payload_delegator.html#a5a9ff8ac3de277290a598df304e686d1',1,'MapDiffBot.WebHook.PayloadDelegator.ProcessPayload()']]],
-  ['pullrequestpayloadhandler',['PullRequestPayloadHandler',['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html#a200a084f8d12b695da34fb0686d41af8',1,'MapDiffBot::WebHook::PullRequestPayloadHandler']]]
+  ['loadinstallation',['LoadInstallation',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a5d4c680994c44e3ff5be0ee16d2575fd',1,'MapDiffBot.Core.GitHubManager.LoadInstallation()'],['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#a6a96944ebaa49ccdf59ae403012ddf8d',1,'MapDiffBot.Core.IGitHubManager.LoadInstallation()']]],
+  ['localrepository',['LocalRepository',['../class_map_diff_bot_1_1_core_1_1_local_repository.html#acfaadde8e30636812ef6502414ade6ab',1,'MapDiffBot::Core::LocalRepository']]],
+  ['localrepositorymanager',['LocalRepositoryManager',['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#ad0b22e6cd50dc8608a4345fed0dae750',1,'MapDiffBot::Core::LocalRepositoryManager']]],
+  ['lock',['Lock',['../class_map_diff_bot_1_1_core_1_1_semaphore_slim_context.html#ab4e0a2c148590316221ecf33320763fb',1,'MapDiffBot::Core::SemaphoreSlimContext']]]
 ];

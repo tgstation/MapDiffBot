@@ -1,21 +1,10 @@
 var searchData=
 [
-  ['generator',['Generator',['../namespace_map_diff_bot_1_1_generator.html',1,'MapDiffBot']]],
-  ['mapdiffbot',['MapDiffBot',['../index.html',1,'']]],
-  ['mapdiff',['MapDiff',['../class_map_diff_bot_1_1_generator_1_1_map_diff.html',1,'MapDiffBot::Generator']]],
-  ['mapdiff',['MapDiff',['../class_map_diff_bot_1_1_generator_1_1_map_diff.html#a6a2ccee2f5bca9375a1dfc24615b0155',1,'MapDiffBot::Generator::MapDiff']]],
-  ['mapdiff_2ecs',['MapDiff.cs',['../_map_diff_8cs.html',1,'']]],
-  ['mapdiffbot',['MapDiffBot',['../namespace_map_diff_bot.html',1,'']]],
-  ['mapdiffoperations',['mapDiffOperations',['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html#a78a4c12b02a35e632dc39db7f8775a13',1,'MapDiffBot::WebHook::PullRequestPayloadHandler']]],
-  ['mapregion',['MapRegion',['../class_map_diff_bot_1_1_generator_1_1_map_region.html',1,'MapDiffBot::Generator']]],
-  ['matrixmultiply_2d266c20b37efa258a_2ed',['matrixmultiply-266c20b37efa258a.d',['../matrixmultiply-266c20b37efa258a_8d.html',1,'']]],
-  ['maxretries',['MaxRetries',['../class_map_diff_bot_1_1_web_hook_1_1_imgur_file_uploader.html#a10993ea1610cf5a0a1690c658201dd32',1,'MapDiffBot::WebHook::ImgurFileUploader']]],
-  ['maxx',['MaxX',['../class_map_diff_bot_1_1_generator_1_1_map_region.html#a8548d91d7e5078d3a55d0cadb9a7733f',1,'MapDiffBot::Generator::MapRegion']]],
-  ['maxy',['MaxY',['../class_map_diff_bot_1_1_generator_1_1_map_region.html#a760753bfdbc627e1e1f1885b71997d83',1,'MapDiffBot::Generator::MapRegion']]],
-  ['maxz',['MaxZ',['../class_map_diff_bot_1_1_generator_1_1_map_region.html#ab498ba559eaaa19af000a84c612c9b5a',1,'MapDiffBot::Generator::MapRegion']]],
-  ['merge',['Merge',['../interface_map_diff_bot_1_1_web_hook_1_1_i_repository.html#a0a62c8310d06afc9de1e80f76028c307',1,'MapDiffBot.WebHook.IRepository.Merge()'],['../class_map_diff_bot_1_1_web_hook_1_1_repository.html#afc7a934b07a3a04ab3a2d2ba8067ec0d',1,'MapDiffBot.WebHook.Repository.Merge()']]],
-  ['minx',['MinX',['../class_map_diff_bot_1_1_generator_1_1_map_region.html#a8ef92387420b17601de45135cd38fc71',1,'MapDiffBot::Generator::MapRegion']]],
-  ['miny',['MinY',['../class_map_diff_bot_1_1_generator_1_1_map_region.html#aa6cc537ff02325489b0b78234000ea67',1,'MapDiffBot::Generator::MapRegion']]],
-  ['minz',['MinZ',['../class_map_diff_bot_1_1_generator_1_1_map_region.html#a13edd0b1031a5aed430a8b6f0517748a',1,'MapDiffBot::Generator::MapRegion']]],
-  ['webhook',['WebHook',['../namespace_map_diff_bot_1_1_web_hook.html',1,'MapDiffBot']]]
+  ['ndarray_2dab59ece0040a81cb_2ed',['ndarray-ab59ece0040a81cb.d',['../ndarray-ab59ece0040a81cb_8d.html',1,'']]],
+  ['normalizeanddelete',['NormalizeAndDelete',['../class_map_diff_bot_1_1_core_1_1_default_i_o_manager.html#afbd642f74859e0c174d8ffb6fa3fad52',1,'MapDiffBot::Core::DefaultIOManager']]],
+  ['num_5fcomplex_2d486d24d1e767b109_2ed',['num_complex-486d24d1e767b109.d',['../num__complex-486d24d1e767b109_8d.html',1,'']]],
+  ['num_5finteger_2de795993ad53872df_2ed',['num_integer-e795993ad53872df.d',['../num__integer-e795993ad53872df_8d.html',1,'']]],
+  ['num_5fiter_2d13587a6c7802e039_2ed',['num_iter-13587a6c7802e039.d',['../num__iter-13587a6c7802e039_8d.html',1,'']]],
+  ['num_5ftraits_2d55799575d0bdfca3_2ed',['num_traits-55799575d0bdfca3.d',['../num__traits-55799575d0bdfca3_8d.html',1,'']]],
+  ['num_5ftraits_2de70651e4dc805e90_2ed',['num_traits-e70651e4dc805e90.d',['../num__traits-e70651e4dc805e90_8d.html',1,'']]]
 ];

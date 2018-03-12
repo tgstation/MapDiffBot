@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['beforepath',['BeforePath',['../interface_map_diff_bot_1_1_generator_1_1_i_map_diff.html#a2f0a1658b48678432648d09a692c26cb',1,'MapDiffBot::Generator::IMapDiff']]]
+  ['beforeimage',['BeforeImage',['../class_map_diff_bot_1_1_models_1_1_map_diff.html#a3275872a5976e6458d7c06c80ac73b20',1,'MapDiffBot::Models::MapDiff']]]
 ];

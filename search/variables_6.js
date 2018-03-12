@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['imguridconfigkey',['ImgurIDConfigKey',['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html#a9b89175b8e238e79412b6e5e927d2aa3',1,'MapDiffBot::WebHook::PullRequestPayloadHandler']]],
-  ['imgursecretconfigkey',['ImgurSecretConfigKey',['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html#a219b25db535deb2c6f2a9817d9404cda',1,'MapDiffBot::WebHook::PullRequestPayloadHandler']]],
-  ['iomanager',['ioManager',['../class_map_diff_bot_1_1_web_hook_1_1_logger.html#a32ceed5b69796f542247e44abe83f944',1,'MapDiffBot.WebHook.Logger.ioManager()'],['../class_map_diff_bot_1_1_web_hook_1_1_payload_delegator.html#afbe1b01ddbcc2b320e9158c060d7e902',1,'MapDiffBot.WebHook.PayloadDelegator.ioManager()'],['../class_map_diff_bot_1_1_web_hook_1_1_pull_request_payload_handler.html#adae137bf90500c56c70a401ed37d236c',1,'MapDiffBot.WebHook.PullRequestPayloadHandler.ioManager()'],['../class_map_diff_bot_1_1_web_hook_1_1_repository_manager.html#af0093d9a6ace18f31aab5a2c3309ab3b',1,'MapDiffBot.WebHook.RepositoryManager.ioManager()']]]
+  ['iomanager',['ioManager',['../class_map_diff_bot_1_1_core_1_1_generator.html#a6e34169238271280aebb56f67e1fd266',1,'MapDiffBot.Core.Generator.ioManager()'],['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#ab73972f5152974311ec3cea9b43be9c6',1,'MapDiffBot.Core.LocalRepositoryManager.ioManager()'],['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#a2220d03a74552c35e2597ee7007b1d16',1,'MapDiffBot.Core.PayloadProcessor.ioManager()']]],
+  ['issuereporturl',['issueReportUrl',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#ac03c18a387851d2df14e2b7a26b9a1dd',1,'MapDiffBot::Core::PayloadProcessor']]]
 ];
