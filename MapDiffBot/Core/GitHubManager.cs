@@ -69,7 +69,7 @@ namespace MapDiffBot.Core
 
 			if (installation != null)
 			{
-				if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow.AddMinutes(-1))
+				if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow.AddMinutes(-10))
 				{
 					var newToken = await gitHubClientFactory.CreateAppClient().GitHubApps.CreateInstallationToken(installation.Id).ConfigureAwait(false);
 					var trackingContext = databaseContext.Installations.Attach(new Models.Installation
