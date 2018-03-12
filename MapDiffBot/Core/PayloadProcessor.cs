@@ -25,6 +25,10 @@ namespace MapDiffBot.Core
 #pragma warning restore CA1812
 	{
 		/// <summary>
+		/// The URL to direct user to report issues at
+		/// </summary>
+		const string issueReportUrl = "https://github.com/MapDiffBot/MapDiffBot/issues/new";
+		/// <summary>
 		/// The intermediate directory for operations
 		/// </summary>
 		public const string WorkingDirectory = "MapDiffs";
@@ -92,81 +96,87 @@ namespace MapDiffBot.Core
 		[AutomaticRetry(Attempts = 0)]
 		public async Task ScanPullRequest(long repositoryId, int pullRequestNumber, string baseUrl, IJobCancellationToken jobCancellationToken)
 		{
-			using (serviceProvider.CreateScope())
+			try
 			{
-				var serverCancellationToken = jobCancellationToken.ShutdownToken;
-				var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
-				var pullRequest = await gitHubManager.GetPullRequest(repositoryId, pullRequestNumber, serverCancellationToken).ConfigureAwait(false);
-				
-				var changedMapsTask = gitHubManager.GetPullRequestChangedFiles(pullRequest, serverCancellationToken);
-				var requestIdentifier = String.Concat(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number);
-
-				//Generate our own cancellation token for rolling builds of the same PR
-				using (var cts = new CancellationTokenSource())
-				using (serverCancellationToken.Register(() => cts.Cancel()))
+				using (serviceProvider.CreateScope())
 				{
-					var cancellationToken = cts.Token;
+					var serverCancellationToken = jobCancellationToken.ShutdownToken;
+					var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
+					var pullRequest = await gitHubManager.GetPullRequest(repositoryId, pullRequestNumber, serverCancellationToken).ConfigureAwait(false);
 
-					lock (mapDiffOperations)
+					var changedMapsTask = gitHubManager.GetPullRequestChangedFiles(pullRequest, serverCancellationToken);
+					var requestIdentifier = String.Concat(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number);
+
+					//Generate our own cancellation token for rolling builds of the same PR
+					using (var cts = new CancellationTokenSource())
+					using (serverCancellationToken.Register(() => cts.Cancel()))
 					{
-						if (mapDiffOperations.TryGetValue(requestIdentifier, out CancellationTokenSource oldOperation))
+						var cancellationToken = cts.Token;
+
+						lock (mapDiffOperations)
 						{
-							oldOperation.Cancel();
-							mapDiffOperations[requestIdentifier] = cts;
-						}
-						else
-							mapDiffOperations.Add(requestIdentifier, cts);
-					}
-
-					try
-					{
-						for (var I = 0; !pullRequest.Mergeable.HasValue && I < 5; cancellationToken.ThrowIfCancellationRequested(), cancellationToken.ThrowIfCancellationRequested(), ++I)
-						{
-							await Task.Delay(1000 * I, cancellationToken).ConfigureAwait(false);
-							pullRequest = await gitHubManager.GetPullRequest(pullRequest.Base.Repository.Id, pullRequest.Number, cancellationToken).ConfigureAwait(false); ;
+							if (mapDiffOperations.TryGetValue(requestIdentifier, out CancellationTokenSource oldOperation))
+							{
+								oldOperation.Cancel();
+								mapDiffOperations[requestIdentifier] = cts;
+							}
+							else
+								mapDiffOperations.Add(requestIdentifier, cts);
 						}
 
-						if (!pullRequest.Mergeable.HasValue || !pullRequest.Mergeable.Value)
-							return;
-
-						var allChangedMaps = await changedMapsTask.ConfigureAwait(false);
-						var changedDmms = allChangedMaps.Where(x => x.FileName.EndsWith(".dmm", StringComparison.InvariantCultureIgnoreCase)).Select(x => x.FileName).ToList();
-						if (changedDmms.Count == 0)
-							return;
-
-						await GenerateDiffs(pullRequest, changedDmms, baseUrl, cancellationToken).ConfigureAwait(false);
-					}
-					catch (OperationCanceledException)
-					{
-						throw;
-					}
-					catch (Exception e)
-					{
-						logger.LogError(e, "An error occurred while scanning PR {0}/{1}", repositoryId, pullRequestNumber);
 						try
 						{
-							//if this is the only exception, throw it directly, otherwise pile it in the exception collection
-							await gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["An error occurred during the operation:\n\n```{0}\n\n```", e], cancellationToken).ConfigureAwait(false);
+							for (var I = 0; !pullRequest.Mergeable.HasValue && I < 5; cancellationToken.ThrowIfCancellationRequested(), cancellationToken.ThrowIfCancellationRequested(), ++I)
+							{
+								await Task.Delay(1000 * I, cancellationToken).ConfigureAwait(false);
+								pullRequest = await gitHubManager.GetPullRequest(pullRequest.Base.Repository.Id, pullRequest.Number, cancellationToken).ConfigureAwait(false); ;
+							}
+
+							if (!pullRequest.Mergeable.HasValue || !pullRequest.Mergeable.Value)
+								return;
+
+							var allChangedMaps = await changedMapsTask.ConfigureAwait(false);
+							var changedDmms = allChangedMaps.Where(x => x.FileName.EndsWith(".dmm", StringComparison.InvariantCultureIgnoreCase)).Select(x => x.FileName).ToList();
+							if (changedDmms.Count == 0)
+								return;
+
+							await GenerateDiffs(pullRequest, changedDmms, baseUrl, cancellationToken).ConfigureAwait(false);
+						}
+						catch (OperationCanceledException)
+						{
 							throw;
 						}
-						catch (OperationCanceledException) { }
-						catch (Exception innerException)
+						catch (Exception e)
 						{
-							logger.LogError(innerException, "An error occurred while creating an error comment about PR {0}/{1}", repositoryId, pullRequestNumber);
-							throw new AggregateException(innerException, e);
+							try
+							{
+								//if this is the only exception, throw it directly, otherwise pile it in the exception collection
+								await gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["An error occurred during the operation:\n\n```\n{0}\n\n```\n\nPlease report this issue [here]({1}).", e, issueReportUrl], cancellationToken).ConfigureAwait(false);
+								throw;
+							}
+							catch (OperationCanceledException) { }
+							catch (Exception innerException)
+							{
+								throw new AggregateException(innerException, e);
+							}
+							finally
+							{
+								cts.Cancel();
+							}
 						}
 						finally
 						{
-							cts.Cancel();
+							lock (mapDiffOperations)
+								if (mapDiffOperations.TryGetValue(requestIdentifier, out CancellationTokenSource maybeOurOperation) && maybeOurOperation == cts)
+									mapDiffOperations.Remove(requestIdentifier);
 						}
 					}
-					finally
-					{
-						lock (mapDiffOperations)
-							if (mapDiffOperations.TryGetValue(requestIdentifier, out CancellationTokenSource maybeOurOperation) && maybeOurOperation == cts)
-								mapDiffOperations.Remove(requestIdentifier);
-					}
 				}
+			}
+			catch(Exception e)
+			{
+				logger.LogError(e, "Error scanning pull requst {0}/#{1}", repositoryId, pullRequestNumber);
+				throw;
 			}
 		}
 
@@ -370,7 +380,7 @@ namespace MapDiffBot.Core
 			}
 
 			//collect results and errors
-			async Task<MapDiff> GetResult(int i)
+			async Task<KeyValuePair<MapDiff, MapRegion>> GetResult(int i)
 			{
 				var beforeTask = beforeRenderings[i];
 				var afterTask = afterRenderings[i];
@@ -386,7 +396,7 @@ namespace MapDiffBot.Core
 				{
 					if (task.Exception != null)
 					{
-						result.LogMessage = String.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", result.LogMessage, Environment.NewLine, task.Exception);
+						result.LogMessage = result.LogMessage == null ? task.Exception.ToString() : String.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", result.LogMessage, Environment.NewLine, task.Exception);
 						return null;
 					}
 					return task.Result;
@@ -394,11 +404,10 @@ namespace MapDiffBot.Core
 
 				var r1 = GetRenderingResult(beforeTask);
 				var r2 = GetRenderingResult(afterTask);
-
-				result.MapRegion = r2?.MapRegion?.ToString();
+				
 				result.MapPath = (r1?.InputPath ?? r2.InputPath).Replace(OldMapExtension, String.Empty, StringComparison.InvariantCulture);
 
-				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:{0}Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}Logs:{0}{7}{0}After:{0}Command Line: {3}{0}Output:{0}{4}{0}Logs:{0}{8}{0}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath, r1?.ToolOutput, r2?.ToolOutput);
+				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:{0}Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}Logs:{0}{7}{0}After:{0}Command Line: {3}{0}Output:{0}{4}{0}Logs:{0}{8}{0}Exceptions:{0}{9}{0}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath, r1?.ToolOutput, r2?.ToolOutput, result.LogMessage);
 
 				result.MapPath = result.MapPath.Replace(repoPath, String.Empty, StringComparison.InvariantCultureIgnoreCase).Substring(1);
 
@@ -417,25 +426,28 @@ namespace MapDiffBot.Core
 				result.AfterImage = await ReadMapImage(r2?.OutputPath).ConfigureAwait(false);
 				result.BeforeImage = await readBeforeTask.ConfigureAwait(false);
 
-				return result;
+				return new KeyValuePair<MapDiff, MapRegion>(result, r2?.MapRegion);
 			}
 
 			await generatingCommentTask.ConfigureAwait(false);
 
 			var results = Enumerable.Range(0, changedDmms.Count).Select(x => GetResult(x)).ToList();
 			await Task.WhenAll(results).ConfigureAwait(false);
-			await HandleResults(pullRequest, results.Select(x => x.Result).ToList(), baseUrl, cancellationToken).ConfigureAwait(false);
+			var dic = new Dictionary<MapDiff, MapRegion>();
+			foreach (var I in results.Select(x => x.Result))
+				dic.Add(I.Key, I.Value);
+			await HandleResults(pullRequest, dic, baseUrl, cancellationToken).ConfigureAwait(false);
 		}
 
 		/// <summary>
 		/// Publish a <see cref="List{T}"/> of <paramref name="diffResults"/>s to <paramref name="baseUrl"/>
 		/// </summary>
 		/// <param name="pullRequest">The <see cref="PullRequest"/> the <paramref name="diffResults"/> are for</param>
-		/// <param name="diffResults">The <see cref="MapDiff"/>s</param>
+		/// <param name="diffResults">The map of <see cref="MapDiff"/>s to <see cref="MapRegion"/>s</param>
 		/// <param name="baseUrl">The base URL of the request</param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		async Task HandleResults(PullRequest pullRequest, List<MapDiff> diffResults, string baseUrl, CancellationToken cancellationToken)
+		async Task HandleResults(PullRequest pullRequest, Dictionary<MapDiff, MapRegion> diffResults, string baseUrl, CancellationToken cancellationToken)
 		{
 			int formatterCount = 0;
 			
@@ -446,14 +458,15 @@ namespace MapDiffBot.Core
 
 			var commentBuilder = new StringBuilder();
 			var prefix = String.Concat("https://", baseUrl);
-			foreach (var I in diffResults)
+			foreach (var kv in diffResults)
 			{
+				var I = kv.Key;
 				var beforeUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "before"));
 				var afterUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "after"));
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "logs"));
 
 				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture,
-					"<details><summary>{0}</summary>{11}{11}{1} | {2}{11}--- | ---{11}![]({3}) | ![]({4}){11}{11}{5} | {6} | {7}{11}--- | --- | ---{11}{8} | {9} | [{7}]({10}){11}{11}</details>{11}{11}",
+					"<details><summary>{0}</summary>{11}{11}{1} | {2}{11}--- | ---{11}![]({3}) | ![]({4}){11}{11}{5} | {6} | {7} | {12}{11}--- | --- | --- | ---{11}{8} | {9} | [{7}]({10}) | [{1}]({3}) \\| [{2}]({4}){11}{11}</details>{11}{11}",
 					I.MapPath,
 					stringLocalizer["Old"],
 					stringLocalizer["New"],
@@ -463,21 +476,23 @@ namespace MapDiffBot.Core
 					stringLocalizer["Region"],
 					stringLocalizer["Logs"],
 					I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"],
-					I.MapRegion ?? stringLocalizer["ALL"],
+					kv.Value?.ToString() ?? stringLocalizer["ALL"],
 					logsUrl,
-					Environment.NewLine
+					Environment.NewLine,
+					stringLocalizer["Raw"]
 					));
 				databaseContext.MapDiffs.Add(I);
 				++formatterCount;
 			}
 			
 			var comment = String.Format(CultureInfo.CurrentCulture,
-				"{4}<br>{0}{3}{3}{3}{3}<br>{1}{3}{3}{3}{3}{2}", 
+				"{4}<br>{0}{3}{3}{3}{3}<br>{1}{3}{3}{3}{3}{2}{3}{3}{3}{3}{5}", 
 				commentBuilder,
 				stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha],
-				stringLocalizer["Full job logs available [here]({0})", String.Concat(prefix, FilesController.RouteToLogs(pullRequest))],
+				stringLocalizer["Full job logs available [here]({0})", String.Concat(prefix, FilesController.RouteToBrowse(pullRequest))],
 				Environment.NewLine,
-				stringLocalizer["Maps with diff:"]
+				stringLocalizer["Maps with diff:"],
+				stringLocalizer["Please report any issues [here]({0}).", issueReportUrl]
 				);
 
 			await deleteTask.ConfigureAwait(false);
@@ -485,6 +500,7 @@ namespace MapDiffBot.Core
 			await serviceProvider.GetRequiredService<IGitHubManager>().CreateSingletonComment(pullRequest, comment, cancellationToken).ConfigureAwait(false);
 		}
 
+		/// <inheritdoc />
 		public void ProcessPayload(PullRequestEventPayload payload, IUrlHelper urlHelper)
 		{
 			if (payload.Action == "opened" || payload.Action == "synchronize")
@@ -493,6 +509,8 @@ namespace MapDiffBot.Core
 				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.PullRequest.Number, basePath, JobCancellationToken.Null));
 			}
 		}
+
+		/// <inheritdoc />
 		public void ProcessPayload(IssueCommentPayload payload, IUrlHelper urlHelper)
 		{
 			if (payload.Action != "created" || payload.Comment.Body == null)

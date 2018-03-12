@@ -16,3 +16,4 @@ packages/*
 *.pubxml
 /TestResults
 /MapDiffBot/appsettings.Development.json
+/obj/Docker

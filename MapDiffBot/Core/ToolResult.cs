@@ -1,11 +1,9 @@
-﻿using MapDiffBot.Models;
-
-namespace MapDiffBot.Core
+﻿namespace MapDiffBot.Core
 {
 	/// <summary>
 	/// Result of a call to a <see cref="IGenerator"/>
 	/// </summary>
-	public class ToolResult
+	class ToolResult
 	{
 		/// <summary>
 		/// Output of the tool
@@ -18,7 +16,7 @@ namespace MapDiffBot.Core
 		public string CommandLine { get; set; }
 
 		/// <summary>
-		/// The <see cref="Models.MapRegion"/> for the operation
+		/// The <see cref="MapRegion"/> for the operation
 		/// </summary>
 		public MapRegion MapRegion { get; set; }
 	}

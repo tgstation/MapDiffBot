@@ -5,7 +5,7 @@ namespace MapDiffBot.Core
 	/// <summary>
 	/// Represents the result of getting a <see cref="MapRegion"/> from dmm-tools
 	/// </summary>
-    public sealed class RenderResult : ToolResult
+    sealed class RenderResult : ToolResult
     {
 		/// <summary>
 		/// The original path of the map

@@ -99,9 +99,6 @@ namespace MapDiffBot.Core
 
 			async Task<Models.Installation> CreateAccessToken(Octokit.Installation newInstallation)
 			{
-				//TODO: Implement this in octokit
-				//If you're here and wondering why we're not using pagination, it's because YOU HAVEN'T PORTED THIS TO OCTOKIT YET
-
 				var installationToken = await client.GitHubApps.CreateInstallationToken(newInstallation.Id).ConfigureAwait(false);
 				var entity = new Models.Installation
 				{
@@ -131,13 +128,13 @@ namespace MapDiffBot.Core
 		public Task LoadInstallation(long repositoryId, CancellationToken cancellationToken) => CreateInstallationClient(repositoryId, cancellationToken);
 
 		/// <inheritdoc />
-		public async Task<bool> CheckAuthorization(long repositoryId, IRequestCookieCollection cookies, CancellationToken cancellationToken)
+		public async Task<AuthenticationLevel> CheckAuthorization(long repositoryId, IRequestCookieCollection cookies, CancellationToken cancellationToken)
 		{
 			if (!cookies.TryGetValue(AuthorizationCookie, out string cookieGuid))
-				return false;
+				return AuthenticationLevel.LoggedOut;
 
 			if (!Guid.TryParse(cookieGuid, out Guid guid))
-				return false;
+				return AuthenticationLevel.LoggedOut;
 
 			logger.LogTrace("Check authorization");
 
@@ -146,7 +143,7 @@ namespace MapDiffBot.Core
 			var everything = await databaseContext.UserAccessTokens.Where(x => x.Expiry < DateTimeOffset.UtcNow).DeleteAsync(cancellationToken).ConfigureAwait(false);
 			var entry = await databaseContext.UserAccessTokens.Where(x => x.Id == guid).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
 			if (entry == default(UserAccessToken))
-				return false;
+				return AuthenticationLevel.LoggedOut;
 			
 			try
 			{
@@ -154,11 +151,11 @@ namespace MapDiffBot.Core
 				var userClient = gitHubClientFactory.CreateOauthClient(entry.AccessToken);
 				var user = await userClient.User.Current().ConfigureAwait(false);
 				var repoClient = await repoClientTask.ConfigureAwait(false);
-				return await repoClient.Repository.Collaborator.IsCollaborator(repositoryId, user.Login).ConfigureAwait(false);
+				return await repoClient.Repository.Collaborator.IsCollaborator(repositoryId, user.Login).ConfigureAwait(false) ? AuthenticationLevel.Maintainer : AuthenticationLevel.User;
 			}
 			catch
 			{
-				return false;
+				return AuthenticationLevel.LoggedOut;
 			}
 		}
 
@@ -186,7 +183,7 @@ namespace MapDiffBot.Core
 				//user is fucking with us, don't even bother
 				return null;
 
-			var expiry = DateTimeOffset.Now.AddDays(AccessTokenExpiryDays);
+			var expiry = DateTimeOffset.UtcNow.AddDays(AccessTokenExpiryDays);
 			var newEntry = new UserAccessToken
 			{
 				Id = Guid.NewGuid(),

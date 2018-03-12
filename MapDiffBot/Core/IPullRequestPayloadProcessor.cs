@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Octokit;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MapDiffBot.Core
 {

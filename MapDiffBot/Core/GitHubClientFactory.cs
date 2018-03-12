@@ -19,11 +19,10 @@ namespace MapDiffBot.Core
 	sealed class GitHubClientFactory : IGitHubClientFactory, IPrivateKeySource
 #pragma warning restore CA1812
 	{
-		//TODO: make this private
 		/// <summary>
 		/// The user agent string to provide to various APIs
 		/// </summary>
-		public static readonly string userAgent = String.Format(CultureInfo.InvariantCulture, "MapDiffBot-v{0}", Assembly.GetExecutingAssembly().GetName().Version);
+		static readonly string userAgent = String.Format(CultureInfo.InvariantCulture, "MapDiffBot-v{0}", Assembly.GetExecutingAssembly().GetName().Version);
 
 		/// <summary>
 		/// Creates a <see cref="GitHubClient"/> with the correct <see cref="ProductHeaderValue"/>
@@ -72,11 +71,11 @@ namespace MapDiffBot.Core
 
 		/// <inheritdoc />
 		public TextReader GetPrivateKeyReader() => new StringReader(gitHubConfiguration.PemData);
-
+		
 		/// <inheritdoc />
 		public async Task<IReadOnlyList<Repository>> GetInstallationRepositories(string installationToken, CancellationToken cancellationToken)
 		{
-			var json = await webRequestManager.RunGet(new Uri("https://api.github.com/installation/repositories"), new List<string> { "Accept: application/vnd.github.machine-man-preview+json", string.Format(CultureInfo.InvariantCulture, "User-Agent: {0}", userAgent) , String.Format(CultureInfo.InvariantCulture, "Authorization: bearer {0}", installationToken) }, cancellationToken).ConfigureAwait(false);
+			var json = await webRequestManager.RunGet(new Uri("https://api.github.com/installation/repositories"), new List<string> { "Accept: application/vnd.github.machine-man-preview+json", String.Format(CultureInfo.InvariantCulture, "User-Agent: {0}", userAgent) , String.Format(CultureInfo.InvariantCulture, "Authorization: bearer {0}", installationToken) }, cancellationToken).ConfigureAwait(false);
 			var jsonObj = JObject.Parse(json);
 			var array = jsonObj["repositories"];
 			return new SimpleJsonSerializer().Deserialize<List<Repository>>(array.ToString());

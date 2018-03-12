@@ -1,4 +1,4 @@
-﻿using MapDiffBot.Models;
+﻿
 using MapDiffBot.Resources;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

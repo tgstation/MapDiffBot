@@ -33,9 +33,10 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">@ViewBag.MapDiffBot</a>
+                <a class="navbar-brand" href="#">MapDiffBot</a>
             </div>
-            @if (!ViewBag.IsMaintainer) {
+            @if (!ViewBag.HideLogin)
+            {
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav pull-right">
                     <li><a href="@ViewBag.SignInHref">@ViewBag.SignIn</a></li>

@@ -1,5 +1,4 @@
-﻿using MapDiffBot.Models;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,7 +7,7 @@ namespace MapDiffBot.Core
 	/// <summary>
 	/// Used for generating cropped comparison images of .dmm files
 	/// </summary>
-	public interface IGenerator : IDisposable
+	interface IGenerator : IDisposable
 	{
 		/// <summary>
 		/// Gets a <see cref="MapRegion"/> indicating the differences between two maps

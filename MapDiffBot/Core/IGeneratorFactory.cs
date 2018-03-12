@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Factory for creating <see cref="IGenerator"/>s
 	/// </summary>
-	public interface IGeneratorFactory
+	interface IGeneratorFactory
 	{
 		/// <summary>
 		/// Create a <see cref="IGenerator"/>

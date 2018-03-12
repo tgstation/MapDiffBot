@@ -47,22 +47,6 @@ namespace MapDiffBot.Controllers
 		}
 
 		/// <summary>
-		/// Sets general parameters in <see cref="Controller.ViewBag"/>
-		/// </summary>
-		/// <param name="repositoryId">The <see cref="Octokit.Repository.Id"/> for the operation</param>
-		void SetViewParameters(long repositoryId)
-		{
-			ViewBag.MapDiffBot = stringLocalizer["MapDiffBot"];
-			ViewBag.SignIn = stringLocalizer["Maintainer Sign-In with GitHub"];
-			ViewBag.SignInHref = gitHubManager.GetAuthorizationURL(new Uri(String.Concat("https://", Request.Host, Request.PathBase, '/', Route, '/', nameof(Authorize))), repositoryId.ToString(CultureInfo.InvariantCulture));
-			ViewBag.Title = stringLocalizer["DME Configuration"];
-			ViewBag.EditHeader = stringLocalizer["Set the path to the .dme MapDiffBot should use for rendering"];
-			ViewBag.AutoDme = stringLocalizer["Auto-Detect"];
-			ViewBag.Submit = stringLocalizer["Submit"];
-			ViewBag.OnlyMemes = stringLocalizer["Only maintainers can perform this action!"];
-		}
-
-		/// <summary>
 		/// Handle a authentication completion
 		/// </summary>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
@@ -82,6 +66,18 @@ namespace MapDiffBot.Controllers
 		}
 
 		/// <summary>
+		/// Logs out the user and redirects them to the <see cref="Index(long, CancellationToken)"/> page
+		/// </summary>
+		/// <param name="repositoryId">The <see cref="InstallationRepository.Id"/></param>
+		/// <returns>A <see cref="RedirectToActionResult"/> directed to <see cref="Index(long, CancellationToken)"/></returns>
+		[HttpGet("SignOut/{repositoryId}")]
+		public RedirectToActionResult SignOut(long repositoryId)
+		{
+			gitHubManager.ExpireAuthorization(Response.Cookies);
+			return RedirectToAction(nameof(Index), new { repositoryId });
+		} 
+
+		/// <summary>
 		/// Get the <see cref="InstallationRepository.TargetDme"/> for a given <paramref name="repositoryId"/>
 		/// </summary>
 		/// <param name="repositoryId">The <see cref="InstallationRepository.Id"/></param>
@@ -95,9 +91,24 @@ namespace MapDiffBot.Controllers
 				var loadRepoTask = gitHubManager.LoadInstallation(repositoryId, cancellationToken);
 				var authedTask = gitHubManager.CheckAuthorization(repositoryId, Request.Cookies, cancellationToken);
 				await loadRepoTask.ConfigureAwait(false);
+
 				ViewBag.ConfiguredDme = await databaseContext.InstallationRepositories.Where(x => x.Id == repositoryId).Select(x => x.TargetDme).ToAsyncEnumerable().First(cancellationToken).ConfigureAwait(false);
-				ViewBag.IsMaintainer = await authedTask.ConfigureAwait(false);
-				SetViewParameters(repositoryId);
+				var authLevel = await authedTask.ConfigureAwait(false);
+		
+				ViewBag.SignIn = stringLocalizer[authLevel == AuthenticationLevel.LoggedOut ? "Sign-In with GitHub" : "Log Out"];
+				if (authLevel == AuthenticationLevel.LoggedOut)
+					ViewBag.SignInHref = gitHubManager.GetAuthorizationURL(new Uri(String.Concat("https://", Request.Host, Request.PathBase, '/', Route, '/', nameof(Authorize))), repositoryId.ToString(CultureInfo.InvariantCulture));
+				else
+					ViewBag.SignInHref = Url.Action(nameof(SignOut), new { repositoryId });
+
+				ViewBag.AuthLevel = authLevel;
+				ViewBag.Title = stringLocalizer["DME Configuration"];
+				ViewBag.HideLogin = false;
+				ViewBag.EditHeader = stringLocalizer["Set the path to the .dme MapDiffBot should use for rendering"];
+				ViewBag.AutoDme = stringLocalizer["Auto-Detect"];
+				ViewBag.Submit = stringLocalizer["Submit"];
+				ViewBag.OnlyMemes = stringLocalizer["Only maintainers can perform this action!"];
+
 				return View();
 			}
 			catch
@@ -107,10 +118,9 @@ namespace MapDiffBot.Controllers
         }
 
 		/// <summary>
-		/// Get a new <paramref name="dmePath"/> for a given <paramref name="repositoryId"/>
+		/// Get a new <see cref="InstallationRepository.TargetDme"/> for a given <see cref="InstallationRepository.Id"/>
 		/// </summary>
 		/// <param name="repositoryId">The <see cref="InstallationRepository.Id"/></param>
-		/// <param name="dmePath">The new <see cref="InstallationRepository.TargetDme"/></param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> for the operation</returns>
 		[HttpPost("{repositoryId}")]
@@ -121,8 +131,14 @@ namespace MapDiffBot.Controllers
 			{
 				string newDmePath = Request.Form[nameof(newDmePath)];
 				var authed = await gitHubManager.CheckAuthorization(repositoryId, Request.Cookies, cancellationToken).ConfigureAwait(false);
-				if (!authed)
-					return Unauthorized();
+				switch (authed)
+				{
+					case AuthenticationLevel.LoggedOut:
+						return Unauthorized();
+					case AuthenticationLevel.User:
+						return Forbid();
+				}
+
 				databaseContext.InstallationRepositories.Attach(new InstallationRepository
 				{
 					Id = repositoryId,

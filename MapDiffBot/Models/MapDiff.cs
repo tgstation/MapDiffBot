@@ -31,25 +31,20 @@ namespace MapDiffBot.Models
 		public int FileId { get; set; }
 
 		/// <summary>
-		/// The <see cref="MapRegion"/> the diff was drawn over
-		/// </summary>
-		public string MapRegion { get; set; }
-
-		/// <summary>
 		/// The path of the diffed files
 		/// </summary>
 		[Required]
 		public string MapPath { get; set; }
 
 		/// <summary>
-		/// The before <see cref="Image"/>
+		/// The before image
 		/// </summary>
 #pragma warning disable CA1819 // Properties should not return arrays
 		public byte[] BeforeImage { get; set; }
 #pragma warning restore CA1819 // Properties should not return arrays
 
 		/// <summary>
-		/// The after <see cref="Image"/>
+		/// The after image
 		/// </summary>
 #pragma warning disable CA1819 // Properties should not return arrays
 		public byte[] AfterImage { get; set; }

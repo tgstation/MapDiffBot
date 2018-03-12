@@ -61,40 +61,53 @@ namespace MapDiffBot.Core
 		/// <returns>A <see cref="Task"/> resulting in the <see cref="ILocalRepository"/> at <paramref name="repoPath"/></returns>
 		async Task<ILocalRepository> TryLoadRepository(string repoPath, Func<Task> onOperationBlocked, Action<TaskCompletionSource<object>> recieveUsageTask, CancellationToken cancellationToken)
 		{
-			var tcs1 = new TaskCompletionSource<bool>();
-			var tcs2 = new TaskCompletionSource<object>();
-			Task usageTask = null;
+			//this function is a little complicated but it ensurse only one using of a repo at a time
+
+			//what happens is a queue of tasks is created via ContinueWith
+			//every call to this function will insert it's own task into the queue and then block until it's run
+			//then it'll either return a ILocalRepository which will determine when that task ends or call recieveUsageTask
+			//either way it's up to the caller to complete the task, and thus, allowing the queue to proceed
+			
+			//represents the thing in front of us in the queue
+			var repoBusyTask = new TaskCompletionSource<object>();
+			//represents our spot in the queue
+			var ourRepoUsageTask = new TaskCompletionSource<object>();
+
+			//if we weren't the very first person in the queue
+			bool operationBlocked;
 
 			lock (activeRepositories)
 			{
-				if (activeRepositories.TryGetValue(repoPath, out usageTask))
-					activeRepositories[repoPath] = usageTask.ContinueWith(async (t) =>
+				operationBlocked = activeRepositories.TryGetValue(repoPath, out Task usageTask);
+				if (!operationBlocked)
+					//set it to completed task to allow for consistency
+					usageTask = Task.CompletedTask;
+				activeRepositories[repoPath] = usageTask.ContinueWith(async (t) =>
+				{
+					//first let this function know it's now its turn
+					repoBusyTask.SetResult(null);
+					try
 					{
-						tcs1.SetResult(false);
-						try
-						{
-							await tcs2.Task.ConfigureAwait(false);
-						}
-						catch (OperationCanceledException) { }
-					}, cancellationToken, TaskContinuationOptions.None, TaskScheduler.Current);
-				else
-					tcs1.SetResult(true);
+						//then wait for it's ourRepoUsageTask to complete
+						await ourRepoUsageTask.Task.ConfigureAwait(false);
+					}
+					catch (OperationCanceledException) { }
+				}, cancellationToken, TaskContinuationOptions.None, TaskScheduler.Current);
 			}
 
 			Task operationBlockedTask = null;
-			if (usageTask != null && onOperationBlocked != null)
+			if (operationBlocked && onOperationBlocked != null)
 				operationBlockedTask = onOperationBlocked();
-
-			bool needsNewKey;
+			
 			try
 			{
 				using (cancellationToken.Register(() =>
 				{
-					tcs1.SetCanceled();
-					tcs2.SetCanceled();
+					repoBusyTask.SetCanceled();
+					ourRepoUsageTask.SetCanceled();
 				}))
-					needsNewKey = await tcs1.Task.ConfigureAwait(false);
-				cancellationToken.ThrowIfCancellationRequested();
+					//wait for our turn
+					await repoBusyTask.Task.ConfigureAwait(false);
 			}
 			finally
 			{
@@ -102,26 +115,16 @@ namespace MapDiffBot.Core
 					await operationBlockedTask.ConfigureAwait(false);
 			}
 
-			cancellationToken.ThrowIfCancellationRequested();
-
+			//ourRepoUsageTask is now the front of the queue
+			//pass it on
 			try
 			{
-				return await CreateRepositoryObject(repoPath, tcs2, cancellationToken).ConfigureAwait(false);
+				return await CreateRepositoryObject(repoPath, ourRepoUsageTask, cancellationToken).ConfigureAwait(false);
 			}
 			catch (LibGit2SharpException)
 			{
-				recieveUsageTask(tcs2);
+				recieveUsageTask(ourRepoUsageTask);
 				throw;
-			}
-			finally
-			{
-				lock (this)
-				{
-					if (needsNewKey)
-						activeRepositories.Add(repoPath, tcs2.Task);
-					else
-						activeRepositories[repoPath] = tcs2.Task;
-				}
 			}
 		}
 	
@@ -130,8 +133,6 @@ namespace MapDiffBot.Core
 		{
 			if (repository == null)
 				throw new ArgumentNullException(nameof(repository));
-
-			await ioManager.CreateDirectory(".", cancellationToken).ConfigureAwait(false);
 
 			var repoPath = ioManager.ConcatPath(repository.Owner.Login, repository.Name);
 
@@ -142,6 +143,8 @@ namespace MapDiffBot.Core
 			}
 			catch (LibGit2SharpException) { }
 
+			//so the repo failed to load and now we're holding our queue spot in usageTask
+			//reclone it
 			try
 			{
 				List<Task> cloneTasks = null;
@@ -188,6 +191,7 @@ namespace MapDiffBot.Core
 			}
 			catch
 			{
+				//ok we can't do anything else, clear our queue spot
 				usageTask.SetResult(null);
 				throw;
 			}
