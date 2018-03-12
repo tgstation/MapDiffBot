@@ -6,6 +6,6 @@
 
 Tool for generating diff images of BYOND maps
 
-### [Get It Here](https://github.com/apps/mapdiffbot)!
+### [Get It Here!](https://github.com/apps/mapdiffbot)
 
 Protip: Tag @MapDiffBot in a pull request to get it to regenerate that pull request's diffs
