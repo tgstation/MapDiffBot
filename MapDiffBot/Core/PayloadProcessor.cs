@@ -482,7 +482,7 @@ namespace MapDiffBot.Core
 				"{4}<br>{0}{3}{3}{3}{3}<br>{1}{3}{3}{3}{3}{2}{3}{3}{3}{3}{5}", 
 				commentBuilder,
 				stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha],
-				stringLocalizer["Full job logs available [here]({0})", String.Concat(prefix, FilesController.RouteToLogs(pullRequest))],
+				stringLocalizer["Full job logs available [here]({0})", String.Concat(prefix, FilesController.RouteToBrowse(pullRequest))],
 				Environment.NewLine,
 				stringLocalizer["Maps with diff:"],
 				stringLocalizer["Please report any issues [here]({0}).", issueReportUrl]

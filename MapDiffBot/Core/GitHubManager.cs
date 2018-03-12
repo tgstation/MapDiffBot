@@ -128,13 +128,13 @@ namespace MapDiffBot.Core
 		public Task LoadInstallation(long repositoryId, CancellationToken cancellationToken) => CreateInstallationClient(repositoryId, cancellationToken);
 
 		/// <inheritdoc />
-		public async Task<bool> CheckAuthorization(long repositoryId, IRequestCookieCollection cookies, CancellationToken cancellationToken)
+		public async Task<AuthenticationLevel> CheckAuthorization(long repositoryId, IRequestCookieCollection cookies, CancellationToken cancellationToken)
 		{
 			if (!cookies.TryGetValue(AuthorizationCookie, out string cookieGuid))
-				return false;
+				return AuthenticationLevel.LoggedOut;
 
 			if (!Guid.TryParse(cookieGuid, out Guid guid))
-				return false;
+				return AuthenticationLevel.LoggedOut;
 
 			logger.LogTrace("Check authorization");
 
@@ -143,7 +143,7 @@ namespace MapDiffBot.Core
 			var everything = await databaseContext.UserAccessTokens.Where(x => x.Expiry < DateTimeOffset.UtcNow).DeleteAsync(cancellationToken).ConfigureAwait(false);
 			var entry = await databaseContext.UserAccessTokens.Where(x => x.Id == guid).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
 			if (entry == default(UserAccessToken))
-				return false;
+				return AuthenticationLevel.LoggedOut;
 			
 			try
 			{
@@ -151,11 +151,11 @@ namespace MapDiffBot.Core
 				var userClient = gitHubClientFactory.CreateOauthClient(entry.AccessToken);
 				var user = await userClient.User.Current().ConfigureAwait(false);
 				var repoClient = await repoClientTask.ConfigureAwait(false);
-				return await repoClient.Repository.Collaborator.IsCollaborator(repositoryId, user.Login).ConfigureAwait(false);
+				return await repoClient.Repository.Collaborator.IsCollaborator(repositoryId, user.Login).ConfigureAwait(false) ? AuthenticationLevel.Maintainer : AuthenticationLevel.User;
 			}
 			catch
 			{
-				return false;
+				return AuthenticationLevel.LoggedOut;
 			}
 		}
 

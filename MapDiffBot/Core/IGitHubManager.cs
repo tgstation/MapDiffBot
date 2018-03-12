@@ -42,8 +42,8 @@ namespace MapDiffBot.Core
 		/// <param name="repositoryId">The <see cref="Repository.Id"/> for the operation</param>
 		/// <param name="cookies">The <see cref="IRequestCookieCollection"/> to check</param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
-		/// <returns>A <see cref="Task{TResult}"/> resulting in <see langword="true"/>, <see langword="false"/> on otherwise</returns>
-		Task<bool> CheckAuthorization(long repositoryId, IRequestCookieCollection cookies, CancellationToken cancellationToken);
+		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="AuthenticationLevel"/> of the user</returns>
+		Task<AuthenticationLevel> CheckAuthorization(long repositoryId, IRequestCookieCollection cookies, CancellationToken cancellationToken);
 
 		/// <summary>
 		/// Creates a comment on a given <paramref name="pullRequest"/>, or updates the first one if it has already done so
