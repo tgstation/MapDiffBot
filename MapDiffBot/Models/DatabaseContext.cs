@@ -33,11 +33,6 @@ namespace MapDiffBot.Models
 		public DbSet<Log> Logs { get; set; }
 
 		/// <summary>
-		/// The <see cref="DbSet{TEntity}"/> for <see cref="Image"/>s
-		/// </summary>
-		public DbSet<Image> Images { get; set; }
-
-		/// <summary>
 		/// The <see cref="DatabaseConfiguration"/> for the <see cref="DatabaseContext"/>
 		/// </summary>
 		readonly DatabaseConfiguration databaseConfiguration;
@@ -74,12 +69,12 @@ namespace MapDiffBot.Models
 			// real relation database can map table:
 			modelBuilder.Entity<Log>().ToTable(nameof(Log));
 
-			//enable multikeys
+			//enable map diff indexing
 			modelBuilder.Entity<MapDiff>().HasKey(x => new { x.InstallationRepositoryId, x.PullRequestNumber, x.FileId });
 
 			//enable cascade deletion
-			modelBuilder.Entity<InstallationRepository>().HasOne<Installation>().WithMany(x => x.Repositories).OnDelete(DeleteBehavior.Cascade);
-			modelBuilder.Entity<MapDiff>().HasOne<InstallationRepository>().WithMany(x => x.MapDiffs).OnDelete(DeleteBehavior.Cascade);
+			modelBuilder.Entity<Installation>().HasMany(x => x.Repositories).WithOne().OnDelete(DeleteBehavior.Cascade);
+			modelBuilder.Entity<InstallationRepository>().HasMany(x => x.MapDiffs).WithOne().OnDelete(DeleteBehavior.Cascade);
 		}
 
 		/// <inheritdoc />

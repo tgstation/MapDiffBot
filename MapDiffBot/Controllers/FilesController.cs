@@ -79,10 +79,10 @@ namespace MapDiffBot.Controllers
 
 			var diff = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.PullRequestNumber == prNumber && x.FileId == fileId).Select(x => before ? x.BeforeImage : x.AfterImage).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
 
-			if (diff == default(Image))
+			if (diff == null)
 				return NotFound();
 			
-			return File(diff.Data, "image/png");
+			return File(diff, "image/png");
 		}
 
 		/// <summary>

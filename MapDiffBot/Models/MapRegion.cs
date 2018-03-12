@@ -9,12 +9,6 @@ namespace MapDiffBot.Models
 	public sealed class MapRegion
 	{
 		/// <summary>
-		/// Column Id
-		/// </summary>
-		[Obsolete("For use by EFCore only", true)]
-		public int Id { get; set; }
-
-		/// <summary>
 		/// The X coordinate of the bottom left turf
 		/// </summary>
 		public short MinX { get; set; }

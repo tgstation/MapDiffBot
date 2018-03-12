@@ -395,20 +395,20 @@ namespace MapDiffBot.Core
 				var r1 = GetRenderingResult(beforeTask);
 				var r2 = GetRenderingResult(afterTask);
 
-				result.MapRegion = r2?.MapRegion;
+				result.MapRegion = r2?.MapRegion?.ToString();
 				result.MapPath = (r1?.InputPath ?? r2.InputPath).Replace(OldMapExtension, String.Empty, StringComparison.InvariantCulture);
 
 				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:{0}Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}Logs:{0}{7}{0}After:{0}Command Line: {3}{0}Output:{0}{4}{0}Logs:{0}{8}{0}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath, r1?.ToolOutput, r2?.ToolOutput);
 
 				result.MapPath = result.MapPath.Replace(repoPath, String.Empty, StringComparison.InvariantCultureIgnoreCase).Substring(1);
 
-				async Task<Image> ReadMapImage(string path)
+				async Task<byte[]> ReadMapImage(string path)
 				{
 					if (path != null && await currentIOManager.FileExists(path, cancellationToken).ConfigureAwait(false))
 					{
 						var bytes = await currentIOManager.ReadAllBytes(path, cancellationToken).ConfigureAwait(false);
 						await currentIOManager.DeleteFile(path, cancellationToken).ConfigureAwait(false);
-						return new Image { Data = bytes };
+						return bytes;
 					}
 					return null;
 				}
@@ -463,7 +463,7 @@ namespace MapDiffBot.Core
 					stringLocalizer["Region"],
 					stringLocalizer["Logs"],
 					I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"],
-					I.MapRegion?.ToString() ?? stringLocalizer["ALL"],
+					I.MapRegion ?? stringLocalizer["ALL"],
 					logsUrl,
 					Environment.NewLine
 					));
