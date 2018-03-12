@@ -53,8 +53,8 @@ namespace MapDiffBot.Core
 		string GenerateRenderCommandLine(MapRegion region)
 		{
 			if (region == null)
-				return String.Format(CultureInfo.InvariantCulture, "{0}minimap --disable hide-space \"{{0}}\"", dmeArgument);
-			return String.Format(CultureInfo.InvariantCulture, "{6}minimap --disable hide-space --min {0},{1},{2} --max {3},{4},{5} \"{{0}}\"", region.MinX, region.MinY, 1, region.MaxX, region.MaxY, 1, dmeArgument);
+				return String.Format(CultureInfo.InvariantCulture, "{0}minimap --disable hide-space,hide-invisible,random \"{{0}}\"", dmeArgument);
+			return String.Format(CultureInfo.InvariantCulture, "{6}minimap --disable hide-space,hide-invisible,random --min {0},{1},{2} --max {3},{4},{5} \"{{0}}\"", region.MinX, region.MinY, 1, region.MaxX, region.MaxY, 1, dmeArgument);
 		}
 
 		/// <summary>
