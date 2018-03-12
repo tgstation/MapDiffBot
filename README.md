@@ -1,4 +1,9 @@
 # MapDiffBot
+
+https://ci.appveyor.com/api/projects/status/6mcrw7n9he2m6tfd/branch/master?svg=true
+
 Tool for generating diff images of BYOND maps
 
- https://www.rust-lang.org/en-US/install.html and then `cargo build -p cli`. The -p is important or it will waste time compiling Qt. Then run `target/debug/dmm-tools --minimap path/to/map.dmm` from the directory that contains `tgstation.dme`
+### [Get It Here](https://github.com/apps/mapdiffbot)
+
+Protip: Tag @MapDiffBot in a pull request to get it to regenerate that pull request's diffs

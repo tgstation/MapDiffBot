@@ -1,0 +1,11 @@
+﻿<div class="row">
+    <form asp-controller="DmeConfiguration" asp-action="Edit" method="post">
+        <h3>@ViewBag.EditHeader:</h3>
+        <input type="text" name="newDmePath" placeholder="@ViewBag.AutoDme" value="@ViewBag.TargetDme" />
+        <button type="submit" class="btn btn-primary" @(ViewBag.IsMaintainer ? String.Empty : "disabled")>@ViewBag.Submit</button>
+    </form>
+    @if (!ViewBag.IsMaintainer)
+    {
+        <span class="label label-warning">@ViewBag.OnlyMemes</span>
+    }
+</div>
