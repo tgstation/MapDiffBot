@@ -107,10 +107,9 @@ namespace MapDiffBot.Controllers
         }
 
 		/// <summary>
-		/// Get a new <paramref name="dmePath"/> for a given <paramref name="repositoryId"/>
+		/// Get a new <see cref="InstallationRepository.TargetDme"/> for a given <see cref="InstallationRepository.Id"/>
 		/// </summary>
 		/// <param name="repositoryId">The <see cref="InstallationRepository.Id"/></param>
-		/// <param name="dmePath">The new <see cref="InstallationRepository.TargetDme"/></param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> for the operation</returns>
 		[HttpPost("{repositoryId}")]

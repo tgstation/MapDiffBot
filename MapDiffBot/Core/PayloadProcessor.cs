@@ -370,7 +370,7 @@ namespace MapDiffBot.Core
 			}
 
 			//collect results and errors
-			async Task<MapDiff> GetResult(int i)
+			async Task<KeyValuePair<MapDiff, MapRegion>> GetResult(int i)
 			{
 				var beforeTask = beforeRenderings[i];
 				var afterTask = afterRenderings[i];
@@ -394,8 +394,7 @@ namespace MapDiffBot.Core
 
 				var r1 = GetRenderingResult(beforeTask);
 				var r2 = GetRenderingResult(afterTask);
-
-				result.MapRegion = r2?.MapRegion?.ToString();
+				
 				result.MapPath = (r1?.InputPath ?? r2.InputPath).Replace(OldMapExtension, String.Empty, StringComparison.InvariantCulture);
 
 				result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:{0}Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}Logs:{0}{7}{0}After:{0}Command Line: {3}{0}Output:{0}{4}{0}Logs:{0}{8}{0}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath, r1?.ToolOutput, r2?.ToolOutput);
@@ -417,25 +416,28 @@ namespace MapDiffBot.Core
 				result.AfterImage = await ReadMapImage(r2?.OutputPath).ConfigureAwait(false);
 				result.BeforeImage = await readBeforeTask.ConfigureAwait(false);
 
-				return result;
+				return new KeyValuePair<MapDiff, MapRegion>(result, r2?.MapRegion);
 			}
 
 			await generatingCommentTask.ConfigureAwait(false);
 
 			var results = Enumerable.Range(0, changedDmms.Count).Select(x => GetResult(x)).ToList();
 			await Task.WhenAll(results).ConfigureAwait(false);
-			await HandleResults(pullRequest, results.Select(x => x.Result).ToList(), baseUrl, cancellationToken).ConfigureAwait(false);
+			var dic = new Dictionary<MapDiff, MapRegion>();
+			foreach (var I in results.Select(x => x.Result))
+				dic.Add(I.Key, I.Value);
+			await HandleResults(pullRequest, dic, baseUrl, cancellationToken).ConfigureAwait(false);
 		}
 
 		/// <summary>
 		/// Publish a <see cref="List{T}"/> of <paramref name="diffResults"/>s to <paramref name="baseUrl"/>
 		/// </summary>
 		/// <param name="pullRequest">The <see cref="PullRequest"/> the <paramref name="diffResults"/> are for</param>
-		/// <param name="diffResults">The <see cref="MapDiff"/>s</param>
+		/// <param name="diffResults">The map of <see cref="MapDiff"/>s to <see cref="MapRegion"/>s</param>
 		/// <param name="baseUrl">The base URL of the request</param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		async Task HandleResults(PullRequest pullRequest, List<MapDiff> diffResults, string baseUrl, CancellationToken cancellationToken)
+		async Task HandleResults(PullRequest pullRequest, Dictionary<MapDiff, MapRegion> diffResults, string baseUrl, CancellationToken cancellationToken)
 		{
 			int formatterCount = 0;
 			
@@ -446,8 +448,9 @@ namespace MapDiffBot.Core
 
 			var commentBuilder = new StringBuilder();
 			var prefix = String.Concat("https://", baseUrl);
-			foreach (var I in diffResults)
+			foreach (var kv in diffResults)
 			{
+				var I = kv.Key;
 				var beforeUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "before"));
 				var afterUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "after"));
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest, formatterCount, "logs"));
@@ -463,7 +466,7 @@ namespace MapDiffBot.Core
 					stringLocalizer["Region"],
 					stringLocalizer["Logs"],
 					I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"],
-					I.MapRegion ?? stringLocalizer["ALL"],
+					kv.Value.ToString() ?? stringLocalizer["ALL"],
 					logsUrl,
 					Environment.NewLine
 					));

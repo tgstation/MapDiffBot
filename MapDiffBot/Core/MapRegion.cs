@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Globalization;
 
-namespace MapDiffBot.Models
+namespace MapDiffBot.Core
 {
 	/// <summary>
 	/// Represents a region on a .dmm map
 	/// </summary>
-	public sealed class MapRegion
+	sealed class MapRegion
 	{
 		/// <summary>
 		/// The X coordinate of the bottom left turf
