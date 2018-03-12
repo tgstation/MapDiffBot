@@ -6,11 +6,11 @@ FROM rust AS compiler
 WORKDIR /src
 COPY . .
 WORKDIR /src/SpacemanDMM
-RUN cargo build -p cli
+RUN cargo build -p cli --release
 
 FROM microsoft/aspnetcore-build AS build
-WORKDIR /src/SpacemanDMM/target/debug/
-COPY --from=compiler /src/SpacemanDMM/target/debug/dmm-tools .
+WORKDIR /src/SpacemanDMM/target/release/
+COPY --from=compiler /src/SpacemanDMM/target/release/dmm-tools .
 WORKDIR /src
 COPY . .
 RUN dotnet restore MapDiffBot/MapDiffBot.csproj
