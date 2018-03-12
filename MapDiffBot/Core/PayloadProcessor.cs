@@ -146,7 +146,7 @@ namespace MapDiffBot.Core
 						try
 						{
 							//if this is the only exception, throw it directly, otherwise pile it in the exception collection
-							await gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["An error occurred during the operation:\n\n```{0}\n\n```", e], cancellationToken).ConfigureAwait(false);
+							await gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["An error occurred during the operation:\n\n```\n{0}\n\n```", e], cancellationToken).ConfigureAwait(false);
 							throw;
 						}
 						catch (OperationCanceledException) { }
@@ -466,7 +466,7 @@ namespace MapDiffBot.Core
 					stringLocalizer["Region"],
 					stringLocalizer["Logs"],
 					I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"],
-					kv.Value.ToString() ?? stringLocalizer["ALL"],
+					kv.Value?.ToString() ?? stringLocalizer["ALL"],
 					logsUrl,
 					Environment.NewLine
 					));
