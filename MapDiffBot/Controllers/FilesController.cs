@@ -138,7 +138,7 @@ namespace MapDiffBot.Controllers
 		[HttpGet("{repositoryId}/{prNumber}")]
 		public async Task<IActionResult> Browse(long repositoryId, int prNumber, CancellationToken cancellationToken)
 		{
-			var diffs = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.PullRequestNumber == prNumber).Select(x => new { x.MapPath, HasBefore = x.BeforeImage != null, HasAfter = x.AfterImage != null }).ToAsyncEnumerable().ToList(cancellationToken).ConfigureAwait(false);
+			var diffs = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.PullRequestNumber == prNumber).Select(x => x.MapPath).ToAsyncEnumerable().ToList(cancellationToken).ConfigureAwait(false);
 
 			if (diffs.Count == 0)
 				return NotFound();
@@ -149,6 +149,8 @@ namespace MapDiffBot.Controllers
 			ViewBag.RepositoryId = repositoryId;
 			ViewBag.PRNumber = prNumber;
 			ViewBag.Logs = stringLocalizer["Logs"];
+			ViewBag.AllLogs = stringLocalizer["All Logs"];
+			ViewBag.Configure = stringLocalizer["Configure"];
 			ViewBag.Before = stringLocalizer["Before"];
 			ViewBag.After = stringLocalizer["After"];
 			ViewBag.MapDiffs = stringLocalizer["Map diffs"];

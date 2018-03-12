@@ -1,14 +1,19 @@
 ﻿<div class="container">
-    <a asp-controller="DmeConfiguration" asp-action="Index" asp-route-repositoryId="@ViewBag.RepositoryId">@ViewBag.Logs</a>
+    <a asp-controller="DmeConfiguration" asp-action="Index" asp-route-repositoryId="@ViewBag.RepositoryId">@ViewBag.Configure</a> | <a asp-action="HandleAllLogsGet" asp-route-repositoryId="@ViewBag.RepositoryId">@ViewBag.AllLogs</a>
 </div>
 
 <hr />
 <div class="container">
-    <h3>@ViewBag.MapDiffs:</h3>@foreach (var I in ViewBag.Diffs)
+    <h3>@ViewBag.MapDiffs:</h3>
+    @{
+        var counter = 0;
+    }
+    @foreach (var I in ViewBag.Diffs)
     {
         <div class="row">
-            <h4>@I.MapPath:</h4>
-            <a asp-action="HandleMapGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-beforeOrAfter="before">@ViewBag.Before</a> | <a asp-action="HandleMapGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-beforeOrAfter="after">@ViewBag.After</a> | <a asp-action="HandleLogsGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber">@ViewBag.Logs</a>
+            <h4>@I:</h4>
+            <a asp-action="HandleMapGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-fileId="@counter" asp-route-beforeOrAfter="before">@ViewBag.Before</a> | <a asp-action="HandleMapGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-fileId="@counter" asp-route-beforeOrAfter="after">@ViewBag.After</a> | <a asp-action="HandleLogsGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-fileId="@counter">@ViewBag.Logs</a>
         </div>
+        ++counter;
     }
 </div>

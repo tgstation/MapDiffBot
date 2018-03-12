@@ -101,7 +101,7 @@ namespace MapDiffBot.Controllers
 				else
 					ViewBag.SignInHref = Url.Action(nameof(SignOut), new { repositoryId });
 
-				ViewBag.SignOutHref = stringLocalizer["Sign-In with GitHub"];
+				ViewBag.AuthLevel = authLevel;
 				ViewBag.Title = stringLocalizer["DME Configuration"];
 				ViewBag.HideLogin = false;
 				ViewBag.EditHeader = stringLocalizer["Set the path to the .dme MapDiffBot should use for rendering"];
