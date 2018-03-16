@@ -63,8 +63,6 @@ namespace MapDiffBot.Core
 					builder.UseSqlServerStorage(dbConfig.ConnectionString, new SqlServerStorageOptions { PrepareSchemaIfNecessary = true });
 			});
 
-			services.Configure<MvcOptions>(options => options.Filters.Add(new RequireHttpsAttribute()));
-
 			services.Configure<IISOptions>((options) => options.ForwardClientCertificate = false);
 			services.AddMvc();
 			services.AddOptions();
