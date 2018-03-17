@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore AS base
+FROM microsoft/aspnetcore:2.0.6-jessie AS base
 WORKDIR /app
 EXPOSE 80
 
@@ -8,7 +8,7 @@ COPY . .
 WORKDIR /src/SpacemanDMM
 RUN cargo build -p cli --release
 
-FROM microsoft/aspnetcore-build AS build
+FROM microsoft/aspnetcore-build:2.0.6-2.1.101-jessie AS build
 WORKDIR /src/SpacemanDMM/target/release/
 COPY --from=compiler /src/SpacemanDMM/target/release/dmm-tools .
 WORKDIR /src

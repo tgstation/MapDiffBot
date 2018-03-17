@@ -27,7 +27,7 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// The URL to direct user to report issues at
 		/// </summary>
-		const string issueReportUrl = "https://github.com/MapDiffBot/MapDiffBot/issues/new";
+		const string issueReportUrl = "https://github.com/MapDiffBot/MapDiffBot/issues";
 		/// <summary>
 		/// The intermediate directory for operations
 		/// </summary>
