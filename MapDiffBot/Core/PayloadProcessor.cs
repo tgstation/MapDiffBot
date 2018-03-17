@@ -175,7 +175,7 @@ namespace MapDiffBot.Core
 			}
 			catch(Exception e)
 			{
-				logger.LogError(e, "Error scanning pull requst {0}/#{1}", repositoryId, pullRequestNumber);
+				logger.LogError(e, "Error scanning pull request {0}/#{1}", repositoryId, pullRequestNumber);
 				throw;
 			}
 		}
