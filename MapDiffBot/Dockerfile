@@ -19,7 +19,6 @@ RUN dotnet build -c Docker -o /app
 
 FROM build AS publish
 RUN dotnet publish -c Docker -o /app
-RUN cp runtimes
 
 FROM base AS final
 WORKDIR /app
