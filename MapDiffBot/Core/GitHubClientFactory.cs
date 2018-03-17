@@ -49,6 +49,7 @@ namespace MapDiffBot.Core
 		/// </summary>
 		/// <param name="gitHubConfigurationOptions">The <see cref="IOptions{TOptions}"/> containing the value of <see cref="gitHubConfiguration"/></param>
 		/// <param name="webRequestManager">The value of <see cref="webRequestManager"/></param>
+		/// <param name="logger">The value of <see cref="logger"/></param>
 		public GitHubClientFactory(IOptions<GitHubConfiguration> gitHubConfigurationOptions, IWebRequestManager webRequestManager, ILogger<GitHubClientFactory> logger)
 		{
 			gitHubConfiguration = gitHubConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(gitHubConfigurationOptions));
