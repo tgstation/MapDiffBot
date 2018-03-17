@@ -70,7 +70,18 @@ namespace MapDiffBot.Core
 		/// <see cref="Dictionary{TKey, TValue}"/> of operation name to their <see cref="CancellationToken"/>
 		/// </summary>
 		readonly Dictionary<string, CancellationTokenSource> mapDiffOperations;
-		
+
+		/// <summary>
+		/// Construct a <see cref="PayloadProcessor"/>
+		/// </summary>
+		/// <param name="gitHubConfigurationOptions">The <see cref="IOptions{TOptions}"/> containing the value of <see cref="gitHubConfiguration"/></param>
+		/// <param name="generatorFactory">The value of <see cref="generatorFactory"/></param>
+		/// <param name="serviceProvider">The value of <see cref="serviceProvider"/></param>
+		/// <param name="repositoryManager">The value of <see cref="repositoryManager"/></param>
+		/// <param name="ioManager">The value of <see cref="ioManager"/></param>
+		/// <param name="logger">The value of <see cref="logger"/></param>
+		/// <param name="stringLocalizer">The value of <see cref="stringLocalizer"/></param>
+		/// <param name="backgroundJobClient">The value of <see cref="backgroundJobClient"/></param>
 		public PayloadProcessor(IOptions<GitHubConfiguration> gitHubConfigurationOptions, IGeneratorFactory generatorFactory, IServiceProvider serviceProvider, ILocalRepositoryManager repositoryManager, IIOManager ioManager, ILogger<PayloadProcessor> logger, IStringLocalizer<PayloadProcessor> stringLocalizer, IBackgroundJobClient backgroundJobClient)
 		{
 			gitHubConfiguration = gitHubConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(gitHubConfigurationOptions));
@@ -175,7 +186,7 @@ namespace MapDiffBot.Core
 			}
 			catch(Exception e)
 			{
-				logger.LogError(e, "Error scanning pull requst {0}/#{1}", repositoryId, pullRequestNumber);
+				logger.LogError(e, "Error scanning pull request {0}/#{1}", repositoryId, pullRequestNumber);
 				throw;
 			}
 		}
