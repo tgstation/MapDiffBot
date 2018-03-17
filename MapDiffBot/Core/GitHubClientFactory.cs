@@ -1,5 +1,6 @@
 ﻿using GitHubJwt;
 using MapDiffBot.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Octokit;
@@ -38,16 +39,21 @@ namespace MapDiffBot.Core
 		/// The <see cref="IWebRequestManager"/> for the <see cref="GitHubClientFactory"/>
 		/// </summary>
 		readonly IWebRequestManager webRequestManager;
+		/// <summary>
+		/// The <see cref="ILogger"/> for the <see cref="GitHubClientFactory"/>
+		/// </summary>
+		readonly ILogger logger;
 
 		/// <summary>
 		/// Construct a <see cref="GitHubClientFactory"/>
 		/// </summary>
 		/// <param name="gitHubConfigurationOptions">The <see cref="IOptions{TOptions}"/> containing the value of <see cref="gitHubConfiguration"/></param>
 		/// <param name="webRequestManager">The value of <see cref="webRequestManager"/></param>
-		public GitHubClientFactory(IOptions<GitHubConfiguration> gitHubConfigurationOptions, IWebRequestManager webRequestManager)
+		public GitHubClientFactory(IOptions<GitHubConfiguration> gitHubConfigurationOptions, IWebRequestManager webRequestManager, ILogger<GitHubClientFactory> logger)
 		{
 			gitHubConfiguration = gitHubConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(gitHubConfigurationOptions));
 			this.webRequestManager = webRequestManager ?? throw new ArgumentNullException(nameof(webRequestManager));
+			this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		/// <inheritdoc />
@@ -64,13 +70,19 @@ namespace MapDiffBot.Core
 		/// <inheritdoc />
 		public IGitHubClient CreateOauthClient(string accessToken)
 		{
+			if (accessToken == null)
+				throw new ArgumentNullException(nameof(accessToken));
 			var client = CreateBareClient();
-			client.Credentials = new Credentials(accessToken ?? throw new ArgumentNullException(nameof(accessToken)), AuthenticationType.Oauth);
+			client.Credentials = new Credentials(accessToken, AuthenticationType.Oauth);
 			return client;
 		}
 
 		/// <inheritdoc />
-		public TextReader GetPrivateKeyReader() => File.OpenText(gitHubConfiguration.PemPath);
+		public TextReader GetPrivateKeyReader()
+		{
+			logger.LogTrace("Opening private key file: {0}", gitHubConfiguration.PemPath);
+			return File.OpenText(gitHubConfiguration.PemPath);
+		}
 		
 		/// <inheritdoc />
 		public async Task<IReadOnlyList<Repository>> GetInstallationRepositories(string installationToken, CancellationToken cancellationToken)
