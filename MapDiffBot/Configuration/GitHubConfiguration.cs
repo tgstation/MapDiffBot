@@ -26,7 +26,7 @@
 		public string PemPath { get; set; }
 
 		/// <summary>
-		/// The ISS value for creating a JWT of <see cref="PemData"/>
+		/// The ISS value for creating a JWT of the private key at <see cref="PemPath"/>
 		/// </summary>
 		public int AppID { get; set; }
 
