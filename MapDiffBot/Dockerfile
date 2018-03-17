@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore:2.0.6-jessie AS base
+FROM microsoft/aspnetcore-build:2.0.6-2.1.101-jessie AS base
 WORKDIR /app
 EXPOSE 80
 
