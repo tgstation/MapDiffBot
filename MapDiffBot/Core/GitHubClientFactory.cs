@@ -70,7 +70,7 @@ namespace MapDiffBot.Core
 		}
 
 		/// <inheritdoc />
-		public TextReader GetPrivateKeyReader() => new StreamReader(gitHubConfiguration.PemPath);
+		public TextReader GetPrivateKeyReader() => File.OpenText(gitHubConfiguration.PemPath);
 		
 		/// <inheritdoc />
 		public async Task<IReadOnlyList<Repository>> GetInstallationRepositories(string installationToken, CancellationToken cancellationToken)
