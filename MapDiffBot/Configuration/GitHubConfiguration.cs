@@ -21,9 +21,9 @@
 		public string WebhookSecret { get; set; }
 
 		/// <summary>
-		/// The GitHub App PEM private key
+		/// The GitHub App PEM private key file path
 		/// </summary>
-		public string PemData { get; set; }
+		public string PemPath { get; set; }
 
 		/// <summary>
 		/// The ISS value for creating a JWT of <see cref="PemData"/>
