@@ -81,6 +81,7 @@ namespace MapDiffBot.Core
 					trackingContext.Property(nameof(Models.Installation.AccessToken)).IsModified = true;
 					trackingContext.Property(nameof(Models.Installation.AccessTokenExpiry)).IsModified = true;
 					await databaseContext.Save(cancellationToken).ConfigureAwait(false);
+					return gitHubClientFactory.CreateOauthClient(newToken.Token);
 				}
 				return gitHubClientFactory.CreateOauthClient(installation.AccessToken);
 			}
