@@ -22,7 +22,7 @@ namespace MapDiffBot.Core.Tests
 			mockIOManager.Setup(x => x.ResolvePath(".")).Returns(".");
 			var lrm = new LocalRepositoryManager(mockIOManager.Object, mockLocalRepositoryFactory.Object, mockRepositoryOperations.Object);
 		}
-
+		
 		[TestMethod]
 		public async Task TestMultiGet()
 		{
@@ -31,6 +31,9 @@ namespace MapDiffBot.Core.Tests
 			var mockLocalRepositoryFactory = new Mock<ILocalRepositoryFactory>();
 			var mockRepositoryOperations = new Mock<IRepositoryOperations>();
 			var lrm = new LocalRepositoryManager(mockIOManager.Object, mockLocalRepositoryFactory.Object, mockRepositoryOperations.Object);
+
+			//async set results because tcs continuation memes
+			Task SetResult(TaskCompletionSource<object> taskCompletionSource) => Task.Run(() => taskCompletionSource.SetResult(null));
 
 			const string FakeUrl = "https://github.com/tgstation/tgstation";
 			const string Identifier = "tgstation\\tgstation";
@@ -42,27 +45,27 @@ namespace MapDiffBot.Core.Tests
 				if (firstTcs != null)
 					return;
 				firstTcs = tcs;
-				ensuranceTcs.SetResult(null);
+				SetResult(ensuranceTcs);
 			}).Returns(Task.FromResult(mockLocalRepository.Object)).Verifiable();
 
 			var firstBlocked = false;
 			async Task FirstGet()
 			{
-				await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { firstBlocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false);
+				Assert.AreSame(mockLocalRepository.Object, await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { firstBlocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false));
 				await continueTcs.Task.ConfigureAwait(false);
 				await ensuranceTcs.Task.ConfigureAwait(false);
-				firstTcs.SetResult(null);
+				var t = SetResult(firstTcs);
 			};
 
 			var blocked = false;
 			async Task SecondGet()
 			{
-				await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { blocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false);
+				Assert.AreSame(mockLocalRepository.Object, await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { blocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false));
 			};
 
 			var firstGet = FirstGet();
 			var secondGet = SecondGet();
-			continueTcs.SetResult(null);
+			var t2 = SetResult(continueTcs);
 			await firstGet.ConfigureAwait(false);
 			await secondGet.ConfigureAwait(false);
 
