@@ -16,12 +16,8 @@ namespace MapDiffBot.Core
 			{
 				Commands.Fetch(repository as Repository, remote, refspecs, new FetchOptions()
 				{
-					OnProgress = (m) => {
-						return !cancellationToken.IsCancellationRequested;
-					},
-					OnTransferProgress = (p) => {
-						return !cancellationToken.IsCancellationRequested;
-					},
+					OnProgress = (m) => !cancellationToken.IsCancellationRequested,
+					OnTransferProgress = (p) => !cancellationToken.IsCancellationRequested,
 					Prune = true,
 					TagFetchMode = TagFetchMode.Auto
 				}, logMessage);
@@ -32,8 +28,8 @@ namespace MapDiffBot.Core
 			}
 		}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
-/// <inheritdoc />
-public async Task Clone(string url, string path, Func<int, Task> onCloneProgress, CancellationToken cancellationToken)
+		/// <inheritdoc />
+		public async Task Clone(string url, string path, Func<int, Task> onCloneProgress, CancellationToken cancellationToken)
 		{
 			if (url == null)
 				throw new ArgumentNullException(nameof(url));
@@ -62,7 +58,7 @@ public async Task Clone(string url, string path, Func<int, Task> onCloneProgress
 							}
 							return true;
 						},
-						OnUpdateTips = (a, b, c) => !cancellationToken.IsCancellationRequested
+						OnUpdateTips = (a, b, c) => !cancellationToken.IsCancellationRequested,
 					});
 				}
 				catch (UserCancelledException)
