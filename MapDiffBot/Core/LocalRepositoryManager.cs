@@ -1,7 +1,6 @@
 ﻿using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,7 +33,7 @@ namespace MapDiffBot.Core
 		/// Construct a <see cref="LocalRepositoryManager"/>
 		/// </summary>
 		/// <param name="ioManager">The value of <see cref="ioManager"/></param>
-		/// <param name="repositoryFactory">The value of <see cref="repositoryFactory"/></param>
+		/// <param name="localRepositoryFactory">The value of <see cref="localRepositoryFactory"/></param>
 		/// <param name="repositoryOperations">The value of <see cref="repositoryOperations"/></param>
 		public LocalRepositoryManager(IIOManager ioManager, ILocalRepositoryFactory localRepositoryFactory, IRepositoryOperations repositoryOperations)
 		{
