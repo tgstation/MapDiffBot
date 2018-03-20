@@ -39,6 +39,8 @@ namespace MapDiffBot.Core.Tests
 			TaskCompletionSource<object> firstTcs = null, continueTcs = new TaskCompletionSource<object>(), ensuranceTcs = new TaskCompletionSource<object>();
 			mockLocalRepositoryFactory.Setup(x => x.CreateLocalRepository(Identifier, It.IsNotNull<TaskCompletionSource<object>>(), default)).Callback((string id, TaskCompletionSource<object> tcs, CancellationToken cancellationToken) =>
 			{
+				if (firstTcs != null)
+					return;
 				firstTcs = tcs;
 				ensuranceTcs.SetResult(null);
 			}).Returns(Task.FromResult(mockLocalRepository.Object)).Verifiable();
