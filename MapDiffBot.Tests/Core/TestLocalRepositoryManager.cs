@@ -36,10 +36,11 @@ namespace MapDiffBot.Core.Tests
 			const string Identifier = "tgstation\\tgstation";
 			var repoModel = new Repository(null, null, FakeUrl, null, null, null, null, 1, new User(null, null, null, 0, null, DateTimeOffset.Now, DateTimeOffset.Now, 0, null, 0, 0, null, null, 0, 0, null, "tgstation", null, 0, null, 0, 0, 0, null, null, false, null, null), "tgstation", null, null, null, null, false, false, 0, 0, null, 0, null, DateTimeOffset.Now, DateTimeOffset.Now, null, null, null, null, false, false, false, false, 0, 0, null, null, null);
 			var mockLocalRepository = new Mock<ILocalRepository>();
-			TaskCompletionSource<object> firstTcs = null, continueTcs = new TaskCompletionSource<object>();
+			TaskCompletionSource<object> firstTcs = null, continueTcs = new TaskCompletionSource<object>(), ensuranceTcs = new TaskCompletionSource<object>();
 			mockLocalRepositoryFactory.Setup(x => x.CreateLocalRepository(Identifier, It.IsNotNull<TaskCompletionSource<object>>(), default)).Callback((string id, TaskCompletionSource<object> tcs, CancellationToken cancellationToken) =>
 			{
 				firstTcs = tcs;
+				ensuranceTcs.SetResult(null);
 			}).Returns(Task.FromResult(mockLocalRepository.Object)).Verifiable();
 
 			var firstBlocked = false;
@@ -47,6 +48,7 @@ namespace MapDiffBot.Core.Tests
 			{
 				await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { firstBlocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false);
 				await continueTcs.Task.ConfigureAwait(false);
+				await ensuranceTcs.Task.ConfigureAwait(false);
 				firstTcs.SetResult(null);
 			};
 
@@ -57,9 +59,7 @@ namespace MapDiffBot.Core.Tests
 			};
 
 			var firstGet = FirstGet();
-			await Task.Delay(100).ConfigureAwait(false);
 			var secondGet = SecondGet();
-			await Task.Delay(100).ConfigureAwait(false);
 			continueTcs.SetResult(null);
 			await firstGet.ConfigureAwait(false);
 			await secondGet.ConfigureAwait(false);
