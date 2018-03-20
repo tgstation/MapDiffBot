@@ -13,12 +13,13 @@ WORKDIR /src/SpacemanDMM/target/release/
 COPY --from=compiler /src/SpacemanDMM/target/release/dmm-tools .
 WORKDIR /src
 COPY . .
-RUN dotnet restore MapDiffBot/MapDiffBot.Tests.csproj
+RUN dotnet restore MapDiffBot.Tests/MapDiffBot.Tests.csproj
 WORKDIR /src/MapDiffBot.Tests
-RUN dotnet build -c Docker -o /app
+RUN dotnet test -c Release
 
 FROM build AS publish
-RUN dotnet publish -c Docker -o /app
+WORKDIR /src/MapDiffBot
+RUN dotnet publish -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
