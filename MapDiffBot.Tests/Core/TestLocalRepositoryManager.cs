@@ -52,7 +52,7 @@ namespace MapDiffBot.Core.Tests
 			var firstBlocked = false;
 			async Task FirstGet()
 			{
-				Assert.AreSame(mockLocalObject, await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { firstBlocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false));
+				await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { firstBlocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false);
 				await continueTcs.Task.ConfigureAwait(false);
 				await ensuranceTcs.Task.ConfigureAwait(false);
 				var t = SetResult(firstTcs);
@@ -61,7 +61,7 @@ namespace MapDiffBot.Core.Tests
 			var blocked = false;
 			async Task SecondGet()
 			{
-				Assert.AreSame(mockLocalObject, await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { blocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false));
+				await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { blocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false);
 			};
 
 			var firstGet = FirstGet();
