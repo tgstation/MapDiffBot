@@ -40,18 +40,19 @@ namespace MapDiffBot.Core.Tests
 			var repoModel = new Repository(null, null, FakeUrl, null, null, null, null, 1, new User(null, null, null, 0, null, DateTimeOffset.Now, DateTimeOffset.Now, 0, null, 0, 0, null, null, 0, 0, null, "tgstation", null, 0, null, 0, 0, 0, null, null, false, null, null), "tgstation", null, null, null, null, false, false, 0, 0, null, 0, null, DateTimeOffset.Now, DateTimeOffset.Now, null, null, null, null, false, false, false, false, 0, 0, null, null, null);
 			var mockLocalRepository = new Mock<ILocalRepository>();
 			TaskCompletionSource<object> firstTcs = null, continueTcs = new TaskCompletionSource<object>(), ensuranceTcs = new TaskCompletionSource<object>();
+			var mockLocalObject = mockLocalRepository.Object;
 			mockLocalRepositoryFactory.Setup(x => x.CreateLocalRepository(Identifier, It.IsNotNull<TaskCompletionSource<object>>(), default)).Callback((string id, TaskCompletionSource<object> tcs, CancellationToken cancellationToken) =>
 			{
 				if (firstTcs != null)
 					return;
 				firstTcs = tcs;
 				SetResult(ensuranceTcs);
-			}).Returns(Task.FromResult(mockLocalRepository.Object)).Verifiable();
+			}).Returns(Task.FromResult(mockLocalObject)).Verifiable();
 
 			var firstBlocked = false;
 			async Task FirstGet()
 			{
-				Assert.AreSame(mockLocalRepository.Object, await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { firstBlocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false));
+				Assert.AreSame(mockLocalObject, await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { firstBlocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false));
 				await continueTcs.Task.ConfigureAwait(false);
 				await ensuranceTcs.Task.ConfigureAwait(false);
 				var t = SetResult(firstTcs);
@@ -60,7 +61,7 @@ namespace MapDiffBot.Core.Tests
 			var blocked = false;
 			async Task SecondGet()
 			{
-				Assert.AreSame(mockLocalRepository.Object, await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { blocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false));
+				Assert.AreSame(mockLocalObject, await lrm.GetRepository(repoModel, (progress) => Task.CompletedTask, () => { blocked = true; return Task.CompletedTask; }, default).ConfigureAwait(false));
 			};
 
 			var firstGet = FirstGet();
