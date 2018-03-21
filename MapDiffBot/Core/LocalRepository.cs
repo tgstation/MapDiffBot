@@ -35,9 +35,13 @@ namespace MapDiffBot.Core
 		public string Path => repositoryLib.Info.WorkingDirectory;
 
 		/// <summary>
-		/// The backing <see cref="Repository"/>
+		/// The <see cref="IRepository"/> for the <see cref="LocalRepository"/>
 		/// </summary>
-		readonly Repository repositoryLib;
+		readonly IRepository repositoryLib;
+		/// <summary>
+		/// The <see cref="IRepositoryOperations"/> for the <see cref="LocalRepository"/>
+		/// </summary>
+		readonly IRepositoryOperations repositoryOperations;
 		/// <summary>
 		/// The <see cref="TaskCompletionSource{TResult}"/> that is completed when <see cref="Dispose"/> is called
 		/// </summary>
@@ -52,10 +56,12 @@ namespace MapDiffBot.Core
 		/// Construct a <see cref="LocalRepository"/>
 		/// </summary>
 		/// <param name="repositoryLib">The value of <see cref="repositoryLib"/></param>
+		/// <param name="repositoryOperations">The value of <see cref="repositoryOperations"/></param>
 		/// <param name="onDisposal">The value of <see cref="onDisposal"/></param>
-		public LocalRepository(Repository repositoryLib, TaskCompletionSource<object> onDisposal)
+		public LocalRepository(IRepository repositoryLib, IRepositoryOperations repositoryOperations, TaskCompletionSource<object> onDisposal)
 		{
 			this.repositoryLib = repositoryLib ?? throw new ArgumentNullException(nameof(repositoryLib));
+			this.repositoryOperations = repositoryOperations ?? throw new ArgumentNullException(nameof(repositoryOperations));
 			this.onDisposal = onDisposal ?? throw new ArgumentNullException(nameof(onDisposal));
 		}
 
@@ -91,40 +97,23 @@ namespace MapDiffBot.Core
 		public Task<bool> ContainsCommit(string sha, CancellationToken cancellationToken) => Task.Factory.StartNew(() => repositoryLib.Lookup(sha) != null, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
 		/// <inheritdoc />
-		public Task Fetch(CancellationToken cancellationToken) => Task.Factory.StartNew(() =>
-			{
-				var remote = repositoryLib.Network.Remotes.First();
-				var refSpecs = remote.FetchRefSpecs.Select(X => X.Specification);
-				try
-				{
-					Commands.Fetch(repositoryLib, remote.Name, refSpecs, GenerateFetchOptions(cancellationToken), "Update of origin branch");
-				}
-				catch (UserCancelledException)
-				{
-					cancellationToken.ThrowIfCancellationRequested();
-				}
-			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+		public async Task Fetch(CancellationToken cancellationToken)
+		{
+			var remote = repositoryLib.Network.Remotes.First();
+			var refSpecs = remote.FetchRefSpecs.Select(X => X.Specification);
+			await repositoryOperations.Fetch(repositoryLib, remote.Name, refSpecs, "Update of origin branch", cancellationToken).ConfigureAwait(false);
+		}
 
 		/// <inheritdoc />
-		public Task FetchPullRequest(int prNumber, CancellationToken cancellationToken) => Task.Factory.StartNew(() =>
-			{
-				if (prNumber < 1)
-					throw new ArgumentOutOfRangeException(nameof(prNumber), prNumber, String.Format(CultureInfo.CurrentCulture, "{0} must be greater than zero!", nameof(prNumber)));
-				var remote = repositoryLib.Network.Remotes.First();
-				var prBranchName = String.Format(CultureInfo.InvariantCulture, "pr-{0}", prNumber);
-				var refSpecs = new List<string>
-				{
-					String.Format(CultureInfo.InvariantCulture, "pull/{0}/head:{1}", prNumber, prBranchName)
-				};
-				try
-				{
-					Commands.Fetch(repositoryLib, remote.Name, refSpecs, GenerateFetchOptions(cancellationToken), String.Format(CultureInfo.CurrentCulture, "Fetch of pull request #{0}", prNumber));
-				}
-				catch (UserCancelledException)
-				{
-					cancellationToken.ThrowIfCancellationRequested();
-				}
-			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+		public async Task FetchPullRequest(int prNumber, CancellationToken cancellationToken)
+		{
+			if (prNumber < 1)
+				throw new ArgumentOutOfRangeException(nameof(prNumber), prNumber, String.Format(CultureInfo.CurrentCulture, "{0} must be greater than zero!", nameof(prNumber)));
+			var remote = repositoryLib.Network.Remotes.First();
+			var prBranchName = String.Format(CultureInfo.InvariantCulture, "pr-{0}", prNumber);
+			var refSpecs = new List<string> { String.Format(CultureInfo.InvariantCulture, "pull/{0}/head:{1}", prNumber, prBranchName) };
+			await repositoryOperations.Fetch(repositoryLib, remote.Name, refSpecs, String.Format(CultureInfo.CurrentCulture, "Fetch of pull request #{0}", prNumber), cancellationToken).ConfigureAwait(false);
+		}
 
 		/// <inheritdoc />
 		public Task Merge(string commitish, CancellationToken cancellationToken) => Task.Factory.StartNew(() =>

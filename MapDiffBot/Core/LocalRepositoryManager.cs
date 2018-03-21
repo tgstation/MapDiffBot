@@ -1,7 +1,6 @@
 ﻿using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +15,14 @@ namespace MapDiffBot.Core
 		/// The <see cref="IIOManager"/> for the <see cref="LocalRepositoryManager"/>
 		/// </summary>
 		readonly IIOManager ioManager;
+		/// <summary>
+		/// The <see cref="ILocalRepositoryFactory"/> for the <see cref="LocalRepositoryManager"/>
+		/// </summary>
+		readonly ILocalRepositoryFactory localRepositoryFactory;
+		/// <summary>
+		/// The <see cref="IRepositoryOperations"/> for the <see cref="LocalRepositoryManager"/>
+		/// </summary>
+		readonly IRepositoryOperations repositoryOperations;
 
 		/// <summary>
 		/// <see cref="Dictionary{TKey, TValue}"/> of repoPaths to <see cref="Task"/>s that will finish when they are done being used
@@ -26,31 +33,16 @@ namespace MapDiffBot.Core
 		/// Construct a <see cref="LocalRepositoryManager"/>
 		/// </summary>
 		/// <param name="ioManager">The value of <see cref="ioManager"/></param>
-		public LocalRepositoryManager(IIOManager ioManager)
+		/// <param name="localRepositoryFactory">The value of <see cref="localRepositoryFactory"/></param>
+		/// <param name="repositoryOperations">The value of <see cref="repositoryOperations"/></param>
+		public LocalRepositoryManager(IIOManager ioManager, ILocalRepositoryFactory localRepositoryFactory, IRepositoryOperations repositoryOperations)
 		{
 			this.ioManager = new ResolvingIOManager(ioManager ?? throw new ArgumentNullException(nameof(ioManager)), "Repositories");
+			this.localRepositoryFactory = localRepositoryFactory ?? throw new ArgumentNullException(nameof(localRepositoryFactory));
+			this.repositoryOperations = repositoryOperations ?? throw new ArgumentNullException(nameof(repositoryOperations));
 			activeRepositories = new Dictionary<string, Task>();
 		}
-
-		/// <summary>
-		/// Creates a <see cref="ILocalRepository"/>
-		/// </summary>
-		/// <param name="repoPath">The path to the <see cref="ILocalRepository"/></param>
-		/// <param name="usageTask">The <see cref="TaskCompletionSource{TResult}"/> that indicates the lifetime of the resulting <see cref="ILocalRepository"/></param>
-		/// <param name="cancellationToken">The <see cref="CancellationToken"/> token for the operation</param>
-		/// <returns>A <see cref="Task"/> resulting in the <see cref="ILocalRepository"/> at <paramref name="repoPath"/></returns>
-		async Task<ILocalRepository> CreateRepositoryObject(string repoPath, TaskCompletionSource<object> usageTask, CancellationToken cancellationToken)
-		{
-			Repository repoLib = null;
-			await Task.Factory.StartNew(() =>
-			{
-				repoLib = new Repository(ioManager.ResolvePath(repoPath));
-				cancellationToken.ThrowIfCancellationRequested();
-				repoLib.RemoveUntrackedFiles();
-			}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
-			return new LocalRepository(repoLib, usageTask);
-		}
-
+		
 		/// <summary>
 		/// Attempt to load the <see cref="ILocalRepository"/> at <paramref name="repoPath"/>. Awaits until all <see cref="ILocalRepository"/>'s referencing <paramref name="repoPath"/> created by <see langword="this"/> are disposed
 		/// </summary>
@@ -76,23 +68,29 @@ namespace MapDiffBot.Core
 			//if we weren't the very first person in the queue
 			bool operationBlocked;
 
+			Task usageTask;
+			async Task Continuation()
+			{
+				//first wait our turn
+				await usageTask.ConfigureAwait(false);
+				//let the function know it can continue
+				repoBusyTask.SetResult(null);
+				try
+				{
+					//then wait for it's ourRepoUsageTask to complete
+					await ourRepoUsageTask.Task.ConfigureAwait(false);
+				}
+				catch (OperationCanceledException) { }
+			};
+
 			lock (activeRepositories)
 			{
-				operationBlocked = activeRepositories.TryGetValue(repoPath, out Task usageTask);
-				if (!operationBlocked)
+				if (!activeRepositories.TryGetValue(repoPath, out usageTask))
 					//set it to completed task to allow for consistency
 					usageTask = Task.CompletedTask;
-				activeRepositories[repoPath] = usageTask.ContinueWith(async (t) =>
-				{
-					//first let this function know it's now its turn
-					repoBusyTask.SetResult(null);
-					try
-					{
-						//then wait for it's ourRepoUsageTask to complete
-						await ourRepoUsageTask.Task.ConfigureAwait(false);
-					}
-					catch (OperationCanceledException) { }
-				}, cancellationToken, TaskContinuationOptions.None, TaskScheduler.Current);
+				operationBlocked = !usageTask.IsCompleted;
+
+				activeRepositories[repoPath] = Continuation();
 			}
 
 			Task operationBlockedTask = null;
@@ -119,7 +117,7 @@ namespace MapDiffBot.Core
 			//pass it on
 			try
 			{
-				return await CreateRepositoryObject(repoPath, ourRepoUsageTask, cancellationToken).ConfigureAwait(false);
+				return await localRepositoryFactory.CreateLocalRepository(repoPath, ourRepoUsageTask, cancellationToken).ConfigureAwait(false);
 			}
 			catch (LibGit2SharpException)
 			{
@@ -147,46 +145,10 @@ namespace MapDiffBot.Core
 			//reclone it
 			try
 			{
-				List<Task> cloneTasks = null;
-				if(onCloneProgress != null)
-					cloneTasks = new List<Task>() { onCloneProgress(0) };
-
 				await ioManager.DeleteDirectory(repoPath, cancellationToken).ConfigureAwait(false);
 				await ioManager.CreateDirectory(repoPath, cancellationToken).ConfigureAwait(false);
-
-				var gitHubURL = String.Format(CultureInfo.InvariantCulture, "https://github.com/{0}/{1}", repository.Owner.Login, repository.Name);
-				await Task.Factory.StartNew(() =>
-				{
-					try
-					{
-						Repository.Clone(gitHubURL, ioManager.ResolvePath(repoPath), new CloneOptions
-						{
-							Checkout = true,
-							OnProgress = (m) => !cancellationToken.IsCancellationRequested,
-							OnTransferProgress = (transferProgress) =>
-							{
-								if (cancellationToken.IsCancellationRequested)
-									return false;
-								if (cloneTasks != null)
-								{
-									var newTask = onCloneProgress((int)Math.Floor((100.0 * (transferProgress.ReceivedObjects + transferProgress.IndexedObjects)) / (transferProgress.TotalObjects * 2)));
-									if (newTask != null)
-										cloneTasks.Add(newTask);
-								}
-								return true;
-							},
-							OnUpdateTips = (a, b, c) => !cancellationToken.IsCancellationRequested
-						});
-					}
-					catch (UserCancelledException)
-					{
-						cancellationToken.ThrowIfCancellationRequested();
-					}
-				}, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
-
-				var result = await CreateRepositoryObject(repoPath, usageTask, cancellationToken).ConfigureAwait(false);
-				if(cloneTasks != null)
-					await Task.WhenAll(cloneTasks).ConfigureAwait(false);
+				await repositoryOperations.Clone(repository.CloneUrl, ioManager.ResolvePath(repoPath), onCloneProgress, cancellationToken).ConfigureAwait(false);
+				var result = await localRepositoryFactory.CreateLocalRepository(repoPath, usageTask, cancellationToken).ConfigureAwait(false);
 				return result;
 			}
 			catch

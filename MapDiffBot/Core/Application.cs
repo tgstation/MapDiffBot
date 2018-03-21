@@ -7,8 +7,6 @@ using MapDiffBot.Models;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -49,7 +47,7 @@ namespace MapDiffBot.Core
 
 
 			services.Configure<IISOptions>((options) => options.ForwardClientCertificate = false);
-
+	
 			services.Configure<GitHubConfiguration>(configuration.GetSection(GitHubConfiguration.Section));
 			var dbConfigSection = configuration.GetSection(DatabaseConfiguration.Section);
 			services.Configure<DatabaseConfiguration>(dbConfigSection);
@@ -79,6 +77,8 @@ namespace MapDiffBot.Core
 			services.AddSingleton<IWebRequestManager, WebRequestManager>();
 			services.AddSingleton<IPayloadProcessor, PayloadProcessor>();
 			services.AddSingleton<ILocalRepositoryManager, LocalRepositoryManager>();
+			services.AddSingleton<ILocalRepositoryFactory, LocalRepositoryFactory>();
+			services.AddSingleton<IRepositoryOperations, RepositoryOperations>();
 		}
 
 		/// <summary>

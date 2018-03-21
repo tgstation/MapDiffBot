@@ -15,9 +15,10 @@ WORKDIR /src
 COPY . .
 RUN dotnet restore MapDiffBot/MapDiffBot.csproj
 WORKDIR /src/MapDiffBot
-RUN dotnet build -c Docker -o /app
+RUN dotnet build -c Docker
 
 FROM build AS publish
+WORKDIR /src/MapDiffBot
 RUN dotnet publish -c Docker -o /app
 
 FROM base AS final

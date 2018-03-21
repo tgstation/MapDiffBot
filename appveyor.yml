@@ -1,6 +1,10 @@
 pull_requests:
   do_not_increment_build_number: true
 skip_branch_with_pr: true
+version: '{build}'
+branches:
+  only:
+  - master
 environment:
   repo_token:
     secure: 2IfF4fXwHC6ix7KXkbvghzUT7zFzOjWWQKypfm/efc7XrUAHZdplFuLU08JJ37yk
@@ -11,11 +15,12 @@ configuration:
   - Release
 cache:
   - packages -> **\*.csproj
+  - SpacemanDMM\target\release\deps -> .gitmodules
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
 install:
   - git submodule update --init --recursive
-  - choco install fciv doxygen.portable
+  - choco install doxygen.portable codecov
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
   - curl -sSf -o rustup-init.exe https://win.rustup.rs
@@ -28,5 +33,12 @@ before_build:
 build:
   project: MapDiffBot.sln
   verbosity: minimal
+test_script:
+  - set path=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\TestAgent\Common7\IDE\CommonExtensions\Microsoft\TestWindow;%path%
+  - copy "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Extensions\appveyor.*" "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\TestAgent\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Extensions" /y
+  - vstest.console /EnableCodeCoverage "MapDiffBot.Tests\bin\%CONFIGURATION%\netcoreapp2.0\MapDiffBot.Tests.dll" /logger:trx;LogFileName=results.trx
+  - ps: $wc = New-Object 'System.Net.WebClient'
+  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestResults\results.trx))
 after_test:
+  - ps: Tools/UploadCoverage.ps1
   - ps: Tools/BuildDox.ps1
