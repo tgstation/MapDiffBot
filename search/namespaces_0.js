@@ -5,5 +5,7 @@ var searchData=
   ['core',['Core',['../namespace_map_diff_bot_1_1_core.html',1,'MapDiffBot']]],
   ['mapdiffbot',['MapDiffBot',['../namespace_map_diff_bot.html',1,'']]],
   ['models',['Models',['../namespace_map_diff_bot_1_1_models.html',1,'MapDiffBot']]],
-  ['resources',['Resources',['../namespace_map_diff_bot_1_1_resources.html',1,'MapDiffBot']]]
+  ['resources',['Resources',['../namespace_map_diff_bot_1_1_resources.html',1,'MapDiffBot']]],
+  ['tests',['Tests',['../namespace_map_diff_bot_1_1_core_1_1_tests.html',1,'MapDiffBot::Core']]],
+  ['tests',['Tests',['../namespace_map_diff_bot_1_1_tests.html',1,'MapDiffBot']]]
 ];
