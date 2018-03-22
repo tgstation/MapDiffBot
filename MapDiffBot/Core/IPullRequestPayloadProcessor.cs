@@ -12,14 +12,12 @@ namespace MapDiffBot.Core
 		/// Process a <see cref="PullRequestEventPayload"/>
 		/// </summary>
 		/// <param name="payload">The <see cref="PullRequestEventPayload"/> to process</param>
-		/// <param name="urlHelper">The <see cref="IUrlHelper"/> for the operation</param>
-		void ProcessPayload(PullRequestEventPayload payload, IUrlHelper urlHelper);
+		void ProcessPayload(PullRequestEventPayload payload);
 
 		/// <summary>
 		/// Process a <see cref="IssueCommentPayload"/>
 		/// </summary>
 		/// <param name="payload">The <see cref="IssueCommentPayload"/> to process</param>
-		/// <param name="urlHelper">The <see cref="IUrlHelper"/> for the operation</param>
-		void ProcessPayload(IssueCommentPayload payload, IUrlHelper urlHelper);
+		void ProcessPayload(IssueCommentPayload payload);
 	}
 }

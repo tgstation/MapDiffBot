@@ -38,6 +38,10 @@ namespace MapDiffBot.Core
 		/// </summary>
 		readonly GitHubConfiguration gitHubConfiguration;
 		/// <summary>
+		/// The <see cref="GeneralConfiguration"/> for the <see cref="PayloadProcessor"/>
+		/// </summary>
+		readonly GeneralConfiguration generalConfiguration;
+		/// <summary>
 		/// The <see cref="IGeneratorFactory"/> for the <see cref="PayloadProcessor"/>
 		/// </summary>
 		readonly IGeneratorFactory generatorFactory;
@@ -75,6 +79,7 @@ namespace MapDiffBot.Core
 		/// Construct a <see cref="PayloadProcessor"/>
 		/// </summary>
 		/// <param name="gitHubConfigurationOptions">The <see cref="IOptions{TOptions}"/> containing the value of <see cref="gitHubConfiguration"/></param>
+		/// <param name="generalConfigurationOptions">The <see cref="IOptions{TOptions}"/> containing the value of <see cref="generalConfiguration"/></param>
 		/// <param name="generatorFactory">The value of <see cref="generatorFactory"/></param>
 		/// <param name="serviceProvider">The value of <see cref="serviceProvider"/></param>
 		/// <param name="repositoryManager">The value of <see cref="repositoryManager"/></param>
@@ -82,9 +87,10 @@ namespace MapDiffBot.Core
 		/// <param name="logger">The value of <see cref="logger"/></param>
 		/// <param name="stringLocalizer">The value of <see cref="stringLocalizer"/></param>
 		/// <param name="backgroundJobClient">The value of <see cref="backgroundJobClient"/></param>
-		public PayloadProcessor(IOptions<GitHubConfiguration> gitHubConfigurationOptions, IGeneratorFactory generatorFactory, IServiceProvider serviceProvider, ILocalRepositoryManager repositoryManager, IIOManager ioManager, ILogger<PayloadProcessor> logger, IStringLocalizer<PayloadProcessor> stringLocalizer, IBackgroundJobClient backgroundJobClient)
+		public PayloadProcessor(IOptions<GitHubConfiguration> gitHubConfigurationOptions, IOptions<GeneralConfiguration> generalConfigurationOptions, IGeneratorFactory generatorFactory, IServiceProvider serviceProvider, ILocalRepositoryManager repositoryManager, IIOManager ioManager, ILogger<PayloadProcessor> logger, IStringLocalizer<PayloadProcessor> stringLocalizer, IBackgroundJobClient backgroundJobClient)
 		{
 			gitHubConfiguration = gitHubConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(gitHubConfigurationOptions));
+			generalConfiguration = generalConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(generalConfigurationOptions));
 			this.ioManager = new ResolvingIOManager(ioManager ?? throw new ArgumentNullException(nameof(ioManager)), WorkingDirectory);
 			this.generatorFactory = generatorFactory ?? throw new ArgumentNullException(nameof(generatorFactory));
 			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -101,11 +107,10 @@ namespace MapDiffBot.Core
 		/// </summary>
 		/// <param name="repositoryId">The <see cref="PullRequest.Base"/> <see cref="Repository.Id"/></param>
 		/// <param name="pullRequestNumber">The <see cref="PullRequest.Number"/></param>
-		/// <param name="baseUrl">The base path of the request URL that triggered the job</param>
 		/// <param name="jobCancellationToken">The <see cref="IJobCancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		[AutomaticRetry(Attempts = 0)]
-		public async Task ScanPullRequest(long repositoryId, int pullRequestNumber, string baseUrl, IJobCancellationToken jobCancellationToken)
+		public async Task ScanPullRequest(long repositoryId, int pullRequestNumber, IJobCancellationToken jobCancellationToken)
 		{
 			try
 			{
@@ -151,7 +156,7 @@ namespace MapDiffBot.Core
 							if (changedDmms.Count == 0)
 								return;
 
-							await GenerateDiffs(pullRequest, changedDmms, baseUrl, cancellationToken).ConfigureAwait(false);
+							await GenerateDiffs(pullRequest, changedDmms, cancellationToken).ConfigureAwait(false);
 						}
 						catch (OperationCanceledException)
 						{
@@ -196,10 +201,9 @@ namespace MapDiffBot.Core
 		/// </summary>
 		/// <param name="pullRequest">The <see cref="PullRequest"/></param>
 		/// <param name="changedDmms">Paths to changed .dmm files</param>
-		/// <param name="baseUrl">The base URL of the request</param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		async Task GenerateDiffs(PullRequest pullRequest, IReadOnlyList<string> changedDmms, string baseUrl, CancellationToken cancellationToken)
+		async Task GenerateDiffs(PullRequest pullRequest, IReadOnlyList<string> changedDmms, CancellationToken cancellationToken)
 		{
 			const string OldMapExtension = ".old_map_diff_bot";
 
@@ -445,18 +449,17 @@ namespace MapDiffBot.Core
 			var dic = new Dictionary<MapDiff, MapRegion>();
 			foreach (var I in results.Select(x => x.Result))
 				dic.Add(I.Key, I.Value);
-			await HandleResults(pullRequest, dic, baseUrl, cancellationToken).ConfigureAwait(false);
+			await HandleResults(pullRequest, dic, cancellationToken).ConfigureAwait(false);
 		}
 
 		/// <summary>
-		/// Publish a <see cref="List{T}"/> of <paramref name="diffResults"/>s to <paramref name="baseUrl"/>
+		/// Publish a <see cref="List{T}"/> of <paramref name="diffResults"/>s to the <see cref="IDatabaseContext"/> and GitHub
 		/// </summary>
 		/// <param name="pullRequest">The <see cref="PullRequest"/> the <paramref name="diffResults"/> are for</param>
 		/// <param name="diffResults">The map of <see cref="MapDiff"/>s to <see cref="MapRegion"/>s</param>
-		/// <param name="baseUrl">The base URL of the request</param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		async Task HandleResults(PullRequest pullRequest, Dictionary<MapDiff, MapRegion> diffResults, string baseUrl, CancellationToken cancellationToken)
+		async Task HandleResults(PullRequest pullRequest, Dictionary<MapDiff, MapRegion> diffResults, CancellationToken cancellationToken)
 		{
 			int formatterCount = 0;
 			
@@ -466,7 +469,7 @@ namespace MapDiffBot.Core
 			var deleteTask = databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == pullRequest.Base.Repository.Id && x.PullRequestNumber == pullRequest.Number).DeleteAsync(cancellationToken);
 
 			var commentBuilder = new StringBuilder();
-			var prefix = String.Concat("https://", baseUrl);
+			var prefix = generalConfiguration.ApplicationPrefix;
 			foreach (var kv in diffResults)
 			{
 				var I = kv.Key;
@@ -510,25 +513,18 @@ namespace MapDiffBot.Core
 		}
 
 		/// <inheritdoc />
-		public void ProcessPayload(PullRequestEventPayload payload, IUrlHelper urlHelper)
+		public void ProcessPayload(PullRequestEventPayload payload)
 		{
 			if (payload.Action == "opened" || payload.Action == "synchronize")
-			{
-				var basePath = urlHelper.ActionContext.HttpContext.Request.Host + urlHelper.ActionContext.HttpContext.Request.PathBase;
-				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.PullRequest.Number, basePath, JobCancellationToken.Null));
-			}
+				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.PullRequest.Number, JobCancellationToken.Null));
 		}
 
 		/// <inheritdoc />
-		public void ProcessPayload(IssueCommentPayload payload, IUrlHelper urlHelper)
+		public void ProcessPayload(IssueCommentPayload payload)
 		{
-			if (payload.Action != "created" || payload.Comment.Body == null)
+			if (payload.Action != "created" || payload.Comment.Body == null || !payload.Comment.Body.Split(' ').Any(x => x == String.Format(CultureInfo.InvariantCulture, "@{0}", gitHubConfiguration.TagUser)))
 				return;
-			if (payload.Comment.Body.Split(' ').Any(x => x == String.Format(CultureInfo.InvariantCulture, "@{0}", gitHubConfiguration.TagUser)))
-			{
-				var basePath = urlHelper.ActionContext.HttpContext.Request.Host + urlHelper.ActionContext.HttpContext.Request.PathBase;
-				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.Issue.Number, basePath, JobCancellationToken.Null));
-			}
+			backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.Issue.Number, JobCancellationToken.Null));
 		}
 	}
 }

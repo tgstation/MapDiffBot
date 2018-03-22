@@ -137,24 +137,24 @@ namespace MapDiffBot.Controllers
 				}
 				logger.LogTrace("Queuing pull request payload processing job.");
 
-				pullRequestProcessor.ProcessPayload(payload, Url);
+				pullRequestProcessor.ProcessPayload(payload);
 			}
 			else if (eventName == "issue_comment")
 			{
 				IssueCommentPayload payload;
-				logger.LogTrace("Deserializing pull request payload.");
+				logger.LogTrace("Deserializing issue comment payload.");
 				try
 				{
 					payload = new SimpleJsonSerializer().Deserialize<IssueCommentPayload>(json);
 				}
 				catch (Exception e)
 				{
-					logger.LogDebug(e, "Failed to deserialize pull request payload JSON!");
+					logger.LogDebug(e, "Failed to deserialize issue comment payload JSON!");
 					return BadRequest(e);
 				}
-				logger.LogTrace("Queuing pull request payload processing job.");
+				logger.LogTrace("Queuing issue comment payload processing job.");
 
-				pullRequestProcessor.ProcessPayload(payload, Url);
+				pullRequestProcessor.ProcessPayload(payload);
 			}
 
 			return Ok();
