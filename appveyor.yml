@@ -15,7 +15,6 @@ configuration:
   - Release
 cache:
   - packages -> **\*.csproj
-  - SpacemanDMM\target\release\deps -> .gitmodules
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
 install:
