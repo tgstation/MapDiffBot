@@ -31,10 +31,7 @@ namespace MapDiffBot.Core
 		/// Construct an <see cref="Application"/>
 		/// </summary>
 		/// <param name="configuration">The value of <see cref="configuration"/></param>
-		public Application(IConfiguration configuration)
-		{
-			this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-		}
+		public Application(IConfiguration configuration) =>	this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
 		/// <summary>
 		/// Configure dependency injected services
@@ -47,7 +44,8 @@ namespace MapDiffBot.Core
 
 
 			services.Configure<IISOptions>((options) => options.ForwardClientCertificate = false);
-	
+
+			services.Configure<GeneralConfiguration>(configuration.GetSection(GeneralConfiguration.Section));
 			services.Configure<GitHubConfiguration>(configuration.GetSection(GitHubConfiguration.Section));
 			var dbConfigSection = configuration.GetSection(DatabaseConfiguration.Section);
 			services.Configure<DatabaseConfiguration>(dbConfigSection);
