@@ -6,7 +6,7 @@ var searchData=
   ['localrepository',['LocalRepository',['../class_map_diff_bot_1_1_core_1_1_local_repository.html',1,'MapDiffBot::Core']]],
   ['localrepository_2ecs',['LocalRepository.cs',['../_local_repository_8cs.html',1,'']]],
   ['localrepositoryfactory',['LocalRepositoryFactory',['../class_map_diff_bot_1_1_core_1_1_local_repository_factory.html',1,'MapDiffBot::Core']]],
-  ['localrepositoryfactory',['LocalRepositoryFactory',['../class_map_diff_bot_1_1_core_1_1_local_repository_factory.html#acd24a5c185a853bfeee5c5cd81df30a4',1,'MapDiffBot.Core.LocalRepositoryFactory.LocalRepositoryFactory()'],['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#a71b48f313cbfc1a4a22b33b9bdcc3499',1,'MapDiffBot.Core.LocalRepositoryManager.localRepositoryFactory()']]],
+  ['localrepositoryfactory',['localRepositoryFactory',['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#a71b48f313cbfc1a4a22b33b9bdcc3499',1,'MapDiffBot.Core.LocalRepositoryManager.localRepositoryFactory()'],['../class_map_diff_bot_1_1_core_1_1_local_repository_factory.html#acd24a5c185a853bfeee5c5cd81df30a4',1,'MapDiffBot.Core.LocalRepositoryFactory.LocalRepositoryFactory()']]],
   ['localrepositoryfactory_2ecs',['LocalRepositoryFactory.cs',['../_local_repository_factory_8cs.html',1,'']]],
   ['localrepositorymanager',['LocalRepositoryManager',['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#ad52b89e4d5e3e9ba5ff4cfcc55619c14',1,'MapDiffBot::Core::LocalRepositoryManager']]],
   ['localrepositorymanager',['LocalRepositoryManager',['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html',1,'MapDiffBot::Core']]],

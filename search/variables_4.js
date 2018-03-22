@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['generalconfiguration',['generalConfiguration',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#add32ffb2bb8b7afe6bca6c0d4b8fca39',1,'MapDiffBot::Core::PayloadProcessor']]],
   ['generatorfactory',['generatorFactory',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#a37aa2393444df2cd05cf17788cdc0577',1,'MapDiffBot::Core::PayloadProcessor']]],
   ['getwebhostbuilder',['GetWebHostBuilder',['../class_map_diff_bot_1_1_program.html#a495dd907349304e3f45232effe254d36',1,'MapDiffBot::Program']]],
   ['githubclientfactory',['gitHubClientFactory',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#aa2e208197f36c8e1cdadaa7f092f9031',1,'MapDiffBot::Core::GitHubManager']]],

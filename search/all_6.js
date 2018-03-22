@@ -1,13 +1,16 @@
 var searchData=
 [
-  ['generatediffs',['GenerateDiffs',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#a724f3d5de8a6f0c30e195db202ab1048',1,'MapDiffBot::Core::PayloadProcessor']]],
+  ['generalconfiguration',['GeneralConfiguration',['../class_map_diff_bot_1_1_configuration_1_1_general_configuration.html',1,'MapDiffBot::Configuration']]],
+  ['generalconfiguration',['generalConfiguration',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#add32ffb2bb8b7afe6bca6c0d4b8fca39',1,'MapDiffBot::Core::PayloadProcessor']]],
+  ['generalconfiguration_2ecs',['GeneralConfiguration.cs',['../_general_configuration_8cs.html',1,'']]],
+  ['generatediffs',['GenerateDiffs',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#a787f79429d0e29505c0f89799439c1d8',1,'MapDiffBot::Core::PayloadProcessor']]],
   ['generatefetchoptions',['GenerateFetchOptions',['../class_map_diff_bot_1_1_core_1_1_local_repository.html#af5b86d4fcfcc7bff342e3a0cb834fba5',1,'MapDiffBot::Core::LocalRepository']]],
   ['generaterendercommandline',['GenerateRenderCommandLine',['../class_map_diff_bot_1_1_core_1_1_generator.html#abbdbbe4b856ea8360ed55c0e44cf312f',1,'MapDiffBot::Core::Generator']]],
   ['generator',['Generator',['../class_map_diff_bot_1_1_core_1_1_generator.html',1,'MapDiffBot::Core']]],
   ['generator',['Generator',['../class_map_diff_bot_1_1_core_1_1_generator.html#af83c1e5ccb24b9841c5dc936838fcc09',1,'MapDiffBot::Core::Generator']]],
   ['generator_2ecs',['Generator.cs',['../_generator_8cs.html',1,'']]],
-  ['generatorfactory',['GeneratorFactory',['../class_map_diff_bot_1_1_core_1_1_generator_factory.html',1,'MapDiffBot::Core']]],
   ['generatorfactory',['generatorFactory',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#a37aa2393444df2cd05cf17788cdc0577',1,'MapDiffBot::Core::PayloadProcessor']]],
+  ['generatorfactory',['GeneratorFactory',['../class_map_diff_bot_1_1_core_1_1_generator_factory.html',1,'MapDiffBot::Core']]],
   ['generatorfactory_2ecs',['GeneratorFactory.cs',['../_generator_factory_8cs.html',1,'']]],
   ['getauthorizationurl',['GetAuthorizationURL',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#aa018881981ec84a490d6052ed7d3b727',1,'MapDiffBot.Core.GitHubManager.GetAuthorizationURL()'],['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#a065edda49b52a43e2d56f73fe7b1367b',1,'MapDiffBot.Core.IGitHubManager.GetAuthorizationURL()']]],
   ['getdifferences',['GetDifferences',['../class_map_diff_bot_1_1_core_1_1_generator.html#aef4d1bf329744053afaf21ce1eb7c0fa',1,'MapDiffBot.Core.Generator.GetDifferences()'],['../interface_map_diff_bot_1_1_core_1_1_i_generator.html#a23573e6c80d8ec89a61138bf16f1cf32',1,'MapDiffBot.Core.IGenerator.GetDifferences()']]],
@@ -28,7 +31,7 @@ var searchData=
   ['githubconfiguration',['GitHubConfiguration',['../class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html',1,'MapDiffBot::Configuration']]],
   ['githubconfiguration',['gitHubConfiguration',['../class_map_diff_bot_1_1_controllers_1_1_payloads_controller.html#ab3eac63d7080de4c6810283069cd05fd',1,'MapDiffBot.Controllers.PayloadsController.gitHubConfiguration()'],['../class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9',1,'MapDiffBot.Core.GitHubClientFactory.gitHubConfiguration()'],['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#ac9b264eec885085925486547cfed15d0',1,'MapDiffBot.Core.GitHubManager.gitHubConfiguration()'],['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#a2138003a1ff1bd5d279e6452d9e1f3ae',1,'MapDiffBot.Core.PayloadProcessor.gitHubConfiguration()']]],
   ['githubconfiguration_2ecs',['GitHubConfiguration.cs',['../_git_hub_configuration_8cs.html',1,'']]],
-  ['githubmanager',['GitHubManager',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a1c864634ccc12146f80043894cabb3ab',1,'MapDiffBot.Core.GitHubManager.GitHubManager()'],['../class_map_diff_bot_1_1_controllers_1_1_dme_configuration_controller.html#a955ecd36ce02d5a1054d08e9627ecdd6',1,'MapDiffBot.Controllers.DmeConfigurationController.gitHubManager()'],['../class_map_diff_bot_1_1_controllers_1_1_payloads_controller.html#a40f1f62aaa289c59cfb7f48da0111afc',1,'MapDiffBot.Controllers.PayloadsController.gitHubManager()']]],
   ['githubmanager',['GitHubManager',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html',1,'MapDiffBot::Core']]],
+  ['githubmanager',['GitHubManager',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a1c864634ccc12146f80043894cabb3ab',1,'MapDiffBot.Core.GitHubManager.GitHubManager()'],['../class_map_diff_bot_1_1_controllers_1_1_dme_configuration_controller.html#a955ecd36ce02d5a1054d08e9627ecdd6',1,'MapDiffBot.Controllers.DmeConfigurationController.gitHubManager()'],['../class_map_diff_bot_1_1_controllers_1_1_payloads_controller.html#a40f1f62aaa289c59cfb7f48da0111afc',1,'MapDiffBot.Controllers.PayloadsController.gitHubManager()']]],
   ['githubmanager_2ecs',['GitHubManager.cs',['../_git_hub_manager_8cs.html',1,'']]]
 ];
