@@ -133,7 +133,10 @@ namespace MapDiffBot.Core
 			applicationBuilder.UseHangfireServer();
 
 			if (hostingEnvironment.IsDevelopment())
-				applicationBuilder.UseHangfireDashboard("/Hangfire");
+				applicationBuilder.UseHangfireDashboard("/Hangfire", new DashboardOptions
+				{
+					Authorization = { }
+				});
 
 			applicationBuilder.UseMvc();
 		}
