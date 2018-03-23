@@ -1,4 +1,5 @@
 ﻿using LibGit2Sharp;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -23,6 +24,10 @@ namespace MapDiffBot.Core
 		/// The <see cref="IRepositoryOperations"/> for the <see cref="LocalRepositoryManager"/>
 		/// </summary>
 		readonly IRepositoryOperations repositoryOperations;
+		/// <summary>
+		/// The <see cref="ILogger"/> for the <see cref="LocalRepositoryManager"/>
+		/// </summary>
+		readonly ILogger<LocalRepositoryManager> logger;
 
 		/// <summary>
 		/// <see cref="Dictionary{TKey, TValue}"/> of repoPaths to <see cref="Task"/>s that will finish when they are done being used
@@ -35,11 +40,13 @@ namespace MapDiffBot.Core
 		/// <param name="ioManager">The value of <see cref="ioManager"/></param>
 		/// <param name="localRepositoryFactory">The value of <see cref="localRepositoryFactory"/></param>
 		/// <param name="repositoryOperations">The value of <see cref="repositoryOperations"/></param>
-		public LocalRepositoryManager(IIOManager ioManager, ILocalRepositoryFactory localRepositoryFactory, IRepositoryOperations repositoryOperations)
+		/// <param name="logger">The value of <see cref="logger"/></param>
+		public LocalRepositoryManager(IIOManager ioManager, ILocalRepositoryFactory localRepositoryFactory, IRepositoryOperations repositoryOperations, ILogger<LocalRepositoryManager> logger)
 		{
 			this.ioManager = new ResolvingIOManager(ioManager ?? throw new ArgumentNullException(nameof(ioManager)), "Repositories");
 			this.localRepositoryFactory = localRepositoryFactory ?? throw new ArgumentNullException(nameof(localRepositoryFactory));
 			this.repositoryOperations = repositoryOperations ?? throw new ArgumentNullException(nameof(repositoryOperations));
+			this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			activeRepositories = new Dictionary<string, Task>();
 		}
 		
@@ -139,7 +146,10 @@ namespace MapDiffBot.Core
 			{
 				return await TryLoadRepository(repoPath, onOperationBlocked, tcs => usageTask = tcs, cancellationToken).ConfigureAwait(false);
 			}
-			catch (LibGit2SharpException) { }
+			catch (LibGit2SharpException e)
+			{
+				logger.LogWarning(e, "Failed to load repository {0}/{1}! Cloning...", repository.Owner.Login, repository.Name);
+			}
 
 			//so the repo failed to load and now we're holding our queue spot in usageTask
 			//reclone it
