@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Octokit;
 using System;
@@ -13,14 +14,16 @@ namespace MapDiffBot.Core.Tests
 		[TestMethod]
 		public void TestInstantiation()
 		{
-			Assert.ThrowsException<ArgumentNullException>(() => new LocalRepositoryManager(null, null, null));
+			Assert.ThrowsException<ArgumentNullException>(() => new LocalRepositoryManager(null, null, null, null));
 			var mockIOManager = new Mock<IIOManager>();
-			Assert.ThrowsException<ArgumentNullException>(() => new LocalRepositoryManager(mockIOManager.Object, null, null));
+			Assert.ThrowsException<ArgumentNullException>(() => new LocalRepositoryManager(mockIOManager.Object, null, null, null));
 			var mockLocalRepositoryFactory = new Mock<ILocalRepositoryFactory>();
-			Assert.ThrowsException<ArgumentNullException>(() => new LocalRepositoryManager(mockIOManager.Object, mockLocalRepositoryFactory.Object, null));
+			Assert.ThrowsException<ArgumentNullException>(() => new LocalRepositoryManager(mockIOManager.Object, mockLocalRepositoryFactory.Object, null, null));
 			var mockRepositoryOperations = new Mock<IRepositoryOperations>();
 			mockIOManager.Setup(x => x.ResolvePath(".")).Returns(".");
-			var lrm = new LocalRepositoryManager(mockIOManager.Object, mockLocalRepositoryFactory.Object, mockRepositoryOperations.Object);
+			Assert.ThrowsException<ArgumentNullException>(() => new LocalRepositoryManager(mockIOManager.Object, mockLocalRepositoryFactory.Object, mockRepositoryOperations.Object, null));
+			var mockLogger = new Mock<ILogger<LocalRepositoryManager>>();
+			var lrm = new LocalRepositoryManager(mockIOManager.Object, mockLocalRepositoryFactory.Object, mockRepositoryOperations.Object, mockLogger.Object);
 		}
 		
 		[TestMethod]
@@ -30,7 +33,8 @@ namespace MapDiffBot.Core.Tests
 			mockIOManager.Setup(x => x.ResolvePath(".")).Returns(".");
 			var mockLocalRepositoryFactory = new Mock<ILocalRepositoryFactory>();
 			var mockRepositoryOperations = new Mock<IRepositoryOperations>();
-			var lrm = new LocalRepositoryManager(mockIOManager.Object, mockLocalRepositoryFactory.Object, mockRepositoryOperations.Object);
+			var mockLogger = new Mock<ILogger<LocalRepositoryManager>>();
+			var lrm = new LocalRepositoryManager(mockIOManager.Object, mockLocalRepositoryFactory.Object, mockRepositoryOperations.Object, mockLogger.Object);
 
 			//async set results because tcs continuation memes
 			Task SetResult(TaskCompletionSource<object> taskCompletionSource) => Task.Run(() => taskCompletionSource.SetResult(null));

@@ -1,5 +1,6 @@
 ﻿using Cyberboss.AspNetCore.AsyncInitializer;
 using Hangfire;
+using Hangfire.Dashboard;
 using Hangfire.MySql;
 using Hangfire.SqlServer;
 using MapDiffBot.Configuration;
@@ -133,7 +134,7 @@ namespace MapDiffBot.Core
 			if (hostingEnvironment.IsDevelopment())
 				applicationBuilder.UseHangfireDashboard("/Hangfire", new DashboardOptions
 				{
-					Authorization = { }
+					Authorization = new List<IDashboardAuthorizationFilter> { }
 				});
 
 			applicationBuilder.UseMvc();
