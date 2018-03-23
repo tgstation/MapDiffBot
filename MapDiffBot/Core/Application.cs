@@ -134,7 +134,7 @@ namespace MapDiffBot.Core
 			if (hostingEnvironment.IsDevelopment())
 				applicationBuilder.UseHangfireDashboard("/Hangfire", new DashboardOptions
 				{
-					Authorization = new List<IDashboardAuthorizationFilter> { new AnonymousDashboardAuthorizationFilter() }
+					Authorization = new List<IDashboardAuthorizationFilter> { }
 				});
 
 			applicationBuilder.UseMvc();
