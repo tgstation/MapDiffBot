@@ -124,7 +124,7 @@ namespace MapDiffBot.Core
 			//pass it on
 			try
 			{
-				return await localRepositoryFactory.CreateLocalRepository(repoPath, ourRepoUsageTask, cancellationToken).ConfigureAwait(false);
+				return await localRepositoryFactory.CreateLocalRepository(ioManager.ResolvePath(repoPath), ourRepoUsageTask, cancellationToken).ConfigureAwait(false);
 			}
 			catch (LibGit2SharpException)
 			{
@@ -158,8 +158,7 @@ namespace MapDiffBot.Core
 				await ioManager.DeleteDirectory(repoPath, cancellationToken).ConfigureAwait(false);
 				await ioManager.CreateDirectory(repoPath, cancellationToken).ConfigureAwait(false);
 				await repositoryOperations.Clone(repository.CloneUrl, ioManager.ResolvePath(repoPath), onCloneProgress, cancellationToken).ConfigureAwait(false);
-				var result = await localRepositoryFactory.CreateLocalRepository(repoPath, usageTask, cancellationToken).ConfigureAwait(false);
-				return result;
+				return await localRepositoryFactory.CreateLocalRepository(ioManager.ResolvePath(repoPath), usageTask, cancellationToken).ConfigureAwait(false);
 			}
 			catch
 			{
