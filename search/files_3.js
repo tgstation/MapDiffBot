@@ -8,7 +8,6 @@ var searchData=
   ['dmm_2dtools_2ed',['dmm-tools.d',['../dmm-tools_8d.html',1,'']]],
   ['dmm_5ftools_2d927b9546d19b1f52_2ed',['dmm_tools-927b9546d19b1f52.d',['../dmm__tools-927b9546d19b1f52_8d.html',1,'']]],
   ['dmm_5ftools_2da9b716cec651e541_2ed',['dmm_tools-a9b716cec651e541.d',['../dmm__tools-a9b716cec651e541_8d.html',1,'']]],
-  ['dmmtools_2edesigner_2ecs',['DmmTools.Designer.cs',['../_dmm_tools_8_designer_8cs.html',1,'']]],
   ['dreammaker_2d24124bc204debfe2_2ed',['dreammaker-24124bc204debfe2.d',['../dreammaker-24124bc204debfe2_8d.html',1,'']]],
   ['dtoa_2d79029eb70942c217_2ed',['dtoa-79029eb70942c217.d',['../dtoa-79029eb70942c217_8d.html',1,'']]]
 ];

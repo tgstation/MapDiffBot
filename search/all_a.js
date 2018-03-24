@@ -27,7 +27,6 @@ var searchData=
   ['miny',['MinY',['../class_map_diff_bot_1_1_core_1_1_map_region.html#a54ee0672a1f1aba0c0bdd1edf8f38be2',1,'MapDiffBot::Core::MapRegion']]],
   ['models',['Models',['../namespace_map_diff_bot_1_1_models.html',1,'MapDiffBot']]],
   ['movefile',['MoveFile',['../class_map_diff_bot_1_1_core_1_1_default_i_o_manager.html#a38f138adc62c33363464e95e1c4d68ff',1,'MapDiffBot.Core.DefaultIOManager.MoveFile()'],['../interface_map_diff_bot_1_1_core_1_1_i_i_o_manager.html#a6a31e83ddc2be18d786e3d1c2835eb63',1,'MapDiffBot.Core.IIOManager.MoveFile()']]],
-  ['resources',['Resources',['../namespace_map_diff_bot_1_1_resources.html',1,'MapDiffBot']]],
-  ['tests',['Tests',['../namespace_map_diff_bot_1_1_tests.html',1,'MapDiffBot']]],
-  ['tests',['Tests',['../namespace_map_diff_bot_1_1_core_1_1_tests.html',1,'MapDiffBot::Core']]]
+  ['tests',['Tests',['../namespace_map_diff_bot_1_1_core_1_1_tests.html',1,'MapDiffBot::Core']]],
+  ['tests',['Tests',['../namespace_map_diff_bot_1_1_tests.html',1,'MapDiffBot']]]
 ];
