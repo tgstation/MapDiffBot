@@ -285,7 +285,7 @@ namespace MapDiffBot.Core
 						}
 						logger.LogTrace("Moving HEAD to pull request base...");
 						await repo.Checkout(pullRequest.Base.Sha, cancellationToken).ConfigureAwait(false);
-						
+
 						//but since we don't need this right await don't await it yet
 						var pullRequestFetchTask = repo.FetchPullRequest(pullRequest.Number, cancellationToken);
 						try
@@ -330,120 +330,119 @@ namespace MapDiffBot.Core
 					var mapRegions = Enumerable.Repeat<MapRegion>(null, changedDmms.Count).ToList();
 					var dmeToUse = dmeToUseTask.Result;
 
-					using (var generator = generatorFactory.CreateGenerator(dmeToUse, new ResolvingIOManager(ioManager, repoPath)))
+					var generator = generatorFactory.CreateGenerator(dmeToUse, new ResolvingIOManager(ioManager, repoPath));
+					var outputDirectory = currentIOManager.ResolvePath(".");
+					logger.LogTrace("Full workdir path: {0}", outputDirectory);
+					//Generate MapRegions for modified maps and render all new maps
+					async Task<RenderResult> DiffAndRenderNewMap(int I)
 					{
-						var outputDirectory = currentIOManager.ResolvePath(".");
-						logger.LogTrace("Full workdir path: {0}", outputDirectory);
-						//Generate MapRegions for modified maps and render all new maps
-						async Task<RenderResult> DiffAndRenderNewMap(int I)
+						await dirPrepTask.ConfigureAwait(false);
+						var originalPath = currentIOManager.ConcatPath(repoPath, changedDmms[I]);
+						if (!await currentIOManager.FileExists(originalPath, cancellationToken).ConfigureAwait(false))
 						{
-							await dirPrepTask.ConfigureAwait(false);
-							var originalPath = currentIOManager.ConcatPath(repoPath, changedDmms[I]);
-							if (!await currentIOManager.FileExists(originalPath, cancellationToken).ConfigureAwait(false))
+							logger.LogTrace("No new map for path {0} exists, skipping region detection and after render", changedDmms[I]);
+							return new RenderResult { InputPath = changedDmms[I], ToolOutput = stringLocalizer["Map missing!"] };
+						}
+						ToolResult result = null;
+						if (oldMapPaths[I] != null)
+						{
+							logger.LogTrace("Getting diff region for {0}...", changedDmms[I]);
+							result = await generator.GetDifferences(oldMapPaths[I], originalPath, cancellationToken).ConfigureAwait(false);
+							var region = result.MapRegion;
+							logger.LogTrace("Diff region for {0}: {1}", changedDmms[I], region);
+							if (region != null)
 							{
-								logger.LogTrace("No new map for path {0} exists, skipping region detection and after render", changedDmms[I]);
-								return new RenderResult { InputPath = changedDmms[I], ToolOutput = stringLocalizer["Map missing!"] };
-							}
-							ToolResult result = null;
-							if (oldMapPaths[I] != null)
-							{
-								logger.LogTrace("Getting diff region for {0}...", changedDmms[I]);
-								result = await generator.GetDifferences(oldMapPaths[I], originalPath, cancellationToken).ConfigureAwait(false);
-								var region = result.MapRegion;
-								logger.LogTrace("Diff region for {0}: {1}", changedDmms[I], region);
-								if (region != null)
+								var xdiam = region.MaxX - region.MinX;
+								var ydiam = region.MaxY - region.MinY;
+								const int minDiffDimensions = 5 - 1;
+								if (xdiam < minDiffDimensions || ydiam < minDiffDimensions)
 								{
-									var xdiam = region.MaxX - region.MinX;
-									var ydiam = region.MaxY - region.MinY;
-									const int minDiffDimensions = 5 - 1;
-									if (xdiam < minDiffDimensions || ydiam < minDiffDimensions)
+									//need to expand
+									var fullResult = await generator.GetMapSize(originalPath, cancellationToken).ConfigureAwait(false);
+									var fullRegion = fullResult.MapRegion;
+									if (fullRegion == null)
 									{
-										//need to expand
-										var fullResult = await generator.GetMapSize(originalPath, cancellationToken).ConfigureAwait(false);
-										var fullRegion = fullResult.MapRegion;
-										if (fullRegion == null)
-										{
-											//give up
-											region = null;
-										}
-										else
-										{
-											bool increaseMax = true;
-											if (xdiam < minDiffDimensions && ((fullRegion.MaxX - fullRegion.MinX) >= minDiffDimensions))
-												while ((region.MaxX - region.MinX) < minDiffDimensions)
-												{
-													if (increaseMax)
-														region.MaxX = (short)Math.Min(region.MaxX + 1, fullRegion.MaxX);
-													else
-														region.MinX = (short)Math.Max(region.MinX - 1, 1);
-													increaseMax = !increaseMax;
-												}
-											if (ydiam < minDiffDimensions && ((fullRegion.MaxY - fullRegion.MinY) >= minDiffDimensions))
-												while ((region.MaxY - region.MinY) < minDiffDimensions)
-												{
-													if (increaseMax)
-														region.MaxY = (short)Math.Min(region.MaxY + 1, fullRegion.MaxY);
-													else
-														region.MinY = (short)Math.Max(region.MinY - 1, 1);
-													increaseMax = !increaseMax;
-												}
-										}
-										logger.LogTrace("Region for {0} expanded to {1}", region);
+										//give up
+										region = null;
 									}
-									mapRegions[I] = region;
+									else
+									{
+										bool increaseMax = true;
+										if (xdiam < minDiffDimensions && ((fullRegion.MaxX - fullRegion.MinX) >= minDiffDimensions))
+											while ((region.MaxX - region.MinX) < minDiffDimensions)
+											{
+												if (increaseMax)
+													region.MaxX = (short)Math.Min(region.MaxX + 1, fullRegion.MaxX);
+												else
+													region.MinX = (short)Math.Max(region.MinX - 1, 1);
+												increaseMax = !increaseMax;
+											}
+										if (ydiam < minDiffDimensions && ((fullRegion.MaxY - fullRegion.MinY) >= minDiffDimensions))
+											while ((region.MaxY - region.MinY) < minDiffDimensions)
+											{
+												if (increaseMax)
+													region.MaxY = (short)Math.Min(region.MaxY + 1, fullRegion.MaxY);
+												else
+													region.MinY = (short)Math.Max(region.MinY - 1, 1);
+												increaseMax = !increaseMax;
+											}
+									}
+									logger.LogTrace("Region for {0} expanded to {1}", region);
 								}
+								mapRegions[I] = region;
 							}
-							else
-								logger.LogTrace("Skipping region detection for {0} due to old map not existing", changedDmms[I]);
-							logger.LogTrace("Performing after rendering for {0}...", changedDmms[I]);
-							var renderResult = await generator.RenderMap(originalPath, mapRegions[I], outputDirectory, "after", cancellationToken).ConfigureAwait(false);
-							logger.LogTrace("After rendering for {0} complete! Result path: {1}, Output: {2}", changedDmms[I], renderResult.OutputPath, renderResult.ToolOutput);
-							if (result != null)
-								renderResult.ToolOutput = String.Format(CultureInfo.InvariantCulture, "Differences task:{0}{1}{0}Render task:{0}{2}", Environment.NewLine, result.ToolOutput, renderResult.ToolOutput);
-							return renderResult;
-						};
+						}
+						else
+							logger.LogTrace("Skipping region detection for {0} due to old map not existing", changedDmms[I]);
+						logger.LogTrace("Performing after rendering for {0}...", changedDmms[I]);
+						var renderResult = await generator.RenderMap(originalPath, mapRegions[I], outputDirectory, "after", cancellationToken).ConfigureAwait(false);
+						logger.LogTrace("After rendering for {0} complete! Result path: {1}, Output: {2}", changedDmms[I], renderResult.OutputPath, renderResult.ToolOutput);
+						if (result != null)
+							renderResult.ToolOutput = String.Format(CultureInfo.InvariantCulture, "Differences task:{0}{1}{0}Render task:{0}{2}", Environment.NewLine, result.ToolOutput, renderResult.ToolOutput);
+						return renderResult;
+					};
 
-						logger.LogTrace("Running iterations of DiffAndRenderNewMap...");
-						//finish up before we go back to the base branch
-						afterRenderings = Enumerable.Range(0, changedDmms.Count).Select(I => DiffAndRenderNewMap(I)).ToList();
-						try
-						{
-							await Task.WhenAll(afterRenderings).ConfigureAwait(false);
-						}
-						catch (Exception e)
-						{
-							logger.LogDebug(e, "After renderings produced exception!");
-							//at this point everything is done but some have failed
-							//we'll handle it later
-						}
-
-						logger.LogTrace("Moving HEAD back to pull request base...");
-						await repo.Checkout(pullRequest.Base.Sha, cancellationToken).ConfigureAwait(false);
-
-						Task<RenderResult> RenderOldMap(int i)
-						{
-							var oldPath = oldMapPaths[i];
-							if (oldMapPaths != null)
-							{
-								logger.LogTrace("Performing before rendering for {0}...", changedDmms[i]);
-								return generator.RenderMap(oldPath, mapRegions[i], outputDirectory, "before", cancellationToken);
-							}
-							return Task.FromResult(new RenderResult { InputPath = changedDmms[i], ToolOutput = stringLocalizer["Map missing!"] });
-						}
-
-						logger.LogTrace("Running iterations of RenderOldMap...");
-						//finish up rendering
-						beforeRenderings = Enumerable.Range(0, changedDmms.Count).Select(I => RenderOldMap(I)).ToList();
-						try
-						{
-							await Task.WhenAll(beforeRenderings).ConfigureAwait(false);
-						}
-						catch (Exception e)
-						{
-							logger.LogDebug(e, "Before renderings produced exception!");
-							//see above
-						}
+					logger.LogTrace("Running iterations of DiffAndRenderNewMap...");
+					//finish up before we go back to the base branch
+					afterRenderings = Enumerable.Range(0, changedDmms.Count).Select(I => DiffAndRenderNewMap(I)).ToList();
+					try
+					{
+						await Task.WhenAll(afterRenderings).ConfigureAwait(false);
 					}
+					catch (Exception e)
+					{
+						logger.LogDebug(e, "After renderings produced exception!");
+						//at this point everything is done but some have failed
+						//we'll handle it later
+					}
+
+					logger.LogTrace("Moving HEAD back to pull request base...");
+					await repo.Checkout(pullRequest.Base.Sha, cancellationToken).ConfigureAwait(false);
+
+					Task<RenderResult> RenderOldMap(int i)
+					{
+						var oldPath = oldMapPaths[i];
+						if (oldMapPaths != null)
+						{
+							logger.LogTrace("Performing before rendering for {0}...", changedDmms[i]);
+							return generator.RenderMap(oldPath, mapRegions[i], outputDirectory, "before", cancellationToken);
+						}
+						return Task.FromResult(new RenderResult { InputPath = changedDmms[i], ToolOutput = stringLocalizer["Map missing!"] });
+					}
+
+					logger.LogTrace("Running iterations of RenderOldMap...");
+					//finish up rendering
+					beforeRenderings = Enumerable.Range(0, changedDmms.Count).Select(I => RenderOldMap(I)).ToList();
+					try
+					{
+						await Task.WhenAll(beforeRenderings).ConfigureAwait(false);
+					}
+					catch (Exception e)
+					{
+						logger.LogDebug(e, "Before renderings produced exception!");
+						//see above
+					}
+
 					//done with the repo at this point
 					logger.LogTrace("Renderings complete. Releasing reposiotory");
 				}

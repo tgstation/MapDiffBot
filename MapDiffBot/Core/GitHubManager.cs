@@ -32,7 +32,7 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// The <see cref="GitHubConfiguration"/> for the <see cref="GitHubManager"/>
 		/// </summary>
-		GitHubConfiguration gitHubConfiguration;
+		readonly GitHubConfiguration gitHubConfiguration;
 		/// <summary>
 		/// The <see cref="GitHubConfiguration"/> for the <see cref="GitHubManager"/>
 		/// </summary>
@@ -46,6 +46,13 @@ namespace MapDiffBot.Core
 		/// </summary>
 		readonly ILogger<GitHubManager> logger;
 
+		/// <summary>
+		/// Construct a <see cref="GitHubManager"/>
+		/// </summary>
+		/// <param name="gitHubConfigurationOptions">The <see cref="IOptions{TOptions}"/> containing the value of <see cref="gitHubConfiguration"/></param>
+		/// <param name="gitHubClientFactory">The value of <see cref="gitHubClientFactory"/></param>
+		/// <param name="databaseContext">The value of <see cref="databaseContext"/></param>
+		/// <param name="logger">The value of <see cref="logger"/></param>
 		public GitHubManager(IOptions<GitHubConfiguration> gitHubConfigurationOptions, IGitHubClientFactory gitHubClientFactory, IDatabaseContext databaseContext, ILogger<GitHubManager> logger)
 		{
 			gitHubConfiguration = gitHubConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(gitHubConfigurationOptions));

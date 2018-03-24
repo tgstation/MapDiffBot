@@ -3,10 +3,12 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MapDiffBot.Configuration;
 using MapDiffBot.Core;
 using MapDiffBot.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 
 namespace MapDiffBot.Controllers
 {
@@ -20,6 +22,11 @@ namespace MapDiffBot.Controllers
 		/// The route to the <see cref="DmeConfigurationController"/>
 		/// </summary>
 		const string Route = "DmeConfiguration";
+
+		/// <summary>
+		/// The <see cref="GeneralConfiguration"/> for the <see cref="DmeConfigurationController"/>
+		/// </summary>
+		readonly GeneralConfiguration generalConfiguration;
 		/// <summary>
 		/// The <see cref="IDatabaseContext"/> for the <see cref="DmeConfigurationController"/>
 		/// </summary>
@@ -36,11 +43,13 @@ namespace MapDiffBot.Controllers
 		/// <summary>
 		/// Construct a <see cref="DmeConfigurationController"/>
 		/// </summary>
+		/// <param name="generalConfigurationOptions">The <see cref="IOptions{TOptions}"/> containing the value of <see cref="generalConfiguration"/></param>
 		/// <param name="databaseContext">The value of <see cref="databaseContext"/></param>
 		/// <param name="gitHubManager">The value of <see cref="gitHubManager"/></param>
 		/// <param name="stringLocalizer">The value of <see cref="stringLocalizer"/></param>
-		public DmeConfigurationController(IDatabaseContext databaseContext, IGitHubManager gitHubManager, IStringLocalizer<DmeConfigurationController> stringLocalizer)
+		public DmeConfigurationController(IOptions<GeneralConfiguration> generalConfigurationOptions, IDatabaseContext databaseContext, IGitHubManager gitHubManager, IStringLocalizer<DmeConfigurationController> stringLocalizer)
 		{
+			generalConfiguration = generalConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(generalConfigurationOptions));
 			this.databaseContext = databaseContext ?? throw new ArgumentNullException(nameof(databaseContext));
 			this.gitHubManager = gitHubManager ?? throw new ArgumentNullException(nameof(gitHubManager));
 			this.stringLocalizer = stringLocalizer ?? throw new ArgumentNullException(nameof(stringLocalizer));
@@ -97,7 +106,7 @@ namespace MapDiffBot.Controllers
 		
 				ViewBag.SignIn = stringLocalizer[authLevel == AuthenticationLevel.LoggedOut ? "Sign-In with GitHub" : "Log Out"];
 				if (authLevel == AuthenticationLevel.LoggedOut)
-					ViewBag.SignInHref = gitHubManager.GetAuthorizationURL(new Uri(String.Concat("https://", Request.Host, Request.PathBase, '/', Route, '/', nameof(Authorize))), repositoryId.ToString(CultureInfo.InvariantCulture));
+					ViewBag.SignInHref = gitHubManager.GetAuthorizationURL(new Uri(String.Concat(generalConfiguration.ApplicationPrefix, '/', Route, '/', nameof(Authorize))), repositoryId.ToString(CultureInfo.InvariantCulture));
 				else
 					ViewBag.SignInHref = Url.Action(nameof(SignOut), new { repositoryId });
 

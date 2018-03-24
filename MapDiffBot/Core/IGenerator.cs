@@ -7,7 +7,7 @@ namespace MapDiffBot.Core
 	/// <summary>
 	/// Used for generating cropped comparison images of .dmm files
 	/// </summary>
-	interface IGenerator : IDisposable
+	interface IGenerator
 	{
 		/// <summary>
 		/// Gets a <see cref="MapRegion"/> indicating the differences between two maps

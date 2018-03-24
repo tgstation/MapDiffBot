@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace MapDiffBot.Core.Tests
 {
+	/// <summary>
+	/// Tests for <see cref="LocalRepositoryManager"/>
+	/// </summary>
 	[TestClass]
 	public sealed class TestLocalRepositoryManager
 	{

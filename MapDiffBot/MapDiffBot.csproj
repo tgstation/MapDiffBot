@@ -47,7 +47,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)|$(Platform)'!='Docker|AnyCPU'">
-    <Exec Command="cd ../SpacemanDMM&#xD;&#xA;cargo build -p cli --release" />
+    <Exec Command="bash ./BuildDMMTools.sh $(OutDir)" />
   </Target>
 
 </Project>
