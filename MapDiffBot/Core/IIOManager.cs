@@ -65,6 +65,13 @@ namespace MapDiffBot.Core
 		Task CopyFile(string src, string dest, CancellationToken cancellationToken);
 
 		/// <summary>
+		/// Gets the directory portion of a given <paramref name="path"/>
+		/// </summary>
+		/// <param name="path">A path to check</param>
+		/// <returns>The directory portion of the given <paramref name="path"/></returns>
+		string GetDirectoryName(string path);
+
+		/// <summary>
 		/// Gets a list of files in <paramref name="path"/> with the given <paramref name="extension"/>
 		/// </summary>
 		/// <param name="path">The directory which contains the files</param>
