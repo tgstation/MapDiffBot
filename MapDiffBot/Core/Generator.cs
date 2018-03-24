@@ -1,6 +1,4 @@
-﻿
-using MapDiffBot.Resources;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -18,6 +16,11 @@ namespace MapDiffBot.Core
 	sealed class Generator : IGenerator
 	{
 		/// <summary>
+		/// Path to dmm-tools.exe
+		/// </summary>
+		const string DMMToolsPath = "./dmm-tools.exe";
+
+		/// <summary>
 		/// Path to the .dme to pass to dmm-tools
 		/// </summary>
 		readonly string dmeArgument;
@@ -25,10 +28,6 @@ namespace MapDiffBot.Core
 		/// Path to the .dme to pass to dmm-tools
 		/// </summary>
 		readonly IIOManager ioManager;
-		/// <summary>
-		/// Used as a lock for extraction <see cref="DmmTools"/>
-		/// </summary>
-		readonly SemaphoreSlim semaphore;
 
 		/// <summary>
 		/// Construct a <see cref="Generator"/>
@@ -39,11 +38,7 @@ namespace MapDiffBot.Core
 		{
 			dmeArgument = dmePath != null ? String.Format(CultureInfo.InvariantCulture, "-e \"{0}\" ", Path.GetFileName(dmePath)) : null;
 			this.ioManager = ioManager ?? throw new ArgumentNullException(nameof(ioManager));
-			semaphore = new SemaphoreSlim(1);
 		}
-		
-		/// <inheritdoc />
-		public void Dispose() => semaphore.Dispose();
 
 		/// <summary>
 		/// Generate the dmm-tools.exe command line arguments with the exception of the .dmm paramter which can be formatted in for rendering a map
@@ -58,25 +53,12 @@ namespace MapDiffBot.Core
 		}
 
 		/// <summary>
-		/// Extract the dmm-tools.exe from the running <see cref="System.Reflection.Assembly"/> and return the path to it
-		/// </summary>
-		async Task<string> GetDMMToolsPath(CancellationToken cancellationToken)
-		{
-			const string path = "dmm-tools.exe";
-			using (await SemaphoreSlimContext.Lock(semaphore, cancellationToken).ConfigureAwait(false))
-				if (!await ioManager.FileExists(path, cancellationToken).ConfigureAwait(false))
-					await ioManager.WriteAllBytes(path, DmmTools.dmm_tools, cancellationToken).ConfigureAwait(false);
-			return ioManager.ResolvePath(path);
-		}
-
-		/// <summary>
 		/// Creates a pre-configured <see cref="Process"/> pointing to dmm-tools.exe
 		/// </summary>
 		/// <param name="output">A <see cref="StringBuilder"/> used to accept stdout</param>
 		/// <param name="errorOutput">A <see cref="StringBuilder"/> used to accept stderr</param>
-		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> resulting in a pre-configured <see cref="Process"/> pointing to dmm-tools.exe</returns>
-		async Task<Process> CreateDMMToolsProcess(StringBuilder output, StringBuilder errorOutput, CancellationToken cancellationToken)
+		Process CreateDMMToolsProcess(StringBuilder output, StringBuilder errorOutput)
 		{
 			var P = new Process();
 			P.StartInfo.RedirectStandardOutput = true;
@@ -100,7 +82,7 @@ namespace MapDiffBot.Core
 
 			try
 			{
-				P.StartInfo.FileName = await GetDMMToolsPath(cancellationToken).ConfigureAwait(false);
+				P.StartInfo.FileName = DMMToolsPath;
 			}
 			catch
 			{
@@ -162,7 +144,7 @@ namespace MapDiffBot.Core
 			var errorOutput = new StringBuilder();
 			var args = String.Format(CultureInfo.InvariantCulture, "{0}map-info -j \"{1}\"", dmeArgument, mapPath);
 			Task<int> processTask;
-			using (var P = await CreateDMMToolsProcess(output, errorOutput, cancellationToken).ConfigureAwait(false))
+			using (var P = CreateDMMToolsProcess(output, errorOutput))
 			{
 				P.StartInfo.Arguments = args;
 
@@ -211,7 +193,7 @@ namespace MapDiffBot.Core
 			var output = new StringBuilder();
 			var errorOutput = new StringBuilder();
 			Task<int> processTask;
-			using (var P = await CreateDMMToolsProcess(output, errorOutput, cancellationToken).ConfigureAwait(false))
+			using (var P = CreateDMMToolsProcess(output, errorOutput))
 			{
 				P.StartInfo.Arguments = args;
 
@@ -265,7 +247,7 @@ namespace MapDiffBot.Core
 			var errorOutput = new StringBuilder();
 			var args = String.Format(CultureInfo.InvariantCulture, "{2}diff-maps \"{0}\" \"{1}\"", mapPathA, mapPathB, dmeArgument);
 			Task<int> processTask;
-			using (var P = await CreateDMMToolsProcess(output, errorOutput, cancellationToken).ConfigureAwait(false))
+			using (var P = CreateDMMToolsProcess(output, errorOutput))
 			{
 				P.StartInfo.Arguments = args;
 
