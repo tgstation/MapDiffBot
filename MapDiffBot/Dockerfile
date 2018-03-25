@@ -1,7 +1,9 @@
 FROM rust AS compiler
 WORKDIR /src/SpacemanDMM
 COPY SpacemanDMM/ ./
+RUN ls -al
 RUN cargo build -p cli --release
+RUN ls -al target/release
 
 FROM microsoft/aspnetcore-build:2.0.6-2.1.101-jessie AS base
 FROM base as build
