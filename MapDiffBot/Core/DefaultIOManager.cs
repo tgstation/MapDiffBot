@@ -95,6 +95,9 @@ namespace MapDiffBot.Core
 		public Task<bool> FileExists(string path, CancellationToken cancellationToken) => Task.Factory.StartNew(() => File.Exists(ResolvePath(path)), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
 		/// <inheritdoc />
+		public string GetDirectoryName(string path) => Path.GetDirectoryName(ResolvePath(path));
+
+		/// <inheritdoc />
 		public string GetFileName(string path) => Path.GetFileName(path ?? throw new ArgumentNullException(nameof(path)));
 
 		/// <inheritdoc />

@@ -21,7 +21,7 @@ namespace MapDiffBot.Core
 	/// <summary>
 	/// Startup point for the web application
 	/// </summary>
-	public class Application
+	public sealed class Application
 	{
 		/// <summary>
 		/// The <see cref="IConfiguration"/> for the <see cref="Application"/>

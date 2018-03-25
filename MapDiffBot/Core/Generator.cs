@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -18,7 +19,7 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// Path to dmm-tools.exe
 		/// </summary>
-		const string DMMToolsPath = "./dmm-tools.exe";
+		const string DMMToolsPath = "dmm-tools.exe";
 
 		/// <summary>
 		/// Path to the .dme to pass to dmm-tools
@@ -82,7 +83,7 @@ namespace MapDiffBot.Core
 
 			try
 			{
-				P.StartInfo.FileName = DMMToolsPath;
+				P.StartInfo.FileName = ioManager.ConcatPath(ioManager.GetDirectoryName(Assembly.GetExecutingAssembly().Location), DMMToolsPath);
 			}
 			catch
 			{
