@@ -23,7 +23,7 @@ RUN cp entrypoint.sh /app/
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-COPY --from=compiler /src/SpacemanDMM/target/release/dmm-tools .
+COPY --from=compiler /src/SpacemanDMM/target/release/dmm-tools dmm-tools.exe
 
 RUN mkdir /config_data
 RUN mv appsettings.Docker.json /config_data/appsettings.Production.json
