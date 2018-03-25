@@ -387,7 +387,7 @@ namespace MapDiffBot.Core
 												increaseMax = !increaseMax;
 											}
 									}
-									logger.LogTrace("Region for {0} expanded to {1}", region);
+									logger.LogTrace("Region for {0} expanded to {1}", changedDmms[I], region);
 								}
 								mapRegions[I] = region;
 							}
