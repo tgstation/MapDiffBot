@@ -31,6 +31,8 @@ var searchData=
   ['installationrepository_2ecs',['InstallationRepository.cs',['../_installation_repository_8cs.html',1,'']]],
   ['installationrepositoryid',['InstallationRepositoryId',['../class_map_diff_bot_1_1_models_1_1_map_diff.html#aee8ecf6132c088dbc45f9153bca93b65',1,'MapDiffBot::Models::MapDiff']]],
   ['installations',['Installations',['../class_map_diff_bot_1_1_models_1_1_database_context.html#a666369121bd0f9564799b02b30ca7f62',1,'MapDiffBot.Models.DatabaseContext.Installations()'],['../interface_map_diff_bot_1_1_models_1_1_i_database_context.html#a9769e964c85d5409c4b608a83930b90a',1,'MapDiffBot.Models.IDatabaseContext.Installations()']]],
+  ['invokemethod',['InvokeMethod',['../class_map_diff_bot_1_1_tests_1_1_private_object.html#a15de4014ecb05c7b62fb087d55a9919c',1,'MapDiffBot::Tests::PrivateObject']]],
+  ['invokemethod_3c_20t_20_3e',['InvokeMethod&lt; T &gt;',['../class_map_diff_bot_1_1_tests_1_1_private_object.html#a21b4cb533aac427dca75c91d84451c78',1,'MapDiffBot::Tests::PrivateObject']]],
   ['iomanager',['ioManager',['../class_map_diff_bot_1_1_core_1_1_generator.html#a6e34169238271280aebb56f67e1fd266',1,'MapDiffBot.Core.Generator.ioManager()'],['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#ab73972f5152974311ec3cea9b43be9c6',1,'MapDiffBot.Core.LocalRepositoryManager.ioManager()'],['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#a2220d03a74552c35e2597ee7007b1d16',1,'MapDiffBot.Core.PayloadProcessor.ioManager()']]],
   ['ipayloadprocessor',['IPayloadProcessor',['../interface_map_diff_bot_1_1_core_1_1_i_payload_processor.html',1,'MapDiffBot::Core']]],
   ['iprivatekeysource',['IPrivateKeySource',['../class_i_private_key_source.html',1,'']]],
