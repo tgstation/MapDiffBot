@@ -30,4 +30,4 @@ RUN mv appsettings.Docker.json /config_data/appsettings.Production.json
 VOLUME ["/config_data"]
 
 EXPOSE 80
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
