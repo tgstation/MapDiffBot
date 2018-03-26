@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Octokit;
+﻿using Octokit;
 
 namespace MapDiffBot.Core
 {
@@ -11,7 +10,7 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// Process a <see cref="PullRequest"/>
 		/// </summary>
-		/// <param name="payload">The <see cref="PullRequest"/> to process</param>
+		/// <param name="pullRequest">The <see cref="PullRequest"/> to process</param>
 		void ProcessPullRequest(PullRequest pullRequest);
 
 		/// <summary>
