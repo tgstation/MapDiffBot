@@ -72,21 +72,15 @@ namespace MapDiffBot.Core
 			IReadOnlyList<Octokit.Installation> gitHubInstalls;
 			List<Models.Installation> allKnownInstalls;
 			IGitHubClient client;
-			var installation = await databaseContext.Installations.Where(x => x.Repositories.Any(y => y.Id == repositoryId)).Select(x => new { x.Id, x.AccessToken, x.AccessTokenExpiry }).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
+			var installation = await databaseContext.Installations.Where(x => x.Repositories.Any(y => y.Id == repositoryId)).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
 
 			if (installation != null)
 			{
 				if (installation.AccessTokenExpiry < DateTimeOffset.UtcNow.AddMinutes(-10))
 				{
 					var newToken = await gitHubClientFactory.CreateAppClient().GitHubApps.CreateInstallationToken(installation.Id).ConfigureAwait(false);
-					var trackingContext = databaseContext.Installations.Attach(new Models.Installation
-					{
-						Id = installation.Id,
-						AccessToken = newToken.Token,
-						AccessTokenExpiry = newToken.ExpiresAt
-					});
-					trackingContext.Property(nameof(Models.Installation.AccessToken)).IsModified = true;
-					trackingContext.Property(nameof(Models.Installation.AccessTokenExpiry)).IsModified = true;
+					installation.AccessToken = newToken.Token;
+					installation.AccessTokenExpiry = newToken.ExpiresAt;
 					await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 					return gitHubClientFactory.CreateOauthClient(newToken.Token);
 				}
