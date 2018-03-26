@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['scopeguard_2d8380f4e38ae1da1a_2ed',['scopeguard-8380f4e38ae1da1a.d',['../scopeguard-8380f4e38ae1da1a_8d.html',1,'']]],
   ['semaphoreslimcontext_2ecs',['SemaphoreSlimContext.cs',['../_semaphore_slim_context_8cs.html',1,'']]],
   ['serde_2dff5891000264a338_2ed',['serde-ff5891000264a338.d',['../serde-ff5891000264a338_8d.html',1,'']]],
   ['serde_5fderive_2ddf9df67760879b71_2ed',['serde_derive-df9df67760879b71.d',['../serde__derive-df9df67760879b71_8d.html',1,'']]],

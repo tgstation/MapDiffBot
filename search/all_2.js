@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['cfg_5fif_2d41870744c1b79795_2ed',['cfg_if-41870744c1b79795.d',['../cfg__if-41870744c1b79795_8d.html',1,'']]],
   ['checkauthorization',['CheckAuthorization',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a12cd58f94aa1b0d38597d9b0bf81e232',1,'MapDiffBot.Core.GitHubManager.CheckAuthorization()'],['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#ad92d4ece7c7339b9403b97ca3aca5719',1,'MapDiffBot.Core.IGitHubManager.CheckAuthorization()']]],
   ['checkout',['Checkout',['../interface_map_diff_bot_1_1_core_1_1_i_local_repository.html#ababdd0290599b6e53d9de7a2d9ca67c9',1,'MapDiffBot.Core.ILocalRepository.Checkout()'],['../class_map_diff_bot_1_1_core_1_1_local_repository.html#ad8ef1eac1f39ea48b18c8b74c05e2f1f',1,'MapDiffBot.Core.LocalRepository.Checkout()']]],
   ['checkpayloadsignature',['CheckPayloadSignature',['../class_map_diff_bot_1_1_controllers_1_1_payloads_controller.html#a2cf54b8b120121e3f9c6d8034c8b850b',1,'MapDiffBot::Controllers::PayloadsController']]],
@@ -23,5 +24,8 @@ var searchData=
   ['createinstallationclient',['CreateInstallationClient',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a349183b2d2ce32f13709b95a451f6d28',1,'MapDiffBot::Core::GitHubManager']]],
   ['createlocalrepository',['CreateLocalRepository',['../interface_map_diff_bot_1_1_core_1_1_i_local_repository_factory.html#a12cefb0ad2ac40486f338a1c7cc922e5',1,'MapDiffBot.Core.ILocalRepositoryFactory.CreateLocalRepository()'],['../class_map_diff_bot_1_1_core_1_1_local_repository_factory.html#affc59a40b4f930d6313907a4e9f96d8b',1,'MapDiffBot.Core.LocalRepositoryFactory.CreateLocalRepository()']]],
   ['createoauthclient',['CreateOauthClient',['../class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a780cf4bcb985892c4876b7a9df5eb695',1,'MapDiffBot.Core.GitHubClientFactory.CreateOauthClient()'],['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_client_factory.html#a2919a4b61b673758bc6d518da3bfc98d',1,'MapDiffBot.Core.IGitHubClientFactory.CreateOauthClient()']]],
-  ['createsingletoncomment',['CreateSingletonComment',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a131b538f37e975a374e02fb88343b2b6',1,'MapDiffBot.Core.GitHubManager.CreateSingletonComment()'],['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#a1e3f8d8a4c0ce57ffc4a95339d39c7c3',1,'MapDiffBot.Core.IGitHubManager.CreateSingletonComment()']]]
+  ['createsingletoncomment',['CreateSingletonComment',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a131b538f37e975a374e02fb88343b2b6',1,'MapDiffBot.Core.GitHubManager.CreateSingletonComment()'],['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#a1e3f8d8a4c0ce57ffc4a95339d39c7c3',1,'MapDiffBot.Core.IGitHubManager.CreateSingletonComment()']]],
+  ['crossbeam_5fdeque_2d055dc6595a01693d_2ed',['crossbeam_deque-055dc6595a01693d.d',['../crossbeam__deque-055dc6595a01693d_8d.html',1,'']]],
+  ['crossbeam_5fepoch_2df7f9c574bfc859e5_2ed',['crossbeam_epoch-f7f9c574bfc859e5.d',['../crossbeam__epoch-f7f9c574bfc859e5_8d.html',1,'']]],
+  ['crossbeam_5futils_2d4c98d40b445bb6c4_2ed',['crossbeam_utils-4c98d40b445bb6c4.d',['../crossbeam__utils-4c98d40b445bb6c4_8d.html',1,'']]]
 ];
