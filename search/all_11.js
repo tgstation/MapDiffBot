@@ -15,5 +15,8 @@ var searchData=
   ['toolresult',['ToolResult',['../class_map_diff_bot_1_1_core_1_1_tool_result.html',1,'MapDiffBot::Core']]],
   ['toolresult_2ecs',['ToolResult.cs',['../_tool_result_8cs.html',1,'']]],
   ['tostring',['ToString',['../class_map_diff_bot_1_1_core_1_1_map_region.html#ab258c8d68d3c2580c185d8e92e2adca5',1,'MapDiffBot::Core::MapRegion']]],
+  ['triggercontroller',['TriggerController',['../class_map_diff_bot_1_1_controllers_1_1_trigger_controller.html#a6e872464a4870d4417e5e37713939770',1,'MapDiffBot::Controllers::TriggerController']]],
+  ['triggercontroller',['TriggerController',['../class_map_diff_bot_1_1_controllers_1_1_trigger_controller.html',1,'MapDiffBot::Controllers']]],
+  ['triggercontroller_2ecs',['TriggerController.cs',['../_trigger_controller_8cs.html',1,'']]],
   ['tryloadrepository',['TryLoadRepository',['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#a0ecba322838efe1118aa28a082cfb85a',1,'MapDiffBot::Core::LocalRepositoryManager']]]
 ];

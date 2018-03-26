@@ -110,9 +110,9 @@ Inheritance diagram for MapDiffBot.Core.IPayloadProcessor:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2006b513b695ea9ba403137013ab3e57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_payload_processor.html#a2006b513b695ea9ba403137013ab3e57">ProcessPayload</a> (PullRequestEventPayload payload)</td></tr>
-<tr class="memdesc:a2006b513b695ea9ba403137013ab3e57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a PullRequestEventPayload  <a href="#a2006b513b695ea9ba403137013ab3e57">More...</a><br /></td></tr>
-<tr class="separator:a2006b513b695ea9ba403137013ab3e57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0867f2b591a5df5a7491c4ccb944db1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_payload_processor.html#ad0867f2b591a5df5a7491c4ccb944db1">ProcessPullRequest</a> (PullRequest pullRequest)</td></tr>
+<tr class="memdesc:ad0867f2b591a5df5a7491c4ccb944db1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a PullRequest  <a href="#ad0867f2b591a5df5a7491c4ccb944db1">More...</a><br /></td></tr>
+<tr class="separator:ad0867f2b591a5df5a7491c4ccb944db1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af184d508f3a99ccdedb9b3bafe9cb534"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_payload_processor.html#af184d508f3a99ccdedb9b3bafe9cb534">ProcessPayload</a> (IssueCommentPayload payload)</td></tr>
 <tr class="memdesc:af184d508f3a99ccdedb9b3bafe9cb534"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a IssueCommentPayload  <a href="#af184d508f3a99ccdedb9b3bafe9cb534">More...</a><br /></td></tr>
 <tr class="separator:af184d508f3a99ccdedb9b3bafe9cb534"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,34 +120,8 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Processes GitHub payloads </p>
 
-<p>Definition at line <a class="el" href="_i_pull_request_payload_processor_8cs_source.html#l00009">9</a> of file <a class="el" href="_i_pull_request_payload_processor_8cs_source.html">IPullRequestPayloadProcessor.cs</a>.</p>
+<p>Definition at line <a class="el" href="_i_pull_request_payload_processor_8cs_source.html#l00008">8</a> of file <a class="el" href="_i_pull_request_payload_processor_8cs_source.html">IPullRequestPayloadProcessor.cs</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a2006b513b695ea9ba403137013ab3e57"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void MapDiffBot.Core.IPayloadProcessor.ProcessPayload </td>
-          <td>(</td>
-          <td class="paramtype">PullRequestEventPayload&#160;</td>
-          <td class="paramname"><em>payload</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Process a PullRequestEventPayload </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">payload</td><td>The PullRequestEventPayload to process</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_map_diff_bot_1_1_core_1_1_payload_processor.html#aedd8a7491d66104bb0613a320e63f138">MapDiffBot.Core.PayloadProcessor</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="af184d508f3a99ccdedb9b3bafe9cb534"></a>
 <div class="memitem">
 <div class="memproto">
@@ -171,6 +145,32 @@ Public Member Functions</h2></td></tr>
 </dl>
 
 <p>Implemented in <a class="el" href="class_map_diff_bot_1_1_core_1_1_payload_processor.html#a3b7f595eea3fc91caf93e3d14e007ba7">MapDiffBot.Core.PayloadProcessor</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad0867f2b591a5df5a7491c4ccb944db1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MapDiffBot.Core.IPayloadProcessor.ProcessPullRequest </td>
+          <td>(</td>
+          <td class="paramtype">PullRequest&#160;</td>
+          <td class="paramname"><em>pullRequest</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Process a PullRequest </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pullRequest</td><td>The PullRequest to process</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_map_diff_bot_1_1_core_1_1_payload_processor.html#afbee90b5ef292a93ce59d229c7d92e63">MapDiffBot.Core.PayloadProcessor</a>.</p>
 
 </div>
 </div>
