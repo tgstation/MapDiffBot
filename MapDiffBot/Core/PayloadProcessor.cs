@@ -575,11 +575,7 @@ namespace MapDiffBot.Core
 		}
 
 		/// <inheritdoc />
-		public void ProcessPayload(PullRequestEventPayload payload)
-		{
-			if (payload.Action == "opened" || payload.Action == "synchronize")
-				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.PullRequest.Number, JobCancellationToken.Null));
-		}
+		public void ProcessPullRequest(PullRequest pullRequest) => backgroundJobClient.Enqueue(() => ScanPullRequest(pullRequest.Base.Repository.Id, pullRequest.Number, JobCancellationToken.Null));
 
 		/// <inheritdoc />
 		public void ProcessPayload(IssueCommentPayload payload)
