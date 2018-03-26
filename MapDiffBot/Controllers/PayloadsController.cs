@@ -12,7 +12,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Threading;
 
 namespace MapDiffBot.Controllers
 {
@@ -137,7 +136,8 @@ namespace MapDiffBot.Controllers
 				}
 				logger.LogTrace("Queuing pull request payload processing job.");
 
-				pullRequestProcessor.ProcessPayload(payload);
+				if (payload.Action == "opened" || payload.Action == "synchronize")
+					pullRequestProcessor.ProcessPullRequest(payload.PullRequest);
 			}
 			else if (eventName == "issue_comment")
 			{

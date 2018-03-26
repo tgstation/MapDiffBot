@@ -9,10 +9,10 @@ namespace MapDiffBot.Core
 	public interface IPayloadProcessor
 	{
 		/// <summary>
-		/// Process a <see cref="PullRequestEventPayload"/>
+		/// Process a <see cref="PullRequest"/>
 		/// </summary>
-		/// <param name="payload">The <see cref="PullRequestEventPayload"/> to process</param>
-		void ProcessPayload(PullRequestEventPayload payload);
+		/// <param name="payload">The <see cref="PullRequest"/> to process</param>
+		void ProcessPullRequest(PullRequest pullRequest);
 
 		/// <summary>
 		/// Process a <see cref="IssueCommentPayload"/>
