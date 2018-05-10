@@ -12,7 +12,7 @@
     {
         <div class="row">
             <h4>@I:</h4>
-            <a asp-action="HandleMapGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-fileId="@counter" asp-route-beforeOrAfter="before">@ViewBag.Before</a> | <a asp-action="HandleMapGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-checkRunId="@ViewBag.CheckRunId" asp-route-fileId="@counter" asp-route-beforeOrAfter="after">@ViewBag.After</a> | <a asp-action="HandleLogsGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-fileId="@counter">@ViewBag.Logs</a>
+            <a asp-action="HandleMapGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-fileId="@counter" asp-route-beforeOrAfter="before">@ViewBag.Before</a> | <a asp-action="HandleMapGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-fileId="@counter" asp-route-beforeOrAfter="after">@ViewBag.After</a> | <a asp-action="HandleLogsGet" asp-route-repositoryId="@ViewBag.RepositoryId" asp-route-prNumber="@ViewBag.PRNumber" asp-route-fileId="@counter">@ViewBag.Logs</a>
         </div>
         ++counter;
     }

@@ -11,6 +11,12 @@ namespace MapDiffBot.Core
 		/// Process a <see cref="PullRequest"/>
 		/// </summary>
 		/// <param name="pullRequest">The <see cref="PullRequest"/> to process</param>
-		void ProcessCheckSuite(CheckSuite checkSuite, bool rerequest);
+		void ProcessPullRequest(PullRequest pullRequest);
+
+		/// <summary>
+		/// Process a <see cref="IssueCommentPayload"/>
+		/// </summary>
+		/// <param name="payload">The <see cref="IssueCommentPayload"/> to process</param>
+		void ProcessPayload(IssueCommentPayload payload);
 	}
 }

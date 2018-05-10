@@ -78,8 +78,5 @@ namespace MapDiffBot.Core
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		Task LoadInstallation(long repositoryId, CancellationToken cancellationToken);
-		Task UpdateCheckRun(Repository repository, long value, CheckRunUpdate checkRunUpdate, CancellationToken cancellationToken);
-		Task<long> CreateCheckRun(Repository repository, long checkSuiteId, NewCheckRun initializer, CancellationToken cancellationToken);
-		Task<IReadOnlyList<string>> GetCommitChangedFiles(Repository repository, string sha, CancellationToken cancellationToken);
 	}
 }

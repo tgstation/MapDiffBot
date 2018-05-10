@@ -20,7 +20,8 @@ namespace MapDiffBot.Models
 		/// The <see cref="Octokit.PullRequest.Number"/>
 		/// </summary>
 		[Key, Column(Order = 1)]
-		public long CheckRunId { get; set; }
+		[Required]
+		public long PullRequestNumber { get; set; }
 
 		/// <summary>
 		/// The id of the diffed file
