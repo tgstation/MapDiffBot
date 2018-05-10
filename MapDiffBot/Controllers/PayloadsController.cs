@@ -12,6 +12,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace MapDiffBot.Controllers
 {
@@ -95,9 +96,10 @@ namespace MapDiffBot.Controllers
 		/// <summary>
 		/// Handle a POST to the <see cref="PayloadsController"/>
 		/// </summary>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> of the POST</returns>
 		[HttpPost]
-		public async Task<IActionResult> Receive()
+		public async Task<IActionResult> Receive(CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved POST.");
 
@@ -136,25 +138,24 @@ namespace MapDiffBot.Controllers
 				}
 				logger.LogTrace("Queuing pull request payload processing job.");
 
-				if (payload.Action == "opened" || payload.Action == "synchronize")
-					pullRequestProcessor.ProcessPullRequest(payload.PullRequest);
+				pullRequestProcessor.ProcessPayload(payload);
 			}
-			else if (eventName == "issue_comment")
+			else if (eventName == "check_suite")
 			{
-				IssueCommentPayload payload;
-				logger.LogTrace("Deserializing issue comment payload.");
+				CheckSuiteEventPayload payload;
+				logger.LogTrace("Deserializing check suite payload.");
 				try
 				{
-					payload = new SimpleJsonSerializer().Deserialize<IssueCommentPayload>(json);
+					payload = new SimpleJsonSerializer().Deserialize<CheckSuiteEventPayload>(json);
 				}
 				catch (Exception e)
 				{
-					logger.LogDebug(e, "Failed to deserialize issue comment payload JSON!");
+					logger.LogDebug(e, "Failed to deserialize check suite payload JSON!");
 					return BadRequest(e);
 				}
-				logger.LogTrace("Queuing issue comment payload processing job.");
+				logger.LogTrace("Queuing check suite payload processing job.");
 
-				pullRequestProcessor.ProcessPayload(payload);
+				await pullRequestProcessor.ProcessPayload(payload, gitHubManager, cancellationToken).ConfigureAwait(false);
 			}
 
 			return Ok();

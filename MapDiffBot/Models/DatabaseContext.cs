@@ -70,7 +70,7 @@ namespace MapDiffBot.Models
 			modelBuilder.Entity<Log>().ToTable(nameof(Log));
 
 			//enable map diff indexing
-			modelBuilder.Entity<MapDiff>().HasKey(x => new { x.InstallationRepositoryId, x.PullRequestNumber, x.FileId });
+			modelBuilder.Entity<MapDiff>().HasKey(x => new { x.InstallationRepositoryId, x.CheckRunId, x.FileId });
 
 			//enable cascade deletion
 			modelBuilder.Entity<Installation>().HasMany(x => x.Repositories).WithOne().OnDelete(DeleteBehavior.Cascade);

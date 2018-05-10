@@ -1,5 +1,5 @@
 #!/bin/bash
-
+exit
 cd ../SpacemanDMM
 cargo build -p cli --release
 cd ../MapDiffBot
