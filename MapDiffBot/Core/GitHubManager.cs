@@ -271,5 +271,22 @@ namespace MapDiffBot.Core
 			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
 			return await client.PullRequest.Get(repositoryId, pullRequestNumber).ConfigureAwait(false);
 		}
+
+		/// <inheritdoc />
+		public async Task UpdateCheckRun(long repositoryId, long checkRunId, CheckRunUpdate checkRunUpdate, CancellationToken cancellationToken)
+		{
+			logger.LogTrace("Update check run {0} on repository {1}", checkRunId, repositoryId);
+			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
+			await client.Checks.Runs.Update(repositoryId, checkRunId, checkRunUpdate).ConfigureAwait(false);
+		}
+
+		/// <inheritdoc />
+		public async Task<long> CreateCheckRun(long repositoryId, NewCheckRun initializer, CancellationToken cancellationToken)
+		{
+			logger.LogTrace("Create check run for ref {0} on repository {1}", initializer.HeadSha, repositoryId);
+			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
+			var checkRun = await client.Checks.Runs.Create(repositoryId, initializer).ConfigureAwait(false);
+			return checkRun.Id;
+		}
 	}
 }

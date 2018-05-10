@@ -17,11 +17,11 @@ namespace MapDiffBot.Models
 		public long InstallationRepositoryId { get; set; }
 
 		/// <summary>
-		/// The <see cref="Octokit.PullRequest.Number"/>
+		/// The <see cref="Octokit.CheckRun.Id"/>
 		/// </summary>
 		[Key, Column(Order = 1)]
 		[Required]
-		public long PullRequestNumber { get; set; }
+		public long CheckRunId { get; set; }
 
 		/// <summary>
 		/// The id of the diffed file
