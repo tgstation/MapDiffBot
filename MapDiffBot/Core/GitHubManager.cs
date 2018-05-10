@@ -271,5 +271,33 @@ namespace MapDiffBot.Core
 			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
 			return await client.PullRequest.Get(repositoryId, pullRequestNumber).ConfigureAwait(false);
 		}
+
+		/// <inheritdoc />
+		public async Task UpdateCheckRun(Repository repository, long checkRunId, CheckRunUpdate checkRunUpdate, CancellationToken cancellationToken)
+		{
+			logger.LogTrace("Update check run {0} on repository {1}", checkRunId, repository.Id);
+			var client = await CreateInstallationClient(repository.Id, cancellationToken).ConfigureAwait(false);
+			await client.Checks.Runs.Update(repository.Id, checkRunId, checkRunUpdate).ConfigureAwait(false);
+		}
+
+		/// <inheritdoc />
+		public async Task<long> CreateCheckRun(Repository repository, long checkSuiteId, NewCheckRun initializer, CancellationToken cancellationToken)
+		{
+			logger.LogTrace("Create check run for suite {0} on repository {1}", checkSuiteId, repository.Id);
+			var client = await CreateInstallationClient(repository.Id, cancellationToken).ConfigureAwait(false);
+			var checkRun = await client.Checks.Runs.Create(repository.Id, initializer).ConfigureAwait(false);
+			return checkRun.Id;
+		}
+
+		/// <inheritdoc />
+		public async Task<IReadOnlyList<string>> GetCommitChangedFiles(Repository repository, string sha, CancellationToken cancellationToken)
+		{
+			logger.LogTrace("Get commit {0} changed files on repository {1}", sha, repository.Id);
+			var client = await CreateInstallationClient(repository.Id, cancellationToken).ConfigureAwait(false);
+			var commit = await client.Repository.Commit.Get(repository.Id, sha).ConfigureAwait(false);
+			var result = commit.Files.Select(x => x.Filename).ToList();
+			commit.Files.Select(x => { if (!result.Contains(x.PreviousFileName)) result.Add(x.PreviousFileName); return x; });
+			return result;
+		}
 	}
 }

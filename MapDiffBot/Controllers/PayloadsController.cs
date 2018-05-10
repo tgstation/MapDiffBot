@@ -121,40 +121,24 @@ namespace MapDiffBot.Controllers
 				return Unauthorized();
 			}
 
-			if (eventName == "pull_request")
+			if (eventName == "check_suite")
 			{
-				PullRequestEventPayload payload;
-				logger.LogTrace("Deserializing pull request payload.");
+				CheckSuiteEventPayload payload;
+				logger.LogTrace("Deserializing check suite payload.");
 				try
 				{
-					payload = new SimpleJsonSerializer().Deserialize<PullRequestEventPayload>(json);
+					payload = new SimpleJsonSerializer().Deserialize<CheckSuiteEventPayload>(json);
 				}
 				catch (Exception e)
 				{
-					logger.LogDebug(e, "Failed to deserialize pull request payload JSON!");
+					logger.LogDebug(e, "Failed to deserialize check suite payload JSON!");
 					return BadRequest(e);
 				}
 				logger.LogTrace("Queuing pull request payload processing job.");
 
-				if (payload.Action == "opened" || payload.Action == "synchronize")
-					pullRequestProcessor.ProcessPullRequest(payload.PullRequest);
-			}
-			else if (eventName == "issue_comment")
-			{
-				IssueCommentPayload payload;
-				logger.LogTrace("Deserializing issue comment payload.");
-				try
-				{
-					payload = new SimpleJsonSerializer().Deserialize<IssueCommentPayload>(json);
-				}
-				catch (Exception e)
-				{
-					logger.LogDebug(e, "Failed to deserialize issue comment payload JSON!");
-					return BadRequest(e);
-				}
-				logger.LogTrace("Queuing issue comment payload processing job.");
-
-				pullRequestProcessor.ProcessPayload(payload);
+				bool rerequest = payload.Action == "rerequested";
+				if (rerequest || payload.Action == "requested")
+					pullRequestProcessor.ProcessCheckSuite(payload.CheckSuite, rerequest);
 			}
 
 			return Ok();
