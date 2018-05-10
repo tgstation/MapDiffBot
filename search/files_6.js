@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['generalconfiguration_2ecs',['GeneralConfiguration.cs',['../_general_configuration_8cs.html',1,'']]],
-  ['generator_2ecs',['Generator.cs',['../_generator_8cs.html',1,'']]],
-  ['generatorfactory_2ecs',['GeneratorFactory.cs',['../_generator_factory_8cs.html',1,'']]],
-  ['githubclientfactory_2ecs',['GitHubClientFactory.cs',['../_git_hub_client_factory_8cs.html',1,'']]],
-  ['githubconfiguration_2ecs',['GitHubConfiguration.cs',['../_git_hub_configuration_8cs.html',1,'']]],
-  ['githubmanager_2ecs',['GitHubManager.cs',['../_git_hub_manager_8cs.html',1,'']]]
+  ['mapdiff_2ecs',['MapDiff.cs',['../_map_diff_8cs.html',1,'']]],
+  ['mapdiffbot_2eassemblyinfo_2ecs',['MapDiffBot.AssemblyInfo.cs',['../_map_diff_bot_8_assembly_info_8cs.html',1,'']]],
+  ['mapdiffbot_2etests_2eassemblyinfo_2ecs',['MapDiffBot.Tests.AssemblyInfo.cs',['../_map_diff_bot_8_tests_8_assembly_info_8cs.html',1,'']]],
+  ['mapdiffbot_2etests_2eprogram_2ecs',['MapDiffBot.Tests.Program.cs',['../_map_diff_bot_8_tests_8_program_8cs.html',1,'']]],
+  ['mapregion_2ecs',['MapRegion.cs',['../_map_region_8cs.html',1,'']]]
 ];

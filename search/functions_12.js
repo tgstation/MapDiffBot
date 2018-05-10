@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['_7elocalrepository',['~LocalRepository',['../class_map_diff_bot_1_1_core_1_1_local_repository.html#a5ecfdcf6f59c483d258fb2aea47363c9',1,'MapDiffBot::Core::LocalRepository']]],
-  ['_7esemaphoreslimcontext',['~SemaphoreSlimContext',['../class_map_diff_bot_1_1_core_1_1_semaphore_slim_context.html#ab80174d21e5967324f036e0b5ba11719',1,'MapDiffBot::Core::SemaphoreSlimContext']]]
+  ['webrequestmanager',['WebRequestManager',['../class_map_diff_bot_1_1_core_1_1_web_request_manager.html#ae6687cdcd83643e2810d2648eac506b6',1,'MapDiffBot::Core::WebRequestManager']]],
+  ['writeallbytes',['WriteAllBytes',['../class_map_diff_bot_1_1_core_1_1_default_i_o_manager.html#a80ca135aaccaa536009f33b5a4ccedf7',1,'MapDiffBot.Core.DefaultIOManager.WriteAllBytes()'],['../interface_map_diff_bot_1_1_core_1_1_i_i_o_manager.html#adcb26424b83c1be9af12916bf0624d99',1,'MapDiffBot.Core.IIOManager.WriteAllBytes()']]]
 ];

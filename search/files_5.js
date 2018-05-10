@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['filescontroller_2ecs',['FilesController.cs',['../_files_controller_8cs.html',1,'']]],
-  ['fixedbitset_2d8e9033a508d43558_2ed',['fixedbitset-8e9033a508d43558.d',['../fixedbitset-8e9033a508d43558_8d.html',1,'']]]
+  ['localrepository_2ecs',['LocalRepository.cs',['../_local_repository_8cs.html',1,'']]],
+  ['localrepositoryfactory_2ecs',['LocalRepositoryFactory.cs',['../_local_repository_factory_8cs.html',1,'']]],
+  ['localrepositorymanager_2ecs',['LocalRepositoryManager.cs',['../_local_repository_manager_8cs.html',1,'']]]
 ];

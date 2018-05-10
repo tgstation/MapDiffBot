@@ -1,22 +1,9 @@
 var searchData=
 [
-  ['taguser',['TagUser',['../class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a908a533e754d34cdd2507b1003569b8d',1,'MapDiffBot::Configuration::GitHubConfiguration']]],
-  ['targetdme',['TargetDme',['../class_map_diff_bot_1_1_models_1_1_installation_repository.html#a6da00a93bf8fba7b16eb1709afbe3a11',1,'MapDiffBot::Models::InstallationRepository']]],
-  ['testinstantiation',['TestInstantiation',['../class_map_diff_bot_1_1_core_1_1_tests_1_1_test_local_repository_manager.html#a897429aa091f82f11fdd58e34673109b',1,'MapDiffBot::Core::Tests::TestLocalRepositoryManager']]],
-  ['testlibgit2sharp',['TestLibGit2Sharp',['../class_map_diff_bot_1_1_tests_1_1_dependencies_1_1_test_lib_git2_sharp.html',1,'MapDiffBot::Tests::Dependencies']]],
-  ['testlibgit2sharp_2ecs',['TestLibGit2Sharp.cs',['../_test_lib_git2_sharp_8cs.html',1,'']]],
-  ['testlocalrepositorymanager',['TestLocalRepositoryManager',['../class_map_diff_bot_1_1_core_1_1_tests_1_1_test_local_repository_manager.html',1,'MapDiffBot::Core::Tests']]],
-  ['testlocalrepositorymanager_2ecs',['TestLocalRepositoryManager.cs',['../_test_local_repository_manager_8cs.html',1,'']]],
-  ['testmultiget',['TestMultiGet',['../class_map_diff_bot_1_1_core_1_1_tests_1_1_test_local_repository_manager.html#a22474d818f0c940655e6dfd1d3c694cd',1,'MapDiffBot::Core::Tests::TestLocalRepositoryManager']]],
-  ['testnativedllloadscorrectly',['TestNativeDllLoadsCorrectly',['../class_map_diff_bot_1_1_tests_1_1_dependencies_1_1_test_lib_git2_sharp.html#aaebac0270437d18166a60942eb82d1fa',1,'MapDiffBot::Tests::Dependencies::TestLibGit2Sharp']]],
-  ['textwrap_2d02e7506f29f8178c_2ed',['textwrap-02e7506f29f8178c.d',['../textwrap-02e7506f29f8178c_8d.html',1,'']]],
-  ['tohexstring',['ToHexString',['../class_map_diff_bot_1_1_controllers_1_1_payloads_controller.html#a8eb24f050a733684b36b9af6177f8a31',1,'MapDiffBot::Controllers::PayloadsController']]],
-  ['tooloutput',['ToolOutput',['../class_map_diff_bot_1_1_core_1_1_tool_result.html#aad45e4c7942c09782764cce9f21c4b81',1,'MapDiffBot::Core::ToolResult']]],
-  ['toolresult',['ToolResult',['../class_map_diff_bot_1_1_core_1_1_tool_result.html',1,'MapDiffBot::Core']]],
-  ['toolresult_2ecs',['ToolResult.cs',['../_tool_result_8cs.html',1,'']]],
-  ['tostring',['ToString',['../class_map_diff_bot_1_1_core_1_1_map_region.html#ab258c8d68d3c2580c185d8e92e2adca5',1,'MapDiffBot::Core::MapRegion']]],
-  ['triggercontroller',['TriggerController',['../class_map_diff_bot_1_1_controllers_1_1_trigger_controller.html#a6e872464a4870d4417e5e37713939770',1,'MapDiffBot::Controllers::TriggerController']]],
-  ['triggercontroller',['TriggerController',['../class_map_diff_bot_1_1_controllers_1_1_trigger_controller.html',1,'MapDiffBot::Controllers']]],
-  ['triggercontroller_2ecs',['TriggerController.cs',['../_trigger_controller_8cs.html',1,'']]],
-  ['tryloadrepository',['TryLoadRepository',['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#a0ecba322838efe1118aa28a082cfb85a',1,'MapDiffBot::Core::LocalRepositoryManager']]]
+  ['updatecheckrun',['UpdateCheckRun',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a0a0b78ee1fce100b5b71a0fd02ad24e4',1,'MapDiffBot.Core.GitHubManager.UpdateCheckRun()'],['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#a1543515bfcd5b4d6be3d14409ba99677',1,'MapDiffBot.Core.IGitHubManager.UpdateCheckRun()']]],
+  ['user',['User',['../namespace_map_diff_bot_1_1_core.html#ad9b1cafc9d08930e50efc621780a9cdaa8f9bfe9d1345237cb3b2b205864da075',1,'MapDiffBot::Core']]],
+  ['useraccesstoken',['UserAccessToken',['../class_map_diff_bot_1_1_models_1_1_user_access_token.html',1,'MapDiffBot::Models']]],
+  ['useraccesstoken_2ecs',['UserAccessToken.cs',['../_user_access_token_8cs.html',1,'']]],
+  ['useraccesstokens',['UserAccessTokens',['../class_map_diff_bot_1_1_models_1_1_database_context.html#a90248fbfe857c354a994b7ef6909940e',1,'MapDiffBot.Models.DatabaseContext.UserAccessTokens()'],['../interface_map_diff_bot_1_1_models_1_1_i_database_context.html#a56af84db39d1b6648fb95c6d0be6db24',1,'MapDiffBot.Models.IDatabaseContext.UserAccessTokens()']]],
+  ['useragent',['userAgent',['../class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a13ceec9c7ac9ed5b77e311171f3a15b7',1,'MapDiffBot::Core::GitHubClientFactory']]]
 ];

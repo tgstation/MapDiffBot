@@ -139,6 +139,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a947009104c43dfb806f30306bfaa2edf"><td class="memItemLeft" align="right" valign="top">async Task&lt; PullRequest &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a947009104c43dfb806f30306bfaa2edf">GetPullRequest</a> (long repositoryId, int pullRequestNumber, CancellationToken cancellationToken)</td></tr>
 <tr class="memdesc:a947009104c43dfb806f30306bfaa2edf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a PullRequest   <a href="#a947009104c43dfb806f30306bfaa2edf">More...</a><br /></td></tr>
 <tr class="separator:a947009104c43dfb806f30306bfaa2edf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a0b78ee1fce100b5b71a0fd02ad24e4"><td class="memItemLeft" align="right" valign="top">async Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a0a0b78ee1fce100b5b71a0fd02ad24e4">UpdateCheckRun</a> (long repositoryId, long checkRunId, CheckRunUpdate checkRunUpdate, CancellationToken cancellationToken)</td></tr>
+<tr class="memdesc:a0a0b78ee1fce100b5b71a0fd02ad24e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update a CheckRun   <a href="#a0a0b78ee1fce100b5b71a0fd02ad24e4">More...</a><br /></td></tr>
+<tr class="separator:a0a0b78ee1fce100b5b71a0fd02ad24e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2055f827b0838a0c8ee9be4609f63e99"><td class="memItemLeft" align="right" valign="top">async Task&lt; long &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a2055f827b0838a0c8ee9be4609f63e99">CreateCheckRun</a> (long repositoryId, NewCheckRun initializer, CancellationToken cancellationToken)</td></tr>
+<tr class="memdesc:a2055f827b0838a0c8ee9be4609f63e99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a CheckRun   <a href="#a2055f827b0838a0c8ee9be4609f63e99">More...</a><br /></td></tr>
+<tr class="separator:a2055f827b0838a0c8ee9be4609f63e99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -323,6 +329,46 @@ Private Attributes</h2></td></tr>
 <div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_manager_html_a2487cf1fec2d18f5617891c9735f7275"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a2487cf1fec2d18f5617891c9735f7275">MapDiffBot.Core.GitHubManager.logger</a></div><div class="ttdeci">readonly ILogger&lt; GitHubManager &gt; logger</div><div class="ttdoc">The ILogger for the GitHubManager </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_manager_8cs_source.html#l00047">GitHubManager.cs:47</a></div></div>
 <div class="ttc" id="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration_html_ae171432ce790720de745ac069386f18b"><div class="ttname"><a href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#ae171432ce790720de745ac069386f18b">MapDiffBot.Configuration.GitHubConfiguration.OauthSecret</a></div><div class="ttdeci">string OauthSecret</div><div class="ttdoc">The client secret for the Oauth application </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_configuration_8cs_source.html#l00041">GitHubConfiguration.cs:41</a></div></div>
 <div class="ttc" id="interface_map_diff_bot_1_1_models_1_1_i_database_context_html_a13c5b27cd636e074fdc2486ccadad6d7"><div class="ttname"><a href="interface_map_diff_bot_1_1_models_1_1_i_database_context.html#a13c5b27cd636e074fdc2486ccadad6d7">MapDiffBot.Models.IDatabaseContext.Save</a></div><div class="ttdeci">Task Save(CancellationToken cancellationToken)</div><div class="ttdoc">Save changes to the IDatabaseContext </div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="a2055f827b0838a0c8ee9be4609f63e99"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">async Task&lt;long&gt; MapDiffBot.Core.GitHubManager.CreateCheckRun </td>
+          <td>(</td>
+          <td class="paramtype">long&#160;</td>
+          <td class="paramname"><em>repositoryId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">NewCheckRun&#160;</td>
+          <td class="paramname"><em>initializer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>cancellationToken</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a CheckRun  </p>
+
+<p>Implements <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#ace48ed8bdad55cb1d8559c8b499a9204">MapDiffBot.Core.IGitHubManager</a>.</p>
+
+<p>Definition at line <a class="el" href="_git_hub_manager_8cs_source.html#l00284">284</a> of file <a class="el" href="_git_hub_manager_8cs_source.html">GitHubManager.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        {</div><div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a2487cf1fec2d18f5617891c9735f7275">logger</a>.LogTrace(<span class="stringliteral">&quot;Create check run for ref {0} on repository {1}&quot;</span>, initializer.HeadSha, repositoryId);</div><div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;            var client = await <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a349183b2d2ce32f13709b95a451f6d28">CreateInstallationClient</a>(repositoryId, cancellationToken).ConfigureAwait(<span class="keyword">false</span>);</div><div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;            var checkRun = await client.Checks.Runs.Create(repositoryId, initializer).ConfigureAwait(<span class="keyword">false</span>);</div><div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;            <span class="keywordflow">return</span> checkRun.Id;</div><div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_manager_html_a349183b2d2ce32f13709b95a451f6d28"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a349183b2d2ce32f13709b95a451f6d28">MapDiffBot.Core.GitHubManager.CreateInstallationClient</a></div><div class="ttdeci">async Task&lt; IGitHubClient &gt; CreateInstallationClient(long repositoryId, CancellationToken cancellationToken)</div><div class="ttdoc">Create a IGitHubClient based on a Repository.Id in a Installation </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_manager_8cs_source.html#l00070">GitHubManager.cs:70</a></div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_manager_html_a2487cf1fec2d18f5617891c9735f7275"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a2487cf1fec2d18f5617891c9735f7275">MapDiffBot.Core.GitHubManager.logger</a></div><div class="ttdeci">readonly ILogger&lt; GitHubManager &gt; logger</div><div class="ttdoc">The ILogger for the GitHubManager </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_manager_8cs_source.html#l00047">GitHubManager.cs:47</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -586,6 +632,52 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#a6a96944ebaa49ccdf59ae403012ddf8d">MapDiffBot.Core.IGitHubManager</a>.</p>
 
+</div>
+</div>
+<a class="anchor" id="a0a0b78ee1fce100b5b71a0fd02ad24e4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">async Task MapDiffBot.Core.GitHubManager.UpdateCheckRun </td>
+          <td>(</td>
+          <td class="paramtype">long&#160;</td>
+          <td class="paramname"><em>repositoryId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&#160;</td>
+          <td class="paramname"><em>checkRunId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CheckRunUpdate&#160;</td>
+          <td class="paramname"><em>checkRunUpdate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>cancellationToken</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Update a CheckRun  </p>
+
+<p>Implements <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#a1543515bfcd5b4d6be3d14409ba99677">MapDiffBot.Core.IGitHubManager</a>.</p>
+
+<p>Definition at line <a class="el" href="_git_hub_manager_8cs_source.html#l00276">276</a> of file <a class="el" href="_git_hub_manager_8cs_source.html">GitHubManager.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        {</div><div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a2487cf1fec2d18f5617891c9735f7275">logger</a>.LogTrace(<span class="stringliteral">&quot;Update check run {0} on repository {1}&quot;</span>, checkRunId, repositoryId);</div><div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            var client = await <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a349183b2d2ce32f13709b95a451f6d28">CreateInstallationClient</a>(repositoryId, cancellationToken).ConfigureAwait(<span class="keyword">false</span>);</div><div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;            await client.Checks.Runs.Update(repositoryId, checkRunId, checkRunUpdate).ConfigureAwait(<span class="keyword">false</span>);</div><div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_manager_html_a349183b2d2ce32f13709b95a451f6d28"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a349183b2d2ce32f13709b95a451f6d28">MapDiffBot.Core.GitHubManager.CreateInstallationClient</a></div><div class="ttdeci">async Task&lt; IGitHubClient &gt; CreateInstallationClient(long repositoryId, CancellationToken cancellationToken)</div><div class="ttdoc">Create a IGitHubClient based on a Repository.Id in a Installation </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_manager_8cs_source.html#l00070">GitHubManager.cs:70</a></div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_manager_html_a2487cf1fec2d18f5617891c9735f7275"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a2487cf1fec2d18f5617891c9735f7275">MapDiffBot.Core.GitHubManager.logger</a></div><div class="ttdeci">readonly ILogger&lt; GitHubManager &gt; logger</div><div class="ttdoc">The ILogger for the GitHubManager </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_manager_8cs_source.html#l00047">GitHubManager.cs:47</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
