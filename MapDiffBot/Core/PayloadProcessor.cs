@@ -565,7 +565,7 @@ namespace MapDiffBot.Core
 
 			var ncr = new CheckRunUpdate
 			{
-				DetailsUrl = FilesController.RouteToBrowse(pullRequest.Base.Repository, checkRunId),
+				DetailsUrl = String.Concat(prefix, FilesController.RouteToBrowse(pullRequest.Base.Repository, checkRunId)),
 				Status = CheckStatus.Completed,
 				CompletedAt = DateTimeOffset.Now,
 				Output = new CheckRunOutput(stringLocalizer["Map Renderings"], stringLocalizer["Before and after renderings of .dmm files"], null, outputImages),
