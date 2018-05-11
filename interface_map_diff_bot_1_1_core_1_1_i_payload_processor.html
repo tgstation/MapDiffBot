@@ -116,6 +116,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9999130795a91e447194995369c21399"><td class="memItemLeft" align="right" valign="top">Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_payload_processor.html#a9999130795a91e447194995369c21399">ProcessPayload</a> (CheckSuiteEventPayload payload, <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html">IGitHubManager</a> gitHubManager, CancellationToken cancellationToken)</td></tr>
 <tr class="memdesc:a9999130795a91e447194995369c21399"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a CheckSuiteEventPayload  <a href="#a9999130795a91e447194995369c21399">More...</a><br /></td></tr>
 <tr class="separator:a9999130795a91e447194995369c21399"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa186da89b886687a439aa005a89360b9"><td class="memItemLeft" align="right" valign="top">Task&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_payload_processor.html#aa186da89b886687a439aa005a89360b9">ProcessPayload</a> (CheckRunEventPayload payload, <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html">IGitHubManager</a> gitHubManager, CancellationToken cancellationToken)</td></tr>
+<tr class="memdesc:aa186da89b886687a439aa005a89360b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a CheckRunEventPayload  <a href="#aa186da89b886687a439aa005a89360b9">More...</a><br /></td></tr>
+<tr class="separator:aa186da89b886687a439aa005a89360b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Processes GitHub payloads </p>
@@ -190,6 +193,51 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A Task representing the running operation</dd></dl>
 
 <p>Implemented in <a class="el" href="class_map_diff_bot_1_1_core_1_1_payload_processor.html#a33351fc06bd65b6cdc73fe38a9c5f754">MapDiffBot.Core.PayloadProcessor</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa186da89b886687a439aa005a89360b9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Task MapDiffBot.Core.IPayloadProcessor.ProcessPayload </td>
+          <td>(</td>
+          <td class="paramtype">CheckRunEventPayload&#160;</td>
+          <td class="paramname"><em>payload</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html">IGitHubManager</a>&#160;</td>
+          <td class="paramname"><em>gitHubManager</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>cancellationToken</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Process a CheckRunEventPayload </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">payload</td><td>The CheckRunEventPayload to process</td></tr>
+    <tr><td class="paramname">gitHubManager</td><td>The <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html" title="Manages operations with GitHub.com ">IGitHubManager</a> for the operation</td></tr>
+    <tr><td class="paramname">cancellationToken</td><td>The CancellationToken for the operation</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Task representing the running operation</dd></dl>
+
+<p>Implemented in <a class="el" href="class_map_diff_bot_1_1_core_1_1_payload_processor.html#a3100767a6e49728afee4035654b3eb30">MapDiffBot.Core.PayloadProcessor</a>.</p>
 
 </div>
 </div>
