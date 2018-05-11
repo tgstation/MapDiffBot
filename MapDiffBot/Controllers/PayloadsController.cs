@@ -139,43 +139,43 @@ namespace MapDiffBot.Controllers
 				logger.LogTrace("Queuing pull request payload processing job.");
 
 				pullRequestProcessor.ProcessPayload(payload);
-            }
-            else if (eventName == "check_suite")
-            {
-                CheckSuiteEventPayload payload;
-                logger.LogTrace("Deserializing check suite payload.");
-                try
-                {
-                    payload = new SimpleJsonSerializer().Deserialize<CheckSuiteEventPayload>(json);
-                }
-                catch (Exception e)
-                {
-                    logger.LogDebug(e, "Failed to deserialize check suite payload JSON!");
-                    return BadRequest(e);
-                }
-                logger.LogTrace("Queuing check suite payload processing job.");
+			}
+			else if (eventName == "check_suite")
+			{
+				CheckSuiteEventPayload payload;
+				logger.LogTrace("Deserializing check suite payload.");
+				try
+				{
+					payload = new SimpleJsonSerializer().Deserialize<CheckSuiteEventPayload>(json);
+				}
+				catch (Exception e)
+				{
+					logger.LogDebug(e, "Failed to deserialize check suite payload JSON!");
+					return BadRequest(e);
+				}
+				logger.LogTrace("Queuing check suite payload processing job.");
 
-                await pullRequestProcessor.ProcessPayload(payload, gitHubManager, cancellationToken).ConfigureAwait(false);
-            }
-            else if (eventName == "check_run")
-            {
-                CheckRunEventPayload payload;
-                logger.LogTrace("Deserializing check run payload.");
-                try
-                {
-                    payload = new SimpleJsonSerializer().Deserialize<CheckRunEventPayload>(json);
-                }
-                catch (Exception e)
-                {
-                    logger.LogDebug(e, "Failed to deserialize check suite payload JSON!");
-                    return BadRequest(e);
-                }
-                logger.LogTrace("Queuing check suite payload processing job.");
+				await pullRequestProcessor.ProcessPayload(payload, gitHubManager, cancellationToken).ConfigureAwait(false);
+			}
+			else if (eventName == "check_run")
+			{
+				CheckRunEventPayload payload;
+				logger.LogTrace("Deserializing check run payload.");
+				try
+				{
+					payload = new SimpleJsonSerializer().Deserialize<CheckRunEventPayload>(json);
+				}
+				catch (Exception e)
+				{
+					logger.LogDebug(e, "Failed to deserialize check suite payload JSON!");
+					return BadRequest(e);
+				}
+				logger.LogTrace("Queuing check suite payload processing job.");
 
-                await pullRequestProcessor.ProcessPayload(payload, gitHubManager, cancellationToken).ConfigureAwait(false);
-            }
+				await pullRequestProcessor.ProcessPayload(payload, gitHubManager, cancellationToken).ConfigureAwait(false);
+			}
 
-            return Ok();
+			return Ok();
 		}
 	}
 }
