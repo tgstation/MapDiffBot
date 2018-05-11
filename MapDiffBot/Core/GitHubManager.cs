@@ -277,7 +277,7 @@ namespace MapDiffBot.Core
 		{
 			logger.LogTrace("Update check run {0} on repository {1}", checkRunId, repositoryId);
 			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
-			await client.Checks.Runs.Update(repositoryId, checkRunId, checkRunUpdate).ConfigureAwait(false);
+			await client.Check.Run.Update(repositoryId, checkRunId, checkRunUpdate).ConfigureAwait(false);
 		}
 
 		/// <inheritdoc />
@@ -285,7 +285,7 @@ namespace MapDiffBot.Core
 		{
 			logger.LogTrace("Create check run for ref {0} on repository {1}", initializer.HeadSha, repositoryId);
 			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
-			var checkRun = await client.Checks.Runs.Create(repositoryId, initializer).ConfigureAwait(false);
+			var checkRun = await client.Check.Run.Create(repositoryId, initializer).ConfigureAwait(false);
 			return checkRun.Id;
 		}
 	}
