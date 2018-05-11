@@ -565,7 +565,7 @@ namespace MapDiffBot.Core
 				DetailsUrl = FilesController.RouteToBrowse(pullRequest.Base.Repository, checkRunId),
 				Status = CheckStatus.Completed,
 				CompletedAt = DateTimeOffset.Now,
-				Output = new CheckRunOutput("Map Renderings", null, null, outputImages),
+				Output = new CheckRunOutput("Map Renderings", "Before and after renderings of .dmm files", null, outputImages),
 				Conclusion = CheckConclusion.Success
 			};
 			await serviceProvider.GetRequiredService<IGitHubManager>().UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, ncr, cancellationToken).ConfigureAwait(false);
