@@ -612,9 +612,9 @@ namespace MapDiffBot.Core
 			if (payload.Action != "rerequested")
 				return;
 			//nice thing about check runs we know they contain our pull request number in the title
-			var prRegex = Regex.Match(payload.CheckRun.Name, "#({1-9}{0-9}*)");
+			var prRegex = Regex.Match(payload.CheckRun.Name, "#([1-9][0-9]*)");
 			if (prRegex.Success)
-				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, Convert.ToInt32(prRegex.Groups.First(), CultureInfo.InvariantCulture), JobCancellationToken.Null));
+				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, Convert.ToInt32(prRegex.Groups[1].Value, CultureInfo.InvariantCulture), JobCancellationToken.Null));
 			else
 			{
 				var now = DateTimeOffset.Now;
