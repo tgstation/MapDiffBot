@@ -135,7 +135,7 @@ namespace MapDiffBot.Core
 					CompletedAt = DateTimeOffset.Now,
 					Status = CheckStatus.Completed,
 					Conclusion = CheckConclusion.Neutral,
-					Output = new CheckRunOutput(stringLocalizer["Operation Cancelled"], stringLocalizer["The operation was cancelled on the server, most likely due to app shutdown. You may attempt re-running it."], null, null)
+					Output = new CheckRunOutput(stringLocalizer["Operation Cancelled"], stringLocalizer["The operation was cancelled on the server, most likely due to app shutdown. You may attempt re-running it."], null, null, null)
 				}, default);
 
 				try
@@ -156,7 +156,7 @@ namespace MapDiffBot.Core
 							CompletedAt = DateTimeOffset.Now,
 							Status = CheckStatus.Completed,
 							Conclusion = CheckConclusion.Failure,
-							Output = new CheckRunOutput(stringLocalizer["Merge Conflict"], stringLocalizer["Unable to render pull requests in an unmergeable state"], null, null)
+							Output = new CheckRunOutput(stringLocalizer["Merge Conflict"], stringLocalizer["Unable to render pull requests in an unmergeable state"], null, null, null)
 						}, cancellationToken).ConfigureAwait(false);
 						return;
 					}
@@ -172,7 +172,7 @@ namespace MapDiffBot.Core
 							CompletedAt = DateTimeOffset.Now,
 							Status = CheckStatus.Completed,
 							Conclusion = CheckConclusion.Neutral,
-							Output = new CheckRunOutput(stringLocalizer["No Modified Maps"], stringLocalizer["No modified .dmm files were detected in this pull request"], null, null)
+							Output = new CheckRunOutput(stringLocalizer["No Modified Maps"], stringLocalizer["No modified .dmm files were detected in this pull request"], null, null, null)
 						}, cancellationToken).ConfigureAwait(false);
 						return;
 					}
@@ -197,7 +197,7 @@ namespace MapDiffBot.Core
 							CompletedAt = DateTimeOffset.Now,
 							Status = CheckStatus.Completed,
 							Conclusion = CheckConclusion.Failure,
-							Output = new CheckRunOutput(stringLocalizer["Error rendering maps!"], stringLocalizer["Exception details:\n\n```\n{0}\n```\n\nPlease report this [here]({1})", e.ToString(), IssueReportUrl], null, null)
+							Output = new CheckRunOutput(stringLocalizer["Error rendering maps!"], stringLocalizer["Exception details:\n\n```\n{0}\n```\n\nPlease report this [here]({1})", e.ToString(), IssueReportUrl], null, null, null)
 						}, default).ConfigureAwait(false);
 						throw;
 					}
@@ -254,7 +254,7 @@ namespace MapDiffBot.Core
 					await gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
 					{
 						Status = CheckStatus.InProgress,
-						Output = new CheckRunOutput(stringLocalizer["Cloning Repository"], stringLocalizer["Clone Progress: {0}%", progress], null, null),
+						Output = new CheckRunOutput(stringLocalizer["Cloning Repository"], stringLocalizer["Clone Progress: {0}%", progress], null, null, null),
 					}, cancellationToken).ConfigureAwait(false);
 				};
 				Task CreateBlockedComment()
@@ -270,7 +270,7 @@ namespace MapDiffBot.Core
 					generatingCommentTask = gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
 					{
 						Status = CheckStatus.InProgress,
-						Output = new CheckRunOutput(stringLocalizer["Generating Diffs"], stringLocalizer["Aww geez rick, I should eventually put some progress message here"], null, null),
+						Output = new CheckRunOutput(stringLocalizer["Generating Diffs"], stringLocalizer["Aww geez rick, I should eventually put some progress message here"], null, null, null),
 					}, cancellationToken);
 					//prep the outputDirectory
 					async Task DirectoryPrep()
@@ -568,7 +568,7 @@ namespace MapDiffBot.Core
 				DetailsUrl = String.Concat(prefix, FilesController.RouteToBrowse(pullRequest.Base.Repository, checkRunId)),
 				Status = CheckStatus.Completed,
 				CompletedAt = DateTimeOffset.Now,
-				Output = new CheckRunOutput(stringLocalizer["Map Renderings"], stringLocalizer["Before and after renderings of .dmm files"], null, outputImages),
+				Output = new CheckRunOutput(stringLocalizer["Map Renderings"], stringLocalizer["Before and after renderings of .dmm files"], null, null, outputImages),
 				Conclusion = CheckConclusion.Success
 			};
 			await serviceProvider.GetRequiredService<IGitHubManager>().UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, ncr, cancellationToken).ConfigureAwait(false);
@@ -601,7 +601,7 @@ namespace MapDiffBot.Core
 					HeadBranch = payload.CheckSuite.HeadBranch,
 					HeadSha = payload.CheckSuite.HeadSha,
 					Name = nmc,
-					Output = new CheckRunOutput(nmc, String.Empty, null, null),
+					Output = new CheckRunOutput(nmc, String.Empty, null, null, null),
 					Status = CheckStatus.Completed
 				}, cancellationToken).ConfigureAwait(false);
 			}
@@ -627,7 +627,7 @@ namespace MapDiffBot.Core
 					HeadBranch = payload.CheckRun.CheckSuite.HeadBranch,
 					HeadSha = payload.CheckRun.CheckSuite.HeadSha,
 					Name = nmc,
-					Output = new CheckRunOutput(nmc, String.Empty, null, null),
+					Output = new CheckRunOutput(nmc, String.Empty, null, null, null),
 					Status = CheckStatus.Completed
 				}, cancellationToken).ConfigureAwait(false);
 			}
