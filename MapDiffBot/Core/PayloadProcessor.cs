@@ -2,7 +2,6 @@
 using MapDiffBot.Configuration;
 using MapDiffBot.Controllers;
 using MapDiffBot.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Z.EntityFramework.Plus;
@@ -25,13 +24,17 @@ namespace MapDiffBot.Core
 #pragma warning restore CA1812
 	{
 		/// <summary>
+		/// The intermediate directory for operations
+		/// </summary>
+		public const string WorkingDirectory = "MapDiffs";
+		/// <summary>
 		/// The URL to direct user to report issues at
 		/// </summary>
 		const string IssueReportUrl = "https://github.com/MapDiffBot/MapDiffBot/issues";
 		/// <summary>
-		/// The intermediate directory for operations
+		/// Localization key
 		/// </summary>
-		public const string WorkingDirectory = "MapDiffs";
+		const string NaprLocalize = "No Associated Pull Request";
 
 		/// <summary>
 		/// The <see cref="GitHubConfiguration"/> for the <see cref="PayloadProcessor"/>
@@ -586,9 +589,10 @@ namespace MapDiffBot.Core
 			if (payload.CheckSuite.PullRequests.Any())
 				foreach (var I in payload.CheckSuite.PullRequests)
 					backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, I.Number, JobCancellationToken.Null));
-			else {
+			else
+			{
 				var now = DateTimeOffset.Now;
-				var nmc = stringLocalizer["No Associated Pull Request"];
+				var nmc = stringLocalizer[NaprLocalize];
 				await gitHubManager.CreateCheckRun(payload.Repository.Id, new NewCheckRun
 				{
 					CompletedAt = now,
@@ -597,10 +601,36 @@ namespace MapDiffBot.Core
 					HeadBranch = payload.CheckSuite.HeadBranch,
 					HeadSha = payload.CheckSuite.HeadSha,
 					Name = nmc,
-					Output = new CheckRunOutput(nmc, null, null, null),
+					Output = new CheckRunOutput(nmc, String.Empty, null, null),
 					Status = CheckStatus.Completed
 				}, cancellationToken).ConfigureAwait(false);
-			}			
+			}
+		}
+
+		public async Task ProcessPayload(CheckRunEventPayload payload, IGitHubManager gitHubManager, CancellationToken cancellationToken)
+		{
+			if (payload.Action != "rerequested")
+				return;
+			//nice thing about check runs we know they contain our pull request number in the title
+			var prRegex = Regex.Match(payload.CheckRun.Name, "#({1-9}{0-9}*)");
+			if (prRegex.Success)
+				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, Convert.ToInt32(prRegex.Groups.First(), CultureInfo.InvariantCulture), JobCancellationToken.Null));
+			else
+			{
+				var now = DateTimeOffset.Now;
+				var nmc = stringLocalizer[NaprLocalize];
+				await gitHubManager.CreateCheckRun(payload.Repository.Id, new NewCheckRun
+				{
+					CompletedAt = now,
+					StartedAt = now,
+					Conclusion = CheckConclusion.Neutral,
+					HeadBranch = payload.CheckRun.CheckSuite.HeadBranch,
+					HeadSha = payload.CheckRun.CheckSuite.HeadSha,
+					Name = nmc,
+					Output = new CheckRunOutput(nmc, String.Empty, null, null),
+					Status = CheckStatus.Completed
+				}, cancellationToken).ConfigureAwait(false);
+			}
 		}
 	}
 }
