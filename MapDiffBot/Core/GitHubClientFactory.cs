@@ -54,6 +54,8 @@ namespace MapDiffBot.Core
 			gitHubConfiguration = gitHubConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(gitHubConfigurationOptions));
 			this.webRequestManager = webRequestManager ?? throw new ArgumentNullException(nameof(webRequestManager));
 			this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+			httpClientAdapter = new HttpClientAdapter(HttpMessageHandlerFactory.CreateDefault);
 		}
 
 		/// <summary>
