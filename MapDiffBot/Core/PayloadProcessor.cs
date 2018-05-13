@@ -591,9 +591,13 @@ namespace MapDiffBot.Core
 			}
 			if (payload.CheckSuite.PullRequests.Any())
 				foreach (var I in payload.CheckSuite.PullRequests)
+				{
+					logger.LogTrace("Found pull request #{0}, scanning", I.Number);
 					backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, I.Number, JobCancellationToken.Null));
+				}
 			else
 			{
+				logger.LogTrace("No pull requests found, submitting empty check run.");
 				var now = DateTimeOffset.Now;
 				var nmc = stringLocalizer[NaprLocalize];
 				await gitHubManager.CreateCheckRun(payload.Repository.Id, new NewCheckRun
