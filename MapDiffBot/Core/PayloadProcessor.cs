@@ -585,12 +585,19 @@ namespace MapDiffBot.Core
 		public async Task ProcessPayload(CheckSuiteEventPayload payload, IGitHubManager gitHubManager, CancellationToken cancellationToken)
 		{
 			if (payload.Action != "requested" || payload.Action != "rerequested")
+			{
+				logger.LogTrace("Invalid payload action: {0}. Aborting...", payload.Action);
 				return;
+			}
 			if (payload.CheckSuite.PullRequests.Any())
 				foreach (var I in payload.CheckSuite.PullRequests)
+				{
+					logger.LogTrace("Found pull request #{0}, scanning", I.Number);
 					backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, I.Number, JobCancellationToken.Null));
+				}
 			else
 			{
+				logger.LogTrace("No pull requests found, submitting empty check run.");
 				var now = DateTimeOffset.Now;
 				var nmc = stringLocalizer[NaprLocalize];
 				await gitHubManager.CreateCheckRun(payload.Repository.Id, new NewCheckRun
@@ -610,13 +617,20 @@ namespace MapDiffBot.Core
 		public async Task ProcessPayload(CheckRunEventPayload payload, IGitHubManager gitHubManager, CancellationToken cancellationToken)
 		{
 			if (payload.Action != "rerequested")
+			{
+				logger.LogTrace("Invalid payload action: {0}. Aborting...", payload.Action);
 				return;
+			}
 			//nice thing about check runs we know they contain our pull request number in the title
 			var prRegex = Regex.Match(payload.CheckRun.Name, "#([1-9][0-9]*)");
 			if (prRegex.Success)
+			{
+				logger.LogTrace("Found pull request #{0}, scanning", prRegex.Groups[1].Value);
 				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, Convert.ToInt32(prRegex.Groups[1].Value, CultureInfo.InvariantCulture), JobCancellationToken.Null));
+			}
 			else
 			{
+				logger.LogTrace("No pull requests found, submitting empty check run.");
 				var now = DateTimeOffset.Now;
 				var nmc = stringLocalizer[NaprLocalize];
 				await gitHubManager.CreateCheckRun(payload.Repository.Id, new NewCheckRun

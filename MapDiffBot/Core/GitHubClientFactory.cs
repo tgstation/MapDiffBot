@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,19 +18,13 @@ namespace MapDiffBot.Core
 {
 	/// <inheritdoc />
 #pragma warning disable CA1812
-	sealed class GitHubClientFactory : IGitHubClientFactory, IPrivateKeySource
+	sealed class GitHubClientFactory : IGitHubClientFactory, IPrivateKeySource, IHttpClient
 #pragma warning restore CA1812
 	{
 		/// <summary>
 		/// The user agent string to provide to various APIs
 		/// </summary>
 		static readonly string userAgent = String.Format(CultureInfo.InvariantCulture, "MapDiffBot-v{0}", Assembly.GetExecutingAssembly().GetName().Version);
-
-		/// <summary>
-		/// Creates a <see cref="GitHubClient"/> with the correct <see cref="ProductHeaderValue"/>
-		/// </summary>
-		/// <returns>A new <see cref="GitHubClient"/></returns>
-		static GitHubClient CreateBareClient() => new GitHubClient(new ProductHeaderValue(userAgent));
 
 		/// <summary>
 		/// The <see cref="GitHubConfiguration"/> for the <see cref="GitHubClientFactory"/>
@@ -43,6 +38,10 @@ namespace MapDiffBot.Core
 		/// The <see cref="ILogger"/> for the <see cref="GitHubClientFactory"/>
 		/// </summary>
 		readonly ILogger logger;
+		/// <summary>
+		/// The <see cref="HttpClientAdapter"/> for the <see cref="GitHubClientFactory"/>
+		/// </summary>
+		readonly HttpClientAdapter httpClientAdapter;
 
 		/// <summary>
 		/// Construct a <see cref="GitHubClientFactory"/>
@@ -55,7 +54,15 @@ namespace MapDiffBot.Core
 			gitHubConfiguration = gitHubConfigurationOptions?.Value ?? throw new ArgumentNullException(nameof(gitHubConfigurationOptions));
 			this.webRequestManager = webRequestManager ?? throw new ArgumentNullException(nameof(webRequestManager));
 			this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+			httpClientAdapter = new HttpClientAdapter(HttpMessageHandlerFactory.CreateDefault);
 		}
+
+		/// <summary>
+		/// Creates a <see cref="GitHubClient"/> with the correct <see cref="ProductHeaderValue"/>
+		/// </summary>
+		/// <returns>A new <see cref="GitHubClient"/></returns>
+		GitHubClient CreateBareClient() => new GitHubClient(new Connection(new ProductHeaderValue(userAgent), this));
 
 		/// <inheritdoc />
 		public IGitHubClient CreateAppClient()
@@ -93,5 +100,19 @@ namespace MapDiffBot.Core
 			var array = jsonObj["repositories"];
 			return new SimpleJsonSerializer().Deserialize<List<Repository>>(array.ToString());
 		}
+
+		/// <inheritdoc />
+		public Task<IResponse> Send(IRequest request, CancellationToken cancellationToken)
+		{
+			if(request.Method.Method == HttpMethod.Post.Method)
+				logger.LogTrace("Octokit POST:\n{0}", request.Body);
+			return httpClientAdapter.Send(request, cancellationToken);
+		}
+
+		/// <inheritdoc />
+		public void SetRequestTimeout(TimeSpan timeout) => httpClientAdapter.SetRequestTimeout(timeout);
+
+		/// <inheritdoc />
+		public void Dispose() => httpClientAdapter.Dispose();
 	}
 }
