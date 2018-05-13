@@ -90,7 +90,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-static-methods">Static Private Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory-members.html">List of all members</a>  </div>
@@ -109,6 +109,7 @@ Inheritance diagram for MapDiffBot.Core.GitHubClientFactory:</div>
   <map id="MapDiffBot.Core.GitHubClientFactory_map" name="MapDiffBot.Core.GitHubClientFactory_map">
 <area href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_client_factory.html" title="Constructs IGitHubClients " alt="MapDiffBot.Core.IGitHubClientFactory" shape="rect" coords="0,0,228,24"/>
 <area href="class_i_private_key_source.html" alt="IPrivateKeySource" shape="rect" coords="238,0,466,24"/>
+<area href="class_i_http_client.html" alt="IHttpClient" shape="rect" coords="476,0,704,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -128,12 +129,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0080a11dead75da6034f56901898afdd"><td class="memItemLeft" align="right" valign="top">async Task&lt; IReadOnlyList&lt; Repository &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a0080a11dead75da6034f56901898afdd">GetInstallationRepositories</a> (string installationToken, CancellationToken cancellationToken)</td></tr>
 <tr class="memdesc:a0080a11dead75da6034f56901898afdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a list of Repositorys in an Installation   <a href="#a0080a11dead75da6034f56901898afdd">More...</a><br /></td></tr>
 <tr class="separator:a0080a11dead75da6034f56901898afdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a3a2cbcd31f4b3c500c43bc06ec65a4"><td class="memItemLeft" align="right" valign="top">Task&lt; IResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8a3a2cbcd31f4b3c500c43bc06ec65a4">Send</a> (IRequest request, CancellationToken cancellationToken)</td></tr>
+<tr class="separator:a8a3a2cbcd31f4b3c500c43bc06ec65a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7b1d3be76a99eeabd8ea5036af00117"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ad7b1d3be76a99eeabd8ea5036af00117">SetRequestTimeout</a> (TimeSpan timeout)</td></tr>
+<tr class="separator:ad7b1d3be76a99eeabd8ea5036af00117"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8867d61ec28ca7bbdd36efdbe54aa20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#af8867d61ec28ca7bbdd36efdbe54aa20">Dispose</a> ()</td></tr>
+<tr class="separator:af8867d61ec28ca7bbdd36efdbe54aa20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-methods"></a>
-Static Private Member Functions</h2></td></tr>
-<tr class="memitem:ae77862b62add172ac8bf5ca8a9dd627c"><td class="memItemLeft" align="right" valign="top">static GitHubClient&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae77862b62add172ac8bf5ca8a9dd627c">CreateBareClient</a> ()</td></tr>
-<tr class="memdesc:ae77862b62add172ac8bf5ca8a9dd627c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a GitHubClient with the correct ProductHeaderValue  <a href="#ae77862b62add172ac8bf5ca8a9dd627c">More...</a><br /></td></tr>
-<tr class="separator:ae77862b62add172ac8bf5ca8a9dd627c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a6e7b16d4edcc92b893ba935c7fc4f6e9"><td class="memItemLeft" align="right" valign="top">GitHubClient&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a6e7b16d4edcc92b893ba935c7fc4f6e9">CreateBareClient</a> ()</td></tr>
+<tr class="memdesc:a6e7b16d4edcc92b893ba935c7fc4f6e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a GitHubClient with the correct ProductHeaderValue  <a href="#a6e7b16d4edcc92b893ba935c7fc4f6e9">More...</a><br /></td></tr>
+<tr class="separator:a6e7b16d4edcc92b893ba935c7fc4f6e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -146,6 +153,9 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a8beb273a376cd7384a535ec91c2626d4"><td class="memItemLeft" align="right" valign="top">readonly ILogger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a></td></tr>
 <tr class="memdesc:a8beb273a376cd7384a535ec91c2626d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ILogger for the <a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html">GitHubClientFactory</a>  <a href="#a8beb273a376cd7384a535ec91c2626d4">More...</a><br /></td></tr>
 <tr class="separator:a8beb273a376cd7384a535ec91c2626d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49e33bb6b8a0b7ab5a52bb7b13552d04"><td class="memItemLeft" align="right" valign="top">readonly HttpClientAdapter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a49e33bb6b8a0b7ab5a52bb7b13552d04">httpClientAdapter</a></td></tr>
+<tr class="memdesc:a49e33bb6b8a0b7ab5a52bb7b13552d04"><td class="mdescLeft">&#160;</td><td class="mdescRight">The HttpClientAdapter for the <a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html">GitHubClientFactory</a>  <a href="#a49e33bb6b8a0b7ab5a52bb7b13552d04">More...</a><br /></td></tr>
+<tr class="separator:a49e33bb6b8a0b7ab5a52bb7b13552d04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
@@ -155,7 +165,7 @@ Static Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00020">20</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00021">21</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ac1dd0626ffab41416cd4cf8cb04ae3ce"></a>
 <div class="memitem">
@@ -197,10 +207,11 @@ Static Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00053">53</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
-<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        {</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">gitHubConfiguration</a> = gitHubConfigurationOptions?.Value ?? <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(gitHubConfigurationOptions));</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            this.<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">webRequestManager</a> = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">webRequestManager</a> ?? <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">webRequestManager</a>));</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            this.<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a> = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a> ?? <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a>));</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a8beb273a376cd7384a535ec91c2626d4"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">MapDiffBot.Core.GitHubClientFactory.logger</a></div><div class="ttdeci">readonly ILogger logger</div><div class="ttdoc">The ILogger for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00045">GitHubClientFactory.cs:45</a></div></div>
-<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_aa3a210177af35954b5c8afc4ee7a50f9"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">MapDiffBot.Core.GitHubClientFactory.gitHubConfiguration</a></div><div class="ttdeci">readonly GitHubConfiguration gitHubConfiguration</div><div class="ttdoc">The GitHubConfiguration for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00037">GitHubClientFactory.cs:37</a></div></div>
-<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_ae23cffb656fdb207589838c5c6eab9e1"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">MapDiffBot.Core.GitHubClientFactory.webRequestManager</a></div><div class="ttdeci">readonly IWebRequestManager webRequestManager</div><div class="ttdoc">The IWebRequestManager for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00041">GitHubClientFactory.cs:41</a></div></div>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00052">52</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        {</div><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">gitHubConfiguration</a> = gitHubConfigurationOptions?.Value ?? <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(gitHubConfigurationOptions));</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            this.<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">webRequestManager</a> = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">webRequestManager</a> ?? <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">webRequestManager</a>));</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            this.<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a> = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a> ?? <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a>));</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a49e33bb6b8a0b7ab5a52bb7b13552d04">httpClientAdapter</a> = <span class="keyword">new</span> HttpClientAdapter(HttpMessageHandlerFactory.CreateDefault);</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a8beb273a376cd7384a535ec91c2626d4"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">MapDiffBot.Core.GitHubClientFactory.logger</a></div><div class="ttdeci">readonly ILogger logger</div><div class="ttdoc">The ILogger for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00040">GitHubClientFactory.cs:40</a></div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a49e33bb6b8a0b7ab5a52bb7b13552d04"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a49e33bb6b8a0b7ab5a52bb7b13552d04">MapDiffBot.Core.GitHubClientFactory.httpClientAdapter</a></div><div class="ttdeci">readonly HttpClientAdapter httpClientAdapter</div><div class="ttdoc">The HttpClientAdapter for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00044">GitHubClientFactory.cs:44</a></div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_aa3a210177af35954b5c8afc4ee7a50f9"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">MapDiffBot.Core.GitHubClientFactory.gitHubConfiguration</a></div><div class="ttdeci">readonly GitHubConfiguration gitHubConfiguration</div><div class="ttdoc">The GitHubConfiguration for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00032">GitHubClientFactory.cs:32</a></div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_ae23cffb656fdb207589838c5c6eab9e1"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">MapDiffBot.Core.GitHubClientFactory.webRequestManager</a></div><div class="ttdeci">readonly IWebRequestManager webRequestManager</div><div class="ttdoc">The IWebRequestManager for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00036">GitHubClientFactory.cs:36</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -222,14 +233,14 @@ Static Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_client_factory.html#a1e46a1ac8b436f72b5477655e5b48ff1">MapDiffBot.Core.IGitHubClientFactory</a>.</p>
 
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00061">61</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
-<div class="fragment"><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        {</div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            <span class="comment">//use app auth, max expiration time</span></div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            var jwtFac = <span class="keyword">new</span> GitHubJwtFactory(<span class="keyword">this</span>, <span class="keyword">new</span> GitHubJwtFactoryOptions { AppIntegrationId = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">gitHubConfiguration</a>.<a class="code" href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a507f3a5596aef21a59c4a62a8c5997c8">AppID</a>, ExpirationSeconds = 600 });</div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            var jwt = jwtFac.CreateEncodedJwtToken();</div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            var client = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae77862b62add172ac8bf5ca8a9dd627c">CreateBareClient</a>();</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            client.Credentials = <span class="keyword">new</span> Credentials(jwt, AuthenticationType.Bearer);</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            <span class="keywordflow">return</span> client;</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration_html_a507f3a5596aef21a59c4a62a8c5997c8"><div class="ttname"><a href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a507f3a5596aef21a59c4a62a8c5997c8">MapDiffBot.Configuration.GitHubConfiguration.AppID</a></div><div class="ttdeci">int AppID</div><div class="ttdoc">The ISS value for creating a JWT of the private key at PemPath </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_configuration_8cs_source.html#l00031">GitHubConfiguration.cs:31</a></div></div>
-<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_aa3a210177af35954b5c8afc4ee7a50f9"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">MapDiffBot.Core.GitHubClientFactory.gitHubConfiguration</a></div><div class="ttdeci">readonly GitHubConfiguration gitHubConfiguration</div><div class="ttdoc">The GitHubConfiguration for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00037">GitHubClientFactory.cs:37</a></div></div>
-<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_ae77862b62add172ac8bf5ca8a9dd627c"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae77862b62add172ac8bf5ca8a9dd627c">MapDiffBot.Core.GitHubClientFactory.CreateBareClient</a></div><div class="ttdeci">static GitHubClient CreateBareClient()</div><div class="ttdoc">Creates a GitHubClient with the correct ProductHeaderValue </div></div>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00068">68</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        {</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            <span class="comment">//use app auth, max expiration time</span></div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            var jwtFac = <span class="keyword">new</span> GitHubJwtFactory(<span class="keyword">this</span>, <span class="keyword">new</span> GitHubJwtFactoryOptions { AppIntegrationId = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">gitHubConfiguration</a>.<a class="code" href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a507f3a5596aef21a59c4a62a8c5997c8">AppID</a>, ExpirationSeconds = 600 });</div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            var jwt = jwtFac.CreateEncodedJwtToken();</div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            var client = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a6e7b16d4edcc92b893ba935c7fc4f6e9">CreateBareClient</a>();</div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            client.Credentials = <span class="keyword">new</span> Credentials(jwt, AuthenticationType.Bearer);</div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            <span class="keywordflow">return</span> client;</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a6e7b16d4edcc92b893ba935c7fc4f6e9"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a6e7b16d4edcc92b893ba935c7fc4f6e9">MapDiffBot.Core.GitHubClientFactory.CreateBareClient</a></div><div class="ttdeci">GitHubClient CreateBareClient()</div><div class="ttdoc">Creates a GitHubClient with the correct ProductHeaderValue </div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration_html_a507f3a5596aef21a59c4a62a8c5997c8"><div class="ttname"><a href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a507f3a5596aef21a59c4a62a8c5997c8">MapDiffBot.Configuration.GitHubConfiguration.AppID</a></div><div class="ttdeci">int AppID</div><div class="ttdoc">The ISS value for creating a JWT of the private key at PemPath </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_configuration_8cs_source.html#l00031">GitHubConfiguration.cs:31</a></div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_aa3a210177af35954b5c8afc4ee7a50f9"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">MapDiffBot.Core.GitHubClientFactory.gitHubConfiguration</a></div><div class="ttdeci">readonly GitHubConfiguration gitHubConfiguration</div><div class="ttdoc">The GitHubConfiguration for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00032">GitHubClientFactory.cs:32</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="ae77862b62add172ac8bf5ca8a9dd627c"></a>
+<a class="anchor" id="a6e7b16d4edcc92b893ba935c7fc4f6e9"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -237,7 +248,7 @@ Static Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static GitHubClient MapDiffBot.Core.GitHubClientFactory.CreateBareClient </td>
+          <td class="memname">GitHubClient MapDiffBot.Core.GitHubClientFactory.CreateBareClient </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -245,7 +256,7 @@ Static Private Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -273,9 +284,26 @@ Static Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_client_factory.html#a2919a4b61b673758bc6d518da3bfc98d">MapDiffBot.Core.IGitHubClientFactory</a>.</p>
 
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00072">72</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
-<div class="fragment"><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        {</div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            <span class="keywordflow">if</span> (accessToken == null)</div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(accessToken));</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            var client = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae77862b62add172ac8bf5ca8a9dd627c">CreateBareClient</a>();</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            client.Credentials = <span class="keyword">new</span> Credentials(accessToken, AuthenticationType.Oauth);</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            <span class="keywordflow">return</span> client;</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_ae77862b62add172ac8bf5ca8a9dd627c"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae77862b62add172ac8bf5ca8a9dd627c">MapDiffBot.Core.GitHubClientFactory.CreateBareClient</a></div><div class="ttdeci">static GitHubClient CreateBareClient()</div><div class="ttdoc">Creates a GitHubClient with the correct ProductHeaderValue </div></div>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00079">79</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        {</div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            <span class="keywordflow">if</span> (accessToken == null)</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;                <span class="keywordflow">throw</span> <span class="keyword">new</span> ArgumentNullException(nameof(accessToken));</div><div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;            var client = <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a6e7b16d4edcc92b893ba935c7fc4f6e9">CreateBareClient</a>();</div><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            client.Credentials = <span class="keyword">new</span> Credentials(accessToken, AuthenticationType.Oauth);</div><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            <span class="keywordflow">return</span> client;</div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a6e7b16d4edcc92b893ba935c7fc4f6e9"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a6e7b16d4edcc92b893ba935c7fc4f6e9">MapDiffBot.Core.GitHubClientFactory.CreateBareClient</a></div><div class="ttdeci">GitHubClient CreateBareClient()</div><div class="ttdoc">Creates a GitHubClient with the correct ProductHeaderValue </div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="af8867d61ec28ca7bbdd36efdbe54aa20"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MapDiffBot.Core.GitHubClientFactory.Dispose </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p></p>
+
 </div>
 </div>
 <a class="anchor" id="a0080a11dead75da6034f56901898afdd"></a>
@@ -306,10 +334,10 @@ Static Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_git_hub_client_factory.html#a958bb4693194adeb03c0f48f7ea823b5">MapDiffBot.Core.IGitHubClientFactory</a>.</p>
 
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00089">89</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
-<div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        {</div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            var json = await <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">webRequestManager</a>.<a class="code" href="interface_map_diff_bot_1_1_core_1_1_i_web_request_manager.html#a8156077450c323a7bd378819bb8f5519">RunGet</a>(<span class="keyword">new</span> Uri(<span class="stringliteral">&quot;https://api.github.com/installation/repositories&quot;</span>), <span class="keyword">new</span> List&lt;string&gt; { <span class="stringliteral">&quot;Accept: application/vnd.github.machine-man-preview+json&quot;</span>, String.Format(CultureInfo.InvariantCulture, <span class="stringliteral">&quot;User-Agent: {0}&quot;</span>, <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a13ceec9c7ac9ed5b77e311171f3a15b7">userAgent</a>) , String.Format(CultureInfo.InvariantCulture, <span class="stringliteral">&quot;Authorization: bearer {0}&quot;</span>, installationToken) }, cancellationToken).ConfigureAwait(<span class="keyword">false</span>);</div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            var jsonObj = JObject.Parse(json);</div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            var array = jsonObj[<span class="stringliteral">&quot;repositories&quot;</span>];</div><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">new</span> SimpleJsonSerializer().Deserialize&lt;List&lt;Repository&gt;&gt;(array.ToString());</div><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a13ceec9c7ac9ed5b77e311171f3a15b7"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a13ceec9c7ac9ed5b77e311171f3a15b7">MapDiffBot.Core.GitHubClientFactory.userAgent</a></div><div class="ttdeci">static readonly string userAgent</div><div class="ttdoc">The user agent string to provide to various APIs </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00026">GitHubClientFactory.cs:26</a></div></div>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00096">96</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        {</div><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            var json = await <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">webRequestManager</a>.<a class="code" href="interface_map_diff_bot_1_1_core_1_1_i_web_request_manager.html#a8156077450c323a7bd378819bb8f5519">RunGet</a>(<span class="keyword">new</span> Uri(<span class="stringliteral">&quot;https://api.github.com/installation/repositories&quot;</span>), <span class="keyword">new</span> List&lt;string&gt; { <span class="stringliteral">&quot;Accept: application/vnd.github.machine-man-preview+json&quot;</span>, String.Format(CultureInfo.InvariantCulture, <span class="stringliteral">&quot;User-Agent: {0}&quot;</span>, <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a13ceec9c7ac9ed5b77e311171f3a15b7">userAgent</a>) , String.Format(CultureInfo.InvariantCulture, <span class="stringliteral">&quot;Authorization: bearer {0}&quot;</span>, installationToken) }, cancellationToken).ConfigureAwait(<span class="keyword">false</span>);</div><div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            var jsonObj = JObject.Parse(json);</div><div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            var array = jsonObj[<span class="stringliteral">&quot;repositories&quot;</span>];</div><div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">new</span> SimpleJsonSerializer().Deserialize&lt;List&lt;Repository&gt;&gt;(array.ToString());</div><div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a13ceec9c7ac9ed5b77e311171f3a15b7"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a13ceec9c7ac9ed5b77e311171f3a15b7">MapDiffBot.Core.GitHubClientFactory.userAgent</a></div><div class="ttdeci">static readonly string userAgent</div><div class="ttdoc">The user agent string to provide to various APIs </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00027">GitHubClientFactory.cs:27</a></div></div>
 <div class="ttc" id="interface_map_diff_bot_1_1_core_1_1_i_web_request_manager_html_a8156077450c323a7bd378819bb8f5519"><div class="ttname"><a href="interface_map_diff_bot_1_1_core_1_1_i_web_request_manager.html#a8156077450c323a7bd378819bb8f5519">MapDiffBot.Core.IWebRequestManager.RunGet</a></div><div class="ttdeci">Task&lt; string &gt; RunGet(Uri url, IEnumerable&lt; string &gt; headers, CancellationToken cancellationToken)</div><div class="ttdoc">Run a HTTP GET on a given url  </div></div>
-<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_ae23cffb656fdb207589838c5c6eab9e1"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">MapDiffBot.Core.GitHubClientFactory.webRequestManager</a></div><div class="ttdeci">readonly IWebRequestManager webRequestManager</div><div class="ttdoc">The IWebRequestManager for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00041">GitHubClientFactory.cs:41</a></div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_ae23cffb656fdb207589838c5c6eab9e1"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#ae23cffb656fdb207589838c5c6eab9e1">MapDiffBot.Core.GitHubClientFactory.webRequestManager</a></div><div class="ttdeci">readonly IWebRequestManager webRequestManager</div><div class="ttdoc">The IWebRequestManager for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00036">GitHubClientFactory.cs:36</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -328,11 +356,61 @@ Static Private Attributes</h2></td></tr>
 
 <p></p>
 
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00082">82</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
-<div class="fragment"><div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        {</div><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a>.LogTrace(<span class="stringliteral">&quot;Opening private key file: {0}&quot;</span>, <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">gitHubConfiguration</a>.<a class="code" href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a5b6cae385e48a4ba656bbff0a15cc9ed">PemPath</a>);</div><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            <span class="keywordflow">return</span> File.OpenText(<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">gitHubConfiguration</a>.<a class="code" href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a5b6cae385e48a4ba656bbff0a15cc9ed">PemPath</a>);</div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a8beb273a376cd7384a535ec91c2626d4"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">MapDiffBot.Core.GitHubClientFactory.logger</a></div><div class="ttdeci">readonly ILogger logger</div><div class="ttdoc">The ILogger for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00045">GitHubClientFactory.cs:45</a></div></div>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00089">89</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        {</div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a>.LogTrace(<span class="stringliteral">&quot;Opening private key file: {0}&quot;</span>, <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">gitHubConfiguration</a>.<a class="code" href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a5b6cae385e48a4ba656bbff0a15cc9ed">PemPath</a>);</div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            <span class="keywordflow">return</span> File.OpenText(<a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">gitHubConfiguration</a>.<a class="code" href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a5b6cae385e48a4ba656bbff0a15cc9ed">PemPath</a>);</div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a8beb273a376cd7384a535ec91c2626d4"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">MapDiffBot.Core.GitHubClientFactory.logger</a></div><div class="ttdeci">readonly ILogger logger</div><div class="ttdoc">The ILogger for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00040">GitHubClientFactory.cs:40</a></div></div>
 <div class="ttc" id="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration_html_a5b6cae385e48a4ba656bbff0a15cc9ed"><div class="ttname"><a href="class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a5b6cae385e48a4ba656bbff0a15cc9ed">MapDiffBot.Configuration.GitHubConfiguration.PemPath</a></div><div class="ttdeci">string PemPath</div><div class="ttdoc">The GitHub App PEM private key file path </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_configuration_8cs_source.html#l00026">GitHubConfiguration.cs:26</a></div></div>
-<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_aa3a210177af35954b5c8afc4ee7a50f9"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">MapDiffBot.Core.GitHubClientFactory.gitHubConfiguration</a></div><div class="ttdeci">readonly GitHubConfiguration gitHubConfiguration</div><div class="ttdoc">The GitHubConfiguration for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00037">GitHubClientFactory.cs:37</a></div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_aa3a210177af35954b5c8afc4ee7a50f9"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#aa3a210177af35954b5c8afc4ee7a50f9">MapDiffBot.Core.GitHubClientFactory.gitHubConfiguration</a></div><div class="ttdeci">readonly GitHubConfiguration gitHubConfiguration</div><div class="ttdoc">The GitHubConfiguration for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00032">GitHubClientFactory.cs:32</a></div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="a8a3a2cbcd31f4b3c500c43bc06ec65a4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Task&lt;IResponse&gt; MapDiffBot.Core.GitHubClientFactory.Send </td>
+          <td>(</td>
+          <td class="paramtype">IRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancellationToken&#160;</td>
+          <td class="paramname"><em>cancellationToken</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p></p>
+
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00105">105</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<div class="fragment"><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        {</div><div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            <span class="keywordflow">if</span>(request.Method.Method == HttpMethod.Post.Method)</div><div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;                <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">logger</a>.LogTrace(<span class="stringliteral">&quot;Octokit POST:\n{0}&quot;</span>, request.Body);</div><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a49e33bb6b8a0b7ab5a52bb7b13552d04">httpClientAdapter</a>.Send(request, cancellationToken);</div><div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        }</div><div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a8beb273a376cd7384a535ec91c2626d4"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a8beb273a376cd7384a535ec91c2626d4">MapDiffBot.Core.GitHubClientFactory.logger</a></div><div class="ttdeci">readonly ILogger logger</div><div class="ttdoc">The ILogger for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00040">GitHubClientFactory.cs:40</a></div></div>
+<div class="ttc" id="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory_html_a49e33bb6b8a0b7ab5a52bb7b13552d04"><div class="ttname"><a href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a49e33bb6b8a0b7ab5a52bb7b13552d04">MapDiffBot.Core.GitHubClientFactory.httpClientAdapter</a></div><div class="ttdeci">readonly HttpClientAdapter httpClientAdapter</div><div class="ttdoc">The HttpClientAdapter for the GitHubClientFactory </div><div class="ttdef"><b>Definition:</b> <a href="_git_hub_client_factory_8cs_source.html#l00044">GitHubClientFactory.cs:44</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="ad7b1d3be76a99eeabd8ea5036af00117"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MapDiffBot.Core.GitHubClientFactory.SetRequestTimeout </td>
+          <td>(</td>
+          <td class="paramtype">TimeSpan&#160;</td>
+          <td class="paramname"><em>timeout</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p></p>
+
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -356,7 +434,31 @@ Static Private Attributes</h2></td></tr>
 
 <p>The GitHubConfiguration for the <a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html">GitHubClientFactory</a> </p>
 
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00037">37</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00032">32</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a49e33bb6b8a0b7ab5a52bb7b13552d04"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">readonly HttpClientAdapter MapDiffBot.Core.GitHubClientFactory.httpClientAdapter</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The HttpClientAdapter for the <a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html">GitHubClientFactory</a> </p>
+
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00044">44</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
 
 </div>
 </div>
@@ -380,7 +482,7 @@ Static Private Attributes</h2></td></tr>
 
 <p>The ILogger for the <a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html">GitHubClientFactory</a> </p>
 
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00045">45</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00040">40</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
 
 </div>
 </div>
@@ -404,7 +506,7 @@ Static Private Attributes</h2></td></tr>
 
 <p>The user agent string to provide to various APIs </p>
 
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00026">26</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00027">27</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
 
 </div>
 </div>
@@ -428,7 +530,7 @@ Static Private Attributes</h2></td></tr>
 
 <p>The <a class="el" href="interface_map_diff_bot_1_1_core_1_1_i_web_request_manager.html" title="Web request provider ">IWebRequestManager</a> for the <a class="el" href="class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html">GitHubClientFactory</a> </p>
 
-<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00041">41</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
+<p>Definition at line <a class="el" href="_git_hub_client_factory_8cs_source.html#l00036">36</a> of file <a class="el" href="_git_hub_client_factory_8cs_source.html">GitHubClientFactory.cs</a>.</p>
 
 </div>
 </div>

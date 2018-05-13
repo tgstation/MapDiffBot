@@ -6,6 +6,7 @@ var searchData=
   ['igeneratorfactory',['IGeneratorFactory',['../interface_map_diff_bot_1_1_core_1_1_i_generator_factory.html',1,'MapDiffBot::Core']]],
   ['igithubclientfactory',['IGitHubClientFactory',['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_client_factory.html',1,'MapDiffBot::Core']]],
   ['igithubmanager',['IGitHubManager',['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html',1,'MapDiffBot::Core']]],
+  ['ihttpclient',['IHttpClient',['../class_i_http_client.html',1,'']]],
   ['iiomanager',['IIOManager',['../interface_map_diff_bot_1_1_core_1_1_i_i_o_manager.html',1,'MapDiffBot::Core']]],
   ['ilocalrepository',['ILocalRepository',['../interface_map_diff_bot_1_1_core_1_1_i_local_repository.html',1,'MapDiffBot::Core']]],
   ['ilocalrepositoryfactory',['ILocalRepositoryFactory',['../interface_map_diff_bot_1_1_core_1_1_i_local_repository_factory.html',1,'MapDiffBot::Core']]],

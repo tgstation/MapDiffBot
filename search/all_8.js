@@ -12,6 +12,7 @@ var searchData=
   ['igithubclientfactory_2ecs',['IGitHubClientFactory.cs',['../_i_git_hub_client_factory_8cs.html',1,'']]],
   ['igithubmanager',['IGitHubManager',['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html',1,'MapDiffBot::Core']]],
   ['igithubmanager_2ecs',['IGitHubManager.cs',['../_i_git_hub_manager_8cs.html',1,'']]],
+  ['ihttpclient',['IHttpClient',['../class_i_http_client.html',1,'']]],
   ['iiomanager',['IIOManager',['../interface_map_diff_bot_1_1_core_1_1_i_i_o_manager.html',1,'MapDiffBot::Core']]],
   ['iiomanager_2ecs',['IIOManager.cs',['../_i_i_o_manager_8cs.html',1,'']]],
   ['ilocalrepository',['ILocalRepository',['../interface_map_diff_bot_1_1_core_1_1_i_local_repository.html',1,'MapDiffBot::Core']]],
