@@ -584,7 +584,7 @@ namespace MapDiffBot.Core
 
 		public async Task ProcessPayload(CheckSuiteEventPayload payload, IGitHubManager gitHubManager, CancellationToken cancellationToken)
 		{
-			if (payload.Action != "requested" || payload.Action != "rerequested")
+			if (payload.Action != "requested" && payload.Action != "rerequested")
 			{
 				logger.LogTrace("Invalid payload action: {0}. Aborting...", payload.Action);
 				return;
