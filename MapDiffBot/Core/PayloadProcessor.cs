@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -537,13 +538,10 @@ namespace MapDiffBot.Core
 			int formatterCount = 0;
 
 			var databaseContext = serviceProvider.GetRequiredService<IDatabaseContext>();
-
-			var prefix = generalConfiguration.ApplicationPrefix;
+			
 			logger.LogTrace("Generating comment and preparing database query...");
-			var outputImages = new List<CheckRunImage>()
-			{
-				Capacity = diffResults.Count
-			};
+			var commentBuilder = new StringBuilder();
+			var prefix = generalConfiguration.ApplicationPrefix;
 			foreach (var kv in diffResults)
 			{
 				var I = kv.Key;
@@ -551,14 +549,36 @@ namespace MapDiffBot.Core
 				var afterUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "after"));
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "logs"));
 
+				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture,
+					"<details><summary>{0}</summary>{11}{11}{1} | {2}{11}--- | ---{11}![{13}]({3}) | ![{13}]({4}){11}{11}{5} | {6} | {7} | {12}{11}--- | --- | --- | ---{11}{8} | {9} | [{7}]({10}) | [{1}]({3}) \\| [{2}]({4}){11}{11}</details>{11}{11}",
+					I.MapPath,
+					stringLocalizer["Old"],
+					stringLocalizer["New"],
+					beforeUrl,
+					afterUrl,
+					stringLocalizer["Status"],
+					stringLocalizer["Region"],
+					stringLocalizer["Logs"],
+					I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"],
+					kv.Value?.ToString() ?? stringLocalizer["ALL"],
+					logsUrl,
+					Environment.NewLine,
+					stringLocalizer["Raw"],
+					stringLocalizer["If the image doesn't load, it may be too big for GitHub. Use the \"Raw\" links."]
+					));
 				logger.LogTrace("Adding MapDiff for {0}...", I.MapPath);
-				var region = kv.Value?.ToString() ?? stringLocalizer["ALL"];
-				outputImages.Add(new CheckRunImage(region, beforeUrl, stringLocalizer["Old"]));
-				outputImages.Add(new CheckRunImage(region, afterUrl, stringLocalizer["New"]));
 				databaseContext.MapDiffs.Add(I);
 				++formatterCount;
 			}
-			
+
+			var comment = String.Format(CultureInfo.CurrentCulture,
+				"{0}{2}{2}{2}{2}<br>{1}{2}{2}{2}{2}{3}",
+				commentBuilder,
+				stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha],
+				Environment.NewLine,
+				stringLocalizer["Please report any issues [here]({0}).", IssueReportUrl]
+				);
+
 			logger.LogTrace("Committing new MapDiffs to the database...");
 			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 			logger.LogTrace("Finalizing GitHub Check...");
@@ -568,7 +588,7 @@ namespace MapDiffBot.Core
 				DetailsUrl = String.Concat(prefix, FilesController.RouteToBrowse(pullRequest.Base.Repository, checkRunId)),
 				Status = CheckStatus.Completed,
 				CompletedAt = DateTimeOffset.Now,
-				Output = new CheckRunOutput(stringLocalizer["Map Renderings"], stringLocalizer["Before and after renderings of .dmm files"], null, null, outputImages),
+				Output = new CheckRunOutput(stringLocalizer["Map Renderings"], stringLocalizer["Maps with diff:"], comment, null, null),
 				Conclusion = CheckConclusion.Success
 			};
 			await serviceProvider.GetRequiredService<IGitHubManager>().UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, ncr, cancellationToken).ConfigureAwait(false);
@@ -582,6 +602,7 @@ namespace MapDiffBot.Core
 			backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.PullRequest.Number, JobCancellationToken.Null));
 		}
 
+		/// <inheritdoc />
 		public async Task ProcessPayload(CheckSuiteEventPayload payload, IGitHubManager gitHubManager, CancellationToken cancellationToken)
 		{
 			if (payload.Action != "requested" && payload.Action != "rerequested")
@@ -614,6 +635,7 @@ namespace MapDiffBot.Core
 			}
 		}
 
+		/// <inheritdoc />
 		public async Task ProcessPayload(CheckRunEventPayload payload, IGitHubManager gitHubManager, CancellationToken cancellationToken)
 		{
 			if (payload.Action != "rerequested")
