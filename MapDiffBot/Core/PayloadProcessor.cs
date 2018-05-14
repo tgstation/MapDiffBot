@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -230,7 +231,7 @@ namespace MapDiffBot.Core
 
 				var gitHubManager = serviceProvider.GetRequiredService<IGitHubManager>();
 
-				Task generatingCommentTask;
+				var generatingCommentTask = Task.CompletedTask;
 				List<Task<RenderResult>> afterRenderings, beforeRenderings;
 
 				var workingDir = ioManager.ConcatPath(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number.ToString(CultureInfo.InvariantCulture));
@@ -260,25 +261,60 @@ namespace MapDiffBot.Core
 				Task CreateBlockedComment()
 				{
 					logger.LogInformation("Waiting for another diff generation on {0}/{1} to complete...", pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name);
-					return gitHubManager.CreateSingletonComment(pullRequest, stringLocalizer["Waiting for another operation on this repository to complete..."], cancellationToken);
+					return gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
+					{
+						Output = new CheckRunOutput(stringLocalizer["Waiting for Repository"], stringLocalizer["Waiting for another operation on this repository to complete..."], null, null, null),
+					}, cancellationToken);
 				};
 
 				logger.LogTrace("Locking repository...");
 				using (var repo = await repositoryManager.GetRepository(pullRequest.Base.Repository, OnCloneProgress, CreateBlockedComment, cancellationToken).ConfigureAwait(false))
 				{
 					logger.LogTrace("Repository ready");
-					generatingCommentTask = gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
+
+					var progressBuilder = new StringBuilder();
+
+					void AddProgressLine(string line)
 					{
-						Status = CheckStatus.InProgress,
-						Output = new CheckRunOutput(stringLocalizer["Generating Diffs"], stringLocalizer["Aww geez rick, I should eventually put some progress message here"], null, null, null),
-					}, cancellationToken);
+						logger.LogTrace(line);
+
+						var ourTask = new TaskCompletionSource<object>();
+						Task toAwait;
+						async Task RunNext()
+						{
+							await toAwait.ConfigureAwait(false);
+
+							string ourLine;
+							lock (progressBuilder)
+							{
+								progressBuilder.AppendLine(String.Format(CultureInfo.InvariantCulture, "[{0}]: {1}", DateTimeOffset.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture), line));
+								ourLine = progressBuilder.ToString();
+							}
+
+							await gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
+							{
+								Status = CheckStatus.InProgress,
+								Output = new CheckRunOutput(stringLocalizer["Generating Diffs"], stringLocalizer["Progress:"], String.Format(CultureInfo.InvariantCulture, "```{0}{1}{0}```", Environment.NewLine, ourLine), null, null),
+							}, cancellationToken).ConfigureAwait(false);
+
+							ourTask.SetResult(null);
+						};
+						lock (progressBuilder)
+						{
+							toAwait = generatingCommentTask;
+							generatingCommentTask = RunNext();
+						}
+					}
+
+					AddProgressLine("Initializing...");
+
 					//prep the outputDirectory
 					async Task DirectoryPrep()
 					{
-						logger.LogTrace("Cleaning workdir...");
+						AddProgressLine("Cleaning working directory...");
 						await currentIOManager.DeleteDirectory(".", cancellationToken).ConfigureAwait(false);
 						await currentIOManager.CreateDirectory(".", cancellationToken).ConfigureAwait(false);
-						logger.LogTrace("Workdir cleaned");
+						AddProgressLine("Working directory cleaned!");
 					};
 
 					var dirPrepTask = DirectoryPrep();
@@ -294,10 +330,10 @@ namespace MapDiffBot.Core
 						//fetch base commit if necessary and check it out, fetch pull request
 						if (!await repo.ContainsCommit(pullRequest.Base.Sha, cancellationToken).ConfigureAwait(false))
 						{
-							logger.LogTrace("Base commit not found, running fetch...");
+							AddProgressLine("Base commit not found, running fetch...");
 							await repo.Fetch(cancellationToken).ConfigureAwait(false);
 						}
-						logger.LogTrace("Moving HEAD to pull request base...");
+						AddProgressLine("Moving HEAD to pull request base...");
 						await repo.Checkout(pullRequest.Base.Sha, cancellationToken).ConfigureAwait(false);
 
 						//but since we don't need this right await don't await it yet
@@ -310,7 +346,7 @@ namespace MapDiffBot.Core
 								var originalPath = currentIOManager.ConcatPath(repoPath, mapPath);
 								if (await currentIOManager.FileExists(originalPath, cancellationToken).ConfigureAwait(false))
 								{
-									logger.LogTrace("Creating old map cache of {0}", mapPath);
+									AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Creating old map cache of {0}", mapPath));
 									var oldMapPath = String.Format(CultureInfo.InvariantCulture, "{0}{1}", originalPath, OldMapExtension);
 									await currentIOManager.CopyFile(originalPath, oldMapPath, cancellationToken).ConfigureAwait(false);
 									return oldMapPath;
@@ -330,7 +366,7 @@ namespace MapDiffBot.Core
 							await pullRequestFetchTask.ConfigureAwait(false);
 						}
 
-						logger.LogTrace("Creating and moving HEAD to pull request merge commit...");
+						AddProgressLine("Creating and moving HEAD to pull request merge commit...");
 						//generate the merge commit ourselves since we can't get it from GitHub because itll return an outdated one
 						await repo.Merge(pullRequest.Head.Sha, cancellationToken).ConfigureAwait(false);
 					}
@@ -354,16 +390,16 @@ namespace MapDiffBot.Core
 						var originalPath = currentIOManager.ConcatPath(repoPath, changedDmms[I]);
 						if (!await currentIOManager.FileExists(originalPath, cancellationToken).ConfigureAwait(false))
 						{
-							logger.LogTrace("No new map for path {0} exists, skipping region detection and after render", changedDmms[I]);
+							AddProgressLine(String.Format(CultureInfo.InvariantCulture, "No new map for path {0} exists, skipping region detection and after render", changedDmms[I]));
 							return new RenderResult { InputPath = changedDmms[I], ToolOutput = stringLocalizer["Map missing!"] };
 						}
 						ToolResult result = null;
 						if (oldMapPaths[I] != null)
 						{
-							logger.LogTrace("Getting diff region for {0}...", changedDmms[I]);
+							AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Getting diff region for {0}...", changedDmms[I]));
 							result = await generator.GetDifferences(oldMapPaths[I], originalPath, cancellationToken).ConfigureAwait(false);
 							var region = result.MapRegion;
-							logger.LogTrace("Diff region for {0}: {1}", changedDmms[I], region);
+							AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Diff region for {0}: {1}", changedDmms[I], region));
 							if (region != null)
 							{
 								var xdiam = region.MaxX - region.MinX;
@@ -401,16 +437,17 @@ namespace MapDiffBot.Core
 												increaseMax = !increaseMax;
 											}
 									}
-									logger.LogTrace("Region for {0} expanded to {1}", changedDmms[I], region);
+									AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Region for {0} expanded to {1}", changedDmms[I], region));
 								}
 								mapRegions[I] = region;
 							}
 						}
 						else
-							logger.LogTrace("Skipping region detection for {0} due to old map not existing", changedDmms[I]);
-						logger.LogTrace("Performing after rendering for {0}...", changedDmms[I]);
+							AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Skipping region detection for {0} due to old map not existing", changedDmms[I]));
+						AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Performing after rendering for {0}...", changedDmms[I]));
 						var renderResult = await generator.RenderMap(originalPath, mapRegions[I], outputDirectory, "after", cancellationToken).ConfigureAwait(false);
 						logger.LogTrace("After rendering for {0} complete! Result path: {1}, Output: {2}", changedDmms[I], renderResult.OutputPath, renderResult.ToolOutput);
+						AddProgressLine(String.Format(CultureInfo.InvariantCulture, "After rendering for {0} complete!", renderResult.OutputPath));
 						if (result != null)
 							renderResult.ToolOutput = String.Format(CultureInfo.InvariantCulture, "Differences task:{0}{1}{0}Render task:{0}{2}", Environment.NewLine, result.ToolOutput, renderResult.ToolOutput);
 						return renderResult;
@@ -430,18 +467,20 @@ namespace MapDiffBot.Core
 						//we'll handle it later
 					}
 
-					logger.LogTrace("Moving HEAD back to pull request base...");
+					AddProgressLine("Moving HEAD back to pull request base...");
 					await repo.Checkout(pullRequest.Base.Sha, cancellationToken).ConfigureAwait(false);
 
-					Task<RenderResult> RenderOldMap(int i)
+					async Task<RenderResult> RenderOldMap(int i)
 					{
 						var oldPath = oldMapPaths[i];
 						if (oldMapPaths != null)
 						{
-							logger.LogTrace("Performing before rendering for {0}...", changedDmms[i]);
-							return generator.RenderMap(oldPath, mapRegions[i], outputDirectory, "before", cancellationToken);
+							AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Performing before rendering for {0}...", changedDmms[i]));
+							var result = await generator.RenderMap(oldPath, mapRegions[i], outputDirectory, "before", cancellationToken).ConfigureAwait(false);
+							AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Before rendering for {0} complete!", changedDmms[i]));
+							return result;
 						}
-						return Task.FromResult(new RenderResult { InputPath = changedDmms[i], ToolOutput = stringLocalizer["Map missing!"] });
+						return new RenderResult { InputPath = changedDmms[i], ToolOutput = stringLocalizer["Map missing!"] };
 					}
 
 					logger.LogTrace("Running iterations of RenderOldMap...");
@@ -457,6 +496,7 @@ namespace MapDiffBot.Core
 						//see above
 					}
 
+					AddProgressLine("Renderings complete, finalizing...");
 					//done with the repo at this point
 					logger.LogTrace("Renderings complete. Releasing reposiotory");
 				}
@@ -511,7 +551,7 @@ namespace MapDiffBot.Core
 					return new KeyValuePair<MapDiff, MapRegion>(result, r2?.MapRegion);
 				}
 
-				logger.LogTrace("Waiting for notification comment to POST...");
+				logger.LogTrace("Waiting for GitHub check to finish updating...");
 				await generatingCommentTask.ConfigureAwait(false);
 
 				logger.LogTrace("Collecting results...");
@@ -537,13 +577,10 @@ namespace MapDiffBot.Core
 			int formatterCount = 0;
 
 			var databaseContext = serviceProvider.GetRequiredService<IDatabaseContext>();
-
-			var prefix = generalConfiguration.ApplicationPrefix;
+			
 			logger.LogTrace("Generating comment and preparing database query...");
-			var outputImages = new List<CheckRunImage>()
-			{
-				Capacity = diffResults.Count
-			};
+			var commentBuilder = new StringBuilder();
+			var prefix = generalConfiguration.ApplicationPrefix;
 			foreach (var kv in diffResults)
 			{
 				var I = kv.Key;
@@ -551,14 +588,36 @@ namespace MapDiffBot.Core
 				var afterUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "after"));
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "logs"));
 
+				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture,
+					"<details><summary>{0}</summary>{11}{11}{1} | {2}{11}--- | ---{11}![{13}]({3}) | ![{13}]({4}){11}{11}{5} | {6} | {7} | {12}{11}--- | --- | --- | ---{11}{8} | {9} | [{7}]({10}) | [{1}]({3}) \\| [{2}]({4}){11}{11}</details>{11}{11}",
+					I.MapPath,
+					stringLocalizer["Old"],
+					stringLocalizer["New"],
+					beforeUrl,
+					afterUrl,
+					stringLocalizer["Status"],
+					stringLocalizer["Region"],
+					stringLocalizer["Logs"],
+					I.BeforeImage != null ? (I.AfterImage != null ? stringLocalizer["Modified"] : stringLocalizer["Deleted"]) : stringLocalizer["Created"],
+					kv.Value?.ToString() ?? stringLocalizer["ALL"],
+					logsUrl,
+					Environment.NewLine,
+					stringLocalizer["Raw"],
+					stringLocalizer["If the image doesn't load, it may be too big for GitHub. Use the \"Raw\" links."]
+					));
 				logger.LogTrace("Adding MapDiff for {0}...", I.MapPath);
-				var region = kv.Value?.ToString() ?? stringLocalizer["ALL"];
-				outputImages.Add(new CheckRunImage(region, beforeUrl, stringLocalizer["Old"]));
-				outputImages.Add(new CheckRunImage(region, afterUrl, stringLocalizer["New"]));
 				databaseContext.MapDiffs.Add(I);
 				++formatterCount;
 			}
-			
+
+			var comment = String.Format(CultureInfo.CurrentCulture,
+				"{0}{2}{2}{2}{2}<br>{1}{2}{2}{2}{2}{3}",
+				commentBuilder,
+				stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha],
+				Environment.NewLine,
+				stringLocalizer["Please report any issues [here]({0}).", IssueReportUrl]
+				);
+
 			logger.LogTrace("Committing new MapDiffs to the database...");
 			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 			logger.LogTrace("Finalizing GitHub Check...");
@@ -568,7 +627,7 @@ namespace MapDiffBot.Core
 				DetailsUrl = String.Concat(prefix, FilesController.RouteToBrowse(pullRequest.Base.Repository, checkRunId)),
 				Status = CheckStatus.Completed,
 				CompletedAt = DateTimeOffset.Now,
-				Output = new CheckRunOutput(stringLocalizer["Map Renderings"], stringLocalizer["Before and after renderings of .dmm files"], null, null, outputImages),
+				Output = new CheckRunOutput(stringLocalizer["Map Renderings"], stringLocalizer["Maps with diff:"], comment, null, null),
 				Conclusion = CheckConclusion.Success
 			};
 			await serviceProvider.GetRequiredService<IGitHubManager>().UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, ncr, cancellationToken).ConfigureAwait(false);
@@ -582,6 +641,7 @@ namespace MapDiffBot.Core
 			backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, payload.PullRequest.Number, JobCancellationToken.Null));
 		}
 
+		/// <inheritdoc />
 		public async Task ProcessPayload(CheckSuiteEventPayload payload, IGitHubManager gitHubManager, CancellationToken cancellationToken)
 		{
 			if (payload.Action != "requested" && payload.Action != "rerequested")
@@ -614,6 +674,7 @@ namespace MapDiffBot.Core
 			}
 		}
 
+		/// <inheritdoc />
 		public async Task ProcessPayload(CheckRunEventPayload payload, IGitHubManager gitHubManager, CancellationToken cancellationToken)
 		{
 			if (payload.Action != "rerequested")
