@@ -97,5 +97,15 @@ namespace MapDiffBot.Core
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the new <see cref="CheckRun.Id"/></returns>
 		Task<long> CreateCheckRun(long repositoryId, NewCheckRun newCheckRun, CancellationToken cancellationToken);
+
+		/// <summary>
+		/// Get <see cref="CheckRun"/>s matching a <paramref name="checkSuiteSha"/>
+		/// </summary>
+		/// <param name="repositoryId">The <see cref="Repository.Id"/></param>
+		/// <param name="checkSuiteId">The <see cref="CheckSuite.Id"/></param>
+		/// <param name="checkSuiteSha">The <see cref="CheckSuite.HeadSha"/></param>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task{TResult}"/> resulting in an <see cref="IEnumerable{T}"/> of relevant <see cref="CheckRun"/>s</returns>
+		Task<IEnumerable<CheckRun>> GetMatchingCheckRuns(long repositoryId, long checkSuiteId, string checkSuiteSha, CancellationToken cancellationToken);
 	}
 }

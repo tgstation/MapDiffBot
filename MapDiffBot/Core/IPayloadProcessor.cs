@@ -19,10 +19,7 @@ namespace MapDiffBot.Core
         /// Process a <see cref="CheckSuiteEventPayload"/>
         /// </summary>
         /// <param name="payload">The <see cref="CheckSuiteEventPayload"/> to process</param>
-        /// <param name="gitHubManager">The <see cref="IGitHubManager"/> for the operation</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
-        /// <returns>A <see cref="Task"/> representing the running operation</returns>
-        Task ProcessPayload(CheckSuiteEventPayload payload, IGitHubManager gitHubManager, CancellationToken cancellationToken);
+        void ProcessPayload(CheckSuiteEventPayload payload);
 
         /// <summary>
         /// Process a <see cref="CheckRunEventPayload"/>
