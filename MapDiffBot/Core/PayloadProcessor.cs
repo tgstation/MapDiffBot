@@ -683,7 +683,7 @@ namespace MapDiffBot.Core
 			{
 				var gitHubManager = scope.ServiceProvider.GetRequiredService<IGitHubManager>();
 				var cancellationToken = jobCancellationToken.ShutdownToken;
-				var checkRuns = await gitHubManager.GetMatchingCheckRuns(repositoryId, checkSuiteId, checkSuiteSha, cancellationToken).ConfigureAwait(false);
+				var checkRuns = await gitHubManager.GetMatchingCheckRuns(repositoryId, checkSuiteId, cancellationToken).ConfigureAwait(false);
 				bool testedAny = false;
 
 				await Task.WhenAll(checkRuns.Select(x =>
