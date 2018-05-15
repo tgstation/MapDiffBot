@@ -288,5 +288,12 @@ namespace MapDiffBot.Core
 			var checkRun = await client.Check.Run.Create(repositoryId, initializer).ConfigureAwait(false);
 			return checkRun.Id;
 		}
+
+		/// <inheritdoc />
+		public async Task<IReadOnlyList<CheckRun>> GetMatchingCheckRuns(long repositoryId, long checkSuiteId, CancellationToken cancellationToken)
+		{
+			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
+            return await client.Check.Run.GetAllForCheckSuite(repositoryId, checkSuiteId).ConfigureAwait(false);
+		}
 	}
 }

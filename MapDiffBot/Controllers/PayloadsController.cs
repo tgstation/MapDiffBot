@@ -155,7 +155,7 @@ namespace MapDiffBot.Controllers
 				}
 				logger.LogTrace("Queuing check suite payload processing job.");
 
-				await pullRequestProcessor.ProcessPayload(payload, gitHubManager, cancellationToken).ConfigureAwait(false);
+				pullRequestProcessor.ProcessPayload(payload);
 			}
 			else if (eventName == "check_run")
 			{
