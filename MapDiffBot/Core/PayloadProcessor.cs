@@ -31,7 +31,7 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// The URL to direct user to report issues at
 		/// </summary>
-		const string IssueReportUrl = "https://github.com/MapDiffBot/MapDiffBot/issues";
+		const string IssueReportUrl = "https://github.com/tgstation/MapDiffBot/issues";
 		/// <summary>
 		/// Localization key
 		/// </summary>
