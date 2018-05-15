@@ -50,7 +50,7 @@ namespace MapDiffBot.Core
 		/// </summary>
 		readonly IGeneratorFactory generatorFactory;
 		/// <summary>
-		/// The <see cref="IGitHubManager"/> for the <see cref="PayloadProcessor"/>
+		/// The <see cref="IServiceProvider"/> for the <see cref="PayloadProcessor"/>
 		/// </summary>
 		readonly IServiceProvider serviceProvider;
 		/// <summary>
