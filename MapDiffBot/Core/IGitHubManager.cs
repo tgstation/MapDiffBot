@@ -78,5 +78,33 @@ namespace MapDiffBot.Core
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		Task LoadInstallation(long repositoryId, CancellationToken cancellationToken);
+
+		/// <summary>
+		/// Update a <see cref="CheckRun"/>
+		/// </summary>
+		/// <param name="repositoryId">The <see cref="Repository.Id"/></param>
+		/// <param name="checkRunId">The <see cref="CheckRun.Id"/></param>
+		/// <param name="checkRunUpdate">The <see cref="CheckRunUpdate"/></param>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task"/> representing the running operation</returns>
+		Task UpdateCheckRun(long repositoryId, long checkRunId, CheckRunUpdate checkRunUpdate, CancellationToken cancellationToken);
+
+		/// <summary>
+		/// Create a <see cref="CheckRun"/>
+		/// </summary>
+		/// <param name="repositoryId">The <see cref="Repository.Id"/></param>
+		/// <param name="newCheckRun">The <see cref="NewCheckRun"/></param>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task{TResult}"/> resulting in the new <see cref="CheckRun.Id"/></returns>
+		Task<long> CreateCheckRun(long repositoryId, NewCheckRun newCheckRun, CancellationToken cancellationToken);
+
+		/// <summary>
+		/// Get <see cref="CheckRun"/>s matching a <paramref name="checkSuiteId"/>
+		/// </summary>
+		/// <param name="repositoryId">The <see cref="Repository.Id"/></param>
+		/// <param name="checkSuiteId">The <see cref="CheckSuite.Id"/></param>
+		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
+		/// <returns>A <see cref="Task{TResult}"/> resulting in an <see cref="IEnumerable{T}"/> of relevant <see cref="CheckRun"/>s</returns>
+		Task<IReadOnlyList<CheckRun>> GetMatchingCheckRuns(long repositoryId, long checkSuiteId, CancellationToken cancellationToken);
 	}
 }
