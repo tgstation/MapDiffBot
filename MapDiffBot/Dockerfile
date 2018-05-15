@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	libcurl3-gnutls \
 	libsasl2-2 \
 	libgpg-error0 \
+	cmake \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN cargo build -p cli --release
