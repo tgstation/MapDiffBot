@@ -327,9 +327,20 @@ namespace MapDiffBot.Core
 						AddProgressLine("Working directory cleaned!");
 					};
 
+					async Task<string> GetDmeToUse()
+					{
+						var customDme = await scope.ServiceProvider.GetRequiredService<IDatabaseContext>().InstallationRepositories.Where(x => x.Id == pullRequest.Base.Repository.Id).Select(x => x.TargetDme).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+
+						if (customDme != null)
+							return customDme;
+
+						var availDmes = await ioManager.GetFilesWithExtension(repo.Path, ".dme", cancellationToken).ConfigureAwait(false);
+						return availDmes.First();
+					}
+
 					var dirPrepTask = DirectoryPrep();
 					//get the dme to use
-					var dmeToUseTask = scope.ServiceProvider.GetRequiredService<IDatabaseContext>().InstallationRepositories.Where(x => x.Id == pullRequest.Base.Repository.Id).Select(x => x.TargetDme).FirstOrDefaultAsync(cancellationToken);
+					var dmeToUseTask = GetDmeToUse();
 
 					var oldMapPaths = new List<string>()
 					{
