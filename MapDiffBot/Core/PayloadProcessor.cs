@@ -332,10 +332,17 @@ namespace MapDiffBot.Core
 						var customDme = await scope.ServiceProvider.GetRequiredService<IDatabaseContext>().InstallationRepositories.Where(x => x.Id == pullRequest.Base.Repository.Id).Select(x => x.TargetDme).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
 						if (customDme != null)
+						{
+							AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Using manually set dme: {0}", customDme));
 							return customDme;
+						}
 
-						var availDmes = await ioManager.GetFilesWithExtension(repo.Path, ".dme", cancellationToken).ConfigureAwait(false);
-						return availDmes.First();
+						AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Looking for dme to use in {0}", repo.Path));
+
+						var availDmes = await ioManager.GetFilesWithExtension(repo.Path, "dme", cancellationToken).ConfigureAwait(false);
+						customDme = availDmes.First();
+						AddProgressLine(String.Format(CultureInfo.InvariantCulture, "Selected {0} out of {1} possibilities", customDme, availDmes.Count));
+						return customDme;
 					}
 
 					var dirPrepTask = DirectoryPrep();
