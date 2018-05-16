@@ -7,6 +7,7 @@ using MapDiffBot.Configuration;
 using MapDiffBot.Core;
 using MapDiffBot.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
@@ -16,8 +17,8 @@ namespace MapDiffBot.Controllers
 	/// Handles configuring <see cref="InstallationRepository.TargetDme"/>s
 	/// </summary>
 	[Route(Route)]
-    public sealed class DmeConfigurationController : Controller
-    {
+	public sealed class DmeConfigurationController : Controller
+	{
 		/// <summary>
 		/// The route to the <see cref="DmeConfigurationController"/>
 		/// </summary>
@@ -93,15 +94,15 @@ namespace MapDiffBot.Controllers
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> for the operation</returns>
 		[HttpGet("{repositoryId}")]
-        public async Task<IActionResult> Index(long repositoryId, CancellationToken cancellationToken)
-        {
+		public async Task<IActionResult> Index(long repositoryId, CancellationToken cancellationToken)
+		{
 			try
 			{
 				var loadRepoTask = gitHubManager.LoadInstallation(repositoryId, cancellationToken);
 				var authedTask = gitHubManager.CheckAuthorization(repositoryId, Request.Cookies, cancellationToken);
 				await loadRepoTask.ConfigureAwait(false);
 
-				ViewBag.ConfiguredDme = await databaseContext.InstallationRepositories.Where(x => x.Id == repositoryId).Select(x => x.TargetDme).ToAsyncEnumerable().First(cancellationToken).ConfigureAwait(false);
+				ViewBag.ConfiguredDme = await databaseContext.InstallationRepositories.Where(x => x.Id == repositoryId).Select(x => x.TargetDme).FirstAsync(cancellationToken).ConfigureAwait(false);
 				var authLevel = await authedTask.ConfigureAwait(false);
 		
 				ViewBag.SignIn = stringLocalizer[authLevel == AuthenticationLevel.LoggedOut ? "Sign-In with GitHub" : "Log Out"];
@@ -124,7 +125,7 @@ namespace MapDiffBot.Controllers
 			{
 				return NotFound();
 			}
-        }
+		}
 
 		/// <summary>
 		/// Get a new <see cref="InstallationRepository.TargetDme"/> for a given <see cref="InstallationRepository.Id"/>
@@ -133,9 +134,9 @@ namespace MapDiffBot.Controllers
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> for the operation</returns>
 		[HttpPost("{repositoryId}")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long repositoryId, CancellationToken cancellationToken)
-        {
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Edit(long repositoryId, CancellationToken cancellationToken)
+		{
 			try
 			{
 				string newDmePath = Request.Form[nameof(newDmePath)];
@@ -160,6 +161,6 @@ namespace MapDiffBot.Controllers
 			{
 				return NotFound();
 			}
-        }
+		}
 	}
 }
