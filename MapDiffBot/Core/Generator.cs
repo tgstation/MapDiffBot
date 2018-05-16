@@ -37,7 +37,7 @@ namespace MapDiffBot.Core
 		/// <param name="ioManager">The value of <see cref="ioManager"/></param>
 		public Generator(string dmePath, IIOManager ioManager)
 		{
-			dmeArgument = dmePath != null ? String.Format(CultureInfo.InvariantCulture, "-e \"{0}\" ", Path.GetFileName(dmePath)) : null;
+			dmeArgument = String.Format(CultureInfo.InvariantCulture, "-e \"{0}\" ", Path.GetFileName(dmePath ?? throw new ArgumentNullException(nameof(dmePath))));
 			this.ioManager = ioManager ?? throw new ArgumentNullException(nameof(ioManager));
 		}
 
