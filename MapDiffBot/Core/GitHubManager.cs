@@ -1,6 +1,7 @@
 ﻿using MapDiffBot.Configuration;
 using MapDiffBot.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -72,7 +73,7 @@ namespace MapDiffBot.Core
 			IReadOnlyList<Octokit.Installation> gitHubInstalls;
 			List<Models.Installation> allKnownInstalls;
 			IGitHubClient client;
-			var installation = await databaseContext.Installations.Where(x => x.Repositories.Any(y => y.Id == repositoryId)).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
+			var installation = await databaseContext.Installations.Where(x => x.Repositories.Any(y => y.Id == repositoryId)).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
 			if (installation != null)
 			{
@@ -91,7 +92,7 @@ namespace MapDiffBot.Core
 			client = gitHubClientFactory.CreateAppClient();
 
 			//remove bad installs while we're here
-			var allKnownInstallsTask = databaseContext.Installations.ToAsyncEnumerable().ToList(cancellationToken);
+			var allKnownInstallsTask = databaseContext.Installations.ToListAsync(cancellationToken);
 			gitHubInstalls = await client.GitHubApps.GetAllInstallationsForCurrent().ConfigureAwait(false);
 			allKnownInstalls = await allKnownInstallsTask.ConfigureAwait(false);
 			databaseContext.Installations.RemoveRange(allKnownInstalls.Where(x => !gitHubInstalls.Any(y => y.Id == x.Id)));
@@ -143,7 +144,7 @@ namespace MapDiffBot.Core
 			//cleanup
 			var now = DateTimeOffset.Now;
 			var everything = await databaseContext.UserAccessTokens.Where(x => x.Expiry < DateTimeOffset.UtcNow).DeleteAsync(cancellationToken).ConfigureAwait(false);
-			var entry = await databaseContext.UserAccessTokens.Where(x => x.Id == guid).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
+			var entry = await databaseContext.UserAccessTokens.Where(x => x.Id == guid).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 			if (entry == default(UserAccessToken))
 				return AuthenticationLevel.LoggedOut;
 			
@@ -293,7 +294,7 @@ namespace MapDiffBot.Core
 		public async Task<IReadOnlyList<CheckRun>> GetMatchingCheckRuns(long repositoryId, long checkSuiteId, CancellationToken cancellationToken)
 		{
 			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
-            return await client.Check.Run.GetAllForCheckSuite(repositoryId, checkSuiteId).ConfigureAwait(false);
+			return await client.Check.Run.GetAllForCheckSuite(repositoryId, checkSuiteId).ConfigureAwait(false);
 		}
 	}
 }

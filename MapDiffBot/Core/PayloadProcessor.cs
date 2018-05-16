@@ -2,6 +2,7 @@
 using MapDiffBot.Configuration;
 using MapDiffBot.Controllers;
 using MapDiffBot.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -328,7 +329,7 @@ namespace MapDiffBot.Core
 
 					var dirPrepTask = DirectoryPrep();
 					//get the dme to use
-					var dmeToUseTask = scope.ServiceProvider.GetRequiredService<IDatabaseContext>().InstallationRepositories.Where(x => x.Id == pullRequest.Base.Repository.Id).Select(x => x.TargetDme).ToAsyncEnumerable().FirstOrDefault(cancellationToken);
+					var dmeToUseTask = scope.ServiceProvider.GetRequiredService<IDatabaseContext>().InstallationRepositories.Where(x => x.Id == pullRequest.Base.Repository.Id).Select(x => x.TargetDme).FirstOrDefaultAsync(cancellationToken);
 
 					var oldMapPaths = new List<string>()
 					{

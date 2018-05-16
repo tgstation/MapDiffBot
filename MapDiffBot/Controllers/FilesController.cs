@@ -1,5 +1,6 @@
 ﻿using MapDiffBot.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Octokit;
@@ -91,7 +92,7 @@ namespace MapDiffBot.Controllers
 			if (!before && beforeOrAfter != "AFTER")
 				return BadRequest();
 
-			var diff = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId && x.FileId == fileId).Select(x => before ? x.BeforeImage : x.AfterImage).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
+			var diff = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId && x.FileId == fileId).Select(x => before ? x.BeforeImage : x.AfterImage).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
 			if (diff == null)
 				return NotFound();
@@ -111,7 +112,7 @@ namespace MapDiffBot.Controllers
 		public async Task<IActionResult> HandleLogsGet(long repositoryId, long checkRunId, int fileId, CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved GET: {0}/{1}/{2}.txt", repositoryId, checkRunId, fileId);
-			var result = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId && x.FileId == fileId).Select(x => x.LogMessage).ToAsyncEnumerable().FirstOrDefault(cancellationToken).ConfigureAwait(false);
+			var result = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId && x.FileId == fileId).Select(x => x.LogMessage).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 			return result != null ? (IActionResult)Content(result) : NotFound();
 		}
 
@@ -126,7 +127,7 @@ namespace MapDiffBot.Controllers
 		public async Task<IActionResult> HandleAllLogsGet(long repositoryId, long checkRunId, CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved GET: {0}/{1}/logs.txt", repositoryId, checkRunId);
-			var results = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId).Select(x => x.LogMessage).ToAsyncEnumerable().ToList(cancellationToken).ConfigureAwait(false);
+			var results = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId).Select(x => x.LogMessage).ToListAsync(cancellationToken).ConfigureAwait(false);
 			return results.Count != 0 ? (IActionResult)Content(String.Join(Environment.NewLine, results)) : NotFound();
 		}
 
@@ -140,7 +141,7 @@ namespace MapDiffBot.Controllers
 		[HttpGet("{repositoryId}/{checkRunId}")]
 		public async Task<IActionResult> Browse(long repositoryId, long checkRunId, CancellationToken cancellationToken)
 		{
-			var diffs = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId).Select(x => x.MapPath).ToAsyncEnumerable().ToList(cancellationToken).ConfigureAwait(false);
+			var diffs = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId).Select(x => x.MapPath).ToListAsync(cancellationToken).ConfigureAwait(false);
 
 			if (diffs.Count == 0)
 				return NotFound();
