@@ -642,7 +642,7 @@ namespace MapDiffBot.Core
 			var comment = String.Format(CultureInfo.CurrentCulture,
 				"{0}{2}{2}{2}{2}<br>{1}{2}{2}{2}{2}{3}",
 				commentBuilder,
-				stringLocalizer["Last updated from merging commit {0} into {1}", pullRequest.Head.Sha, pullRequest.Base.Sha],
+				stringLocalizer["Merge base commit used: {0}", pullRequest.Base.Sha],
 				Environment.NewLine,
 				stringLocalizer["Please report any issues [here]({0}).", IssueReportUrl]
 				);
