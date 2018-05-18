@@ -138,6 +138,10 @@ namespace MapDiffBot.Core
 					StartedAt = DateTimeOffset.Now,
 					Status = CheckStatus.Queued
 				};
+
+				if (pullRequest.Head.Repository.Id == repositoryId)
+					ncr.HeadBranch = pullRequest.Head.Ref;
+
 				var checkRunId = await gitHubManager.CreateCheckRun(repositoryId, ncr, cancellationToken).ConfigureAwait(false);
 
 				Task HandleCancel() => gitHubManager.UpdateCheckRun(repositoryId, checkRunId, new CheckRunUpdate
@@ -668,9 +672,10 @@ namespace MapDiffBot.Core
 		/// <param name="repositoryId">The <see cref="Repository.Id"/></param>
 		/// <param name="gitHubManager">The <see cref="IGitHubManager"/> for the operation</param>
 		/// <param name="checkSuiteSha">The <see cref="CheckSuite.HeadSha"/></param>
+		/// <param name="checkSuiteBranch">The <see cref="CheckSuite.HeadBranch"/></param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		async Task CreateUnassociatedCheck(long repositoryId, IGitHubManager gitHubManager, string checkSuiteSha, CancellationToken cancellationToken)
+		async Task CreateUnassociatedCheck(long repositoryId, IGitHubManager gitHubManager, string checkSuiteSha, string checkSuiteBranch, CancellationToken cancellationToken)
 		{
 			var now = DateTimeOffset.Now;
 			var nmc = stringLocalizer["No Associated Pull Request"];
@@ -680,6 +685,7 @@ namespace MapDiffBot.Core
 				StartedAt = now,
 				Conclusion = CheckConclusion.Neutral,
 				HeadSha = checkSuiteSha,
+				HeadBranch = checkSuiteBranch,
 				Name = nmc,
 				Output = new CheckRunOutput(nmc, String.Empty, null, null, null),
 				Status = CheckStatus.Completed
@@ -692,10 +698,11 @@ namespace MapDiffBot.Core
 		/// <param name="repositoryId">The <see cref="PullRequest.Base"/> <see cref="Repository.Id"/></param>
 		/// <param name="checkSuiteId">The <see cref="CheckSuite.Id"/></param>
 		/// <param name="checkSuiteSha">The <see cref="CheckSuite.HeadSha"/></param>
+		/// <param name="checkSuiteBranch">The <see cref="CheckSuite.HeadBranch"/></param>
 		/// <param name="jobCancellationToken">The <see cref="IJobCancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		[AutomaticRetry(Attempts = 0)]
-		public async Task ScanCheckSuite(long repositoryId, long checkSuiteId, string checkSuiteSha, IJobCancellationToken jobCancellationToken)
+		public async Task ScanCheckSuite(long repositoryId, long checkSuiteId, string checkSuiteSha, string checkSuiteBranch, IJobCancellationToken jobCancellationToken)
 		{
 			using (logger.BeginScope("Scanning check suite {0} for repository {1}. Sha: ", checkSuiteId, repositoryId, checkSuiteSha))
 			using (var scope = serviceProvider.CreateScope())
@@ -717,7 +724,7 @@ namespace MapDiffBot.Core
 				})).ConfigureAwait(false);
 
 				if (!testedAny)
-					await CreateUnassociatedCheck(repositoryId, gitHubManager, checkSuiteSha, cancellationToken).ConfigureAwait(false);
+					await CreateUnassociatedCheck(repositoryId, gitHubManager, checkSuiteSha, checkSuiteBranch, cancellationToken).ConfigureAwait(false);
 			}
 		}
 
@@ -750,7 +757,7 @@ namespace MapDiffBot.Core
 			if (payload.Action != "rerequested")
 				return;
 			
-			backgroundJobClient.Enqueue(() => ScanCheckSuite(payload.Repository.Id, payload.CheckSuite.Id, payload.CheckSuite.HeadSha, JobCancellationToken.Null));
+			backgroundJobClient.Enqueue(() => ScanCheckSuite(payload.Repository.Id, payload.CheckSuite.Id, payload.CheckSuite.HeadSha, payload.CheckSuite.HeadBranch, JobCancellationToken.Null));
 		}
 
 		/// <inheritdoc />
@@ -762,7 +769,7 @@ namespace MapDiffBot.Core
 			if (prNumber.HasValue)
 				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, prNumber.Value, JobCancellationToken.Null));
 			else
-				await CreateUnassociatedCheck(payload.Repository.Id, gitHubManager, payload.CheckRun.CheckSuite.HeadSha, cancellationToken).ConfigureAwait(false);
+				await CreateUnassociatedCheck(payload.Repository.Id, gitHubManager, payload.CheckRun.CheckSuite.HeadSha, payload.CheckRun.CheckSuite.HeadBranch, cancellationToken).ConfigureAwait(false);
 		}
 	}
 }
