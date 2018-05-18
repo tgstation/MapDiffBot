@@ -1,7 +1,7 @@
 var searchData=
 [
   ['save',['Save',['../class_map_diff_bot_1_1_models_1_1_database_context.html#a37c24f37a9f70f2f2d0d0e9c35ef1112',1,'MapDiffBot.Models.DatabaseContext.Save()'],['../interface_map_diff_bot_1_1_models_1_1_i_database_context.html#a13c5b27cd636e074fdc2486ccadad6d7',1,'MapDiffBot.Models.IDatabaseContext.Save()']]],
-  ['scanchecksuite',['ScanCheckSuite',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#ad838b1ea93a1788bb734171cb0394529',1,'MapDiffBot::Core::PayloadProcessor']]],
+  ['scanchecksuite',['ScanCheckSuite',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#aaa9a9260b076a1e506b93c302d356603',1,'MapDiffBot::Core::PayloadProcessor']]],
   ['scanpullrequest',['ScanPullRequest',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#adf5ded478499d5e17efcaf0abd542525',1,'MapDiffBot::Core::PayloadProcessor']]],
   ['scanpullrequestimpl',['ScanPullRequestImpl',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#abc23c78a9aa50d3654826d96fe1db33f',1,'MapDiffBot::Core::PayloadProcessor']]],
   ['semaphoreslimcontext',['SemaphoreSlimContext',['../class_map_diff_bot_1_1_core_1_1_semaphore_slim_context.html#a179a775562df2ad46f349fce47c34aeb',1,'MapDiffBot::Core::SemaphoreSlimContext']]],
