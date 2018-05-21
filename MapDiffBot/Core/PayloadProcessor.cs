@@ -614,6 +614,8 @@ namespace MapDiffBot.Core
 			logger.LogTrace("Generating comment and preparing database query...");
 			var commentBuilder = new StringBuilder();
 			var prefix = generalConfiguration.ApplicationPrefix;
+			var noImage = stringLocalizer["No Image"];
+			var bigImage = stringLocalizer["If the image doesn't load, it may be too big for GitHub. Use the \"Raw\" links."];
 			foreach (var kv in diffResults)
 			{
 				var I = kv.Key;
@@ -622,7 +624,7 @@ namespace MapDiffBot.Core
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "logs"));
 
 				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture,
-					"<details><summary>{0}</summary>{11}{11}{1} | {2}{11}--- | ---{11}![{13}]({3}) | ![{13}]({4}){11}{11}{5} | {6} | {7} | {12}{11}--- | --- | --- | ---{11}{8} | {9} | [{7}]({10}) | [{1}]({3}) \\| [{2}]({4}){11}{11}</details>{11}{11}",
+					"<details><summary>{0}</summary>{11}{11}{1} | {2}{11}--- | ---{11}![{13}]({3}) | ![{14}]({4}){11}{11}{5} | {6} | {7} | {12}{11}--- | --- | --- | ---{11}{8} | {9} | [{7}]({10}) | [{1}]({3}) \\| [{2}]({4}){11}{11}</details>{11}{11}",
 					I.MapPath,
 					stringLocalizer["Old"],
 					stringLocalizer["New"],
@@ -636,7 +638,8 @@ namespace MapDiffBot.Core
 					logsUrl,
 					Environment.NewLine,
 					stringLocalizer["Raw"],
-					stringLocalizer["If the image doesn't load, it may be too big for GitHub. Use the \"Raw\" links."]
+					I.BeforeImage != null ? bigImage : noImage,
+					I.AfterImage != null ? bigImage : noImage,
 					));
 				logger.LogTrace("Adding MapDiff for {0}...", I.MapPath);
 				databaseContext.MapDiffs.Add(I);
