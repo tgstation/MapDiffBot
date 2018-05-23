@@ -14,5 +14,10 @@
 		/// The public URL for the application
 		/// </summary>
 		public string ApplicationPrefix { get; set; }
+
+		/// <summary>
+		/// Maximum number of dmm-tools processes to run in tandem across all jobs
+		/// </summary>
+		public uint ProcessLimit { get; set; }
 	}
 }

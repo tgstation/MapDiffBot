@@ -29,16 +29,22 @@ namespace MapDiffBot.Core
 		/// Path to the .dme to pass to dmm-tools
 		/// </summary>
 		readonly IIOManager ioManager;
+		/// <summary>
+		/// The <see cref="IProcessThrottler"/> for the <see cref="Generator"/>
+		/// </summary>
+		readonly IProcessThrottler processThrottler;
 
 		/// <summary>
 		/// Construct a <see cref="Generator"/>
 		/// </summary>
 		/// <param name="dmePath">Used for creating the <see cref="dmeArgument"/></param>
 		/// <param name="ioManager">The value of <see cref="ioManager"/></param>
-		public Generator(string dmePath, IIOManager ioManager)
+		/// <param name="processThrottler">The value of <see cref="processThrottler"/></param>
+		public Generator(string dmePath, IIOManager ioManager, IProcessThrottler processThrottler)
 		{
 			dmeArgument = String.Format(CultureInfo.InvariantCulture, "-e \"{0}\" ", Path.GetFileName(dmePath ?? throw new ArgumentNullException(nameof(dmePath))));
 			this.ioManager = ioManager ?? throw new ArgumentNullException(nameof(ioManager));
+			this.processThrottler = processThrottler ?? throw new ArgumentNullException(nameof(processThrottler));
 		}
 
 		/// <summary>
@@ -100,7 +106,7 @@ namespace MapDiffBot.Core
 		/// <param name="process">The <see cref="Process"/> to run</param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		static async Task<int> StartAndWaitForProcessExit(Process process, CancellationToken cancellationToken)
+		async Task<int> StartAndWaitForProcessExit(Process process, CancellationToken cancellationToken)
 		{
 			var tcs = new TaskCompletionSource<object>();
 			process.EnableRaisingEvents = true;
@@ -112,24 +118,27 @@ namespace MapDiffBot.Core
 					tcs.SetResult(null);
 			};
 
-			process.Start();
-			try
+			using (await processThrottler.BeginProcess(cancellationToken).ConfigureAwait(false))
 			{
-				process.PriorityClass = ProcessPriorityClass.BelowNormal;
-				process.BeginOutputReadLine();
-				process.BeginErrorReadLine();
-				using (var reg = cancellationToken.Register(() =>
+				process.Start();
+				try
 				{
-					try
+					process.PriorityClass = ProcessPriorityClass.BelowNormal;
+					process.BeginOutputReadLine();
+					process.BeginErrorReadLine();
+					using (var reg = cancellationToken.Register(() =>
 					{
-						process.Kill();
-					}
-					catch (InvalidOperationException) { }
-				}))
-					await tcs.Task.ConfigureAwait(false);
+						try
+						{
+							process.Kill();
+						}
+						catch (InvalidOperationException) { }
+					}))
+						await tcs.Task.ConfigureAwait(false);
+				}
+				//process exited
+				catch (InvalidOperationException) { }
 			}
-			//process exited
-			catch (InvalidOperationException) { }
 
 			return process.ExitCode;
 		}
