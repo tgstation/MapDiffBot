@@ -24,7 +24,7 @@ FROM microsoft/aspnetcore-build:2.0.6-2.1.101-jessie AS build
 WORKDIR /src
 COPY MapDiffBot/MapDiffBot.csproj MapDiffBot/
 COPY MapDiffBot.Tests/MapDiffBot.Tests.csproj MapDiffBot.Tests/
-RUN dotnet restore
+RUN cd MapDiffBot.Tests && dotnet restore
 
 COPY MapDiffBot/* MapDiffBot/
 COPY MapDiffBot.Tests/* MapDiffBot.Tests/
