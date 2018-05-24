@@ -12,6 +12,7 @@ var searchData=
   ['installation_2ecs',['Installation.cs',['../_installation_8cs.html',1,'']]],
   ['installationrepository_2ecs',['InstallationRepository.cs',['../_installation_repository_8cs.html',1,'']]],
   ['ipayloadprocessor_2ecs',['IPayloadProcessor.cs',['../_i_payload_processor_8cs.html',1,'']]],
+  ['iprocessthrottler_2ecs',['IProcessThrottler.cs',['../_i_process_throttler_8cs.html',1,'']]],
   ['irepositoryoperations_2ecs',['IRepositoryOperations.cs',['../_i_repository_operations_8cs.html',1,'']]],
   ['iwebrequestmanager_2ecs',['IWebRequestManager.cs',['../_i_web_request_manager_8cs.html',1,'']]]
 ];

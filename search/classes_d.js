@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['webrequestmanager',['WebRequestManager',['../class_map_diff_bot_1_1_core_1_1_web_request_manager.html',1,'MapDiffBot::Core']]]
+  ['useraccesstoken',['UserAccessToken',['../class_map_diff_bot_1_1_models_1_1_user_access_token.html',1,'MapDiffBot::Models']]]
 ];

@@ -37,6 +37,8 @@ var searchData=
   ['ipayloadprocessor',['IPayloadProcessor',['../interface_map_diff_bot_1_1_core_1_1_i_payload_processor.html',1,'MapDiffBot::Core']]],
   ['ipayloadprocessor_2ecs',['IPayloadProcessor.cs',['../_i_payload_processor_8cs.html',1,'']]],
   ['iprivatekeysource',['IPrivateKeySource',['../class_i_private_key_source.html',1,'']]],
+  ['iprocessthrottler',['IProcessThrottler',['../interface_map_diff_bot_1_1_core_1_1_i_process_throttler.html',1,'MapDiffBot::Core']]],
+  ['iprocessthrottler_2ecs',['IProcessThrottler.cs',['../_i_process_throttler_8cs.html',1,'']]],
   ['irepositoryoperations',['IRepositoryOperations',['../interface_map_diff_bot_1_1_core_1_1_i_repository_operations.html',1,'MapDiffBot::Core']]],
   ['irepositoryoperations_2ecs',['IRepositoryOperations.cs',['../_i_repository_operations_8cs.html',1,'']]],
   ['ismysql',['IsMySQL',['../class_map_diff_bot_1_1_configuration_1_1_database_configuration.html#a603629ed9f374765a70feffbfc21af07',1,'MapDiffBot::Configuration::DatabaseConfiguration']]],
