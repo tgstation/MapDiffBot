@@ -37,18 +37,19 @@ namespace MapDiffBot.Models
 		public string MapPath { get; set; }
 
 		/// <summary>
-		/// The before image
+		/// The before <see cref="Image"/>
 		/// </summary>
-#pragma warning disable CA1819 // Properties should not return arrays
-		public byte[] BeforeImage { get; set; }
-#pragma warning restore CA1819 // Properties should not return arrays
+		public Image BeforeImage { get; set; }
 
 		/// <summary>
-		/// The after image
+		/// The after <see cref="Image"/>
 		/// </summary>
-#pragma warning disable CA1819 // Properties should not return arrays
-		public byte[] AfterImage { get; set; }
-#pragma warning restore CA1819 // Properties should not return arrays
+		public Image AfterImage { get; set; }
+
+		/// <summary>
+		/// The difference <see cref="Image"/>
+		/// </summary>
+		public Image DifferenceImage { get; set; }
 
 		/// <summary>
 		/// Logs of the operation

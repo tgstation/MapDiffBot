@@ -10,8 +10,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using MemoryStream = System.IO.MemoryStream;
-
 namespace MapDiffBot.Controllers
 {
 	/// <summary>
@@ -88,11 +86,12 @@ namespace MapDiffBot.Controllers
 			logger.LogTrace("Recieved GET: {0}/{1}/{2}/{3}.png", repositoryId, checkRunId, fileId, beforeOrAfter);
 
 			beforeOrAfter = beforeOrAfter.ToUpperInvariant();
-			bool before = beforeOrAfter == "BEFORE";
-			if (!before && beforeOrAfter != "AFTER")
+			var differ = beforeOrAfter == "DIFF";
+			var before = !differ && beforeOrAfter == "BEFORE";
+			if (!differ && !before && beforeOrAfter != "AFTER")
 				return BadRequest();
 
-			var diff = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId && x.FileId == fileId).Select(x => before ? x.BeforeImage : x.AfterImage).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+			var diff = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId && x.FileId == fileId).Select(x => differ ? x.DifferenceImage : (before ? x.BeforeImage : x.AfterImage)).Select(x => x.Data).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
 			if (diff == null)
 				return NotFound();
