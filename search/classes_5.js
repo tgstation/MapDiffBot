@@ -11,6 +11,7 @@ var searchData=
   ['ilocalrepository',['ILocalRepository',['../interface_map_diff_bot_1_1_core_1_1_i_local_repository.html',1,'MapDiffBot::Core']]],
   ['ilocalrepositoryfactory',['ILocalRepositoryFactory',['../interface_map_diff_bot_1_1_core_1_1_i_local_repository_factory.html',1,'MapDiffBot::Core']]],
   ['ilocalrepositorymanager',['ILocalRepositoryManager',['../interface_map_diff_bot_1_1_core_1_1_i_local_repository_manager.html',1,'MapDiffBot::Core']]],
+  ['image',['Image',['../class_map_diff_bot_1_1_models_1_1_image.html',1,'MapDiffBot::Models']]],
   ['installation',['Installation',['../class_map_diff_bot_1_1_models_1_1_installation.html',1,'MapDiffBot::Models']]],
   ['installationrepository',['InstallationRepository',['../class_map_diff_bot_1_1_models_1_1_installation_repository.html',1,'MapDiffBot::Models']]],
   ['ipayloadprocessor',['IPayloadProcessor',['../interface_map_diff_bot_1_1_core_1_1_i_payload_processor.html',1,'MapDiffBot::Core']]],

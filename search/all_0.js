@@ -4,7 +4,7 @@ var searchData=
   ['accesstokenexpiry',['AccessTokenExpiry',['../class_map_diff_bot_1_1_models_1_1_installation.html#aa035d27340ebe8b49271abfa7b04a21c',1,'MapDiffBot::Models::Installation']]],
   ['accesstokenexpirydays',['AccessTokenExpiryDays',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a5146a4400555b4f22d76fc75d696dbb8',1,'MapDiffBot::Core::GitHubManager']]],
   ['activerepositories',['activeRepositories',['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#a417f4270eaa0817d05d08d2c7d8dadc0',1,'MapDiffBot::Core::LocalRepositoryManager']]],
-  ['afterimage',['AfterImage',['../class_map_diff_bot_1_1_models_1_1_map_diff.html#a3d03e5b64e643b4e5af0c5467a6392cc',1,'MapDiffBot::Models::MapDiff']]],
+  ['afterimage',['AfterImage',['../class_map_diff_bot_1_1_models_1_1_map_diff.html#a2b6ee0d37dbc0d52a2314693b0e640f1',1,'MapDiffBot::Models::MapDiff']]],
   ['appendalltext',['AppendAllText',['../class_map_diff_bot_1_1_core_1_1_default_i_o_manager.html#aba313620e15c64bf554213ff5ccf1b8b',1,'MapDiffBot::Core::DefaultIOManager']]],
   ['appid',['AppID',['../class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a507f3a5596aef21a59c4a62a8c5997c8',1,'MapDiffBot::Configuration::GitHubConfiguration']]],
   ['application',['Application',['../class_map_diff_bot_1_1_core_1_1_application.html#ad48cc64e36415fad40f16340ea4e157a',1,'MapDiffBot::Core::Application']]],

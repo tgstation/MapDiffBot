@@ -9,6 +9,7 @@ var searchData=
   ['ilocalrepository_2ecs',['ILocalRepository.cs',['../_i_local_repository_8cs.html',1,'']]],
   ['ilocalrepositoryfactory_2ecs',['ILocalRepositoryFactory.cs',['../_i_local_repository_factory_8cs.html',1,'']]],
   ['ilocalrepositorymanager_2ecs',['ILocalRepositoryManager.cs',['../_i_local_repository_manager_8cs.html',1,'']]],
+  ['image_2ecs',['Image.cs',['../_image_8cs.html',1,'']]],
   ['installation_2ecs',['Installation.cs',['../_installation_8cs.html',1,'']]],
   ['installationrepository_2ecs',['InstallationRepository.cs',['../_installation_repository_8cs.html',1,'']]],
   ['ipayloadprocessor_2ecs',['IPayloadProcessor.cs',['../_i_payload_processor_8cs.html',1,'']]],

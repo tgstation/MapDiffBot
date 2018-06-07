@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['webhooksecret',['WebhookSecret',['../class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a3ff8b1cb3a20dd13e5115dcd27d5a719',1,'MapDiffBot::Configuration::GitHubConfiguration']]]
+  ['useraccesstokens',['UserAccessTokens',['../class_map_diff_bot_1_1_models_1_1_database_context.html#a90248fbfe857c354a994b7ef6909940e',1,'MapDiffBot.Models.DatabaseContext.UserAccessTokens()'],['../interface_map_diff_bot_1_1_models_1_1_i_database_context.html#a56af84db39d1b6648fb95c6d0be6db24',1,'MapDiffBot.Models.IDatabaseContext.UserAccessTokens()']]]
 ];
