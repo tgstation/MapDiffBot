@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using ImageMagick;
 using MapDiffBot.Configuration;
 using MapDiffBot.Controllers;
 using MapDiffBot.Models;
@@ -17,6 +18,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Z.EntityFramework.Plus;
+
+using MemoryStream = System.IO.MemoryStream;
 
 namespace MapDiffBot.Core
 {
@@ -565,13 +568,13 @@ namespace MapDiffBot.Core
 
 					result.LogMessage = String.Format(CultureInfo.InvariantCulture, "Job {5}:{0}Path: {6}{0}Before:{0}Command Line: {1}{0}Output:{0}{2}{0}Logs:{0}{7}{0}After:{0}Command Line: {3}{0}Output:{0}{4}{0}Logs:{0}{8}{0}Exceptions:{0}{9}{0}", Environment.NewLine, r1?.CommandLine, r1?.OutputPath, r2?.CommandLine, r2?.OutputPath, i + 1, result.MapPath, r1?.ToolOutput, r2?.ToolOutput, result.LogMessage);
 
-					async Task<byte[]> ReadMapImage(string path)
+					async Task<Image> ReadMapImage(string path)
 					{
 						if (path != null && await currentIOManager.FileExists(path, cancellationToken).ConfigureAwait(false))
 						{
 							var bytes = await currentIOManager.ReadAllBytes(path, cancellationToken).ConfigureAwait(false);
 							await currentIOManager.DeleteFile(path, cancellationToken).ConfigureAwait(false);
-							return bytes;
+							return new Image { Data = bytes };
 						}
 						return null;
 					}
@@ -579,6 +582,27 @@ namespace MapDiffBot.Core
 					var readBeforeTask = ReadMapImage(r1?.OutputPath);
 					result.AfterImage = await ReadMapImage(r2?.OutputPath).ConfigureAwait(false);
 					result.BeforeImage = await readBeforeTask.ConfigureAwait(false);
+
+					Image GenerateDifferenceImage(Image before, Image after)
+					{
+						if (before == null || result.AfterImage == null)
+							return null;
+						using (var ms = new MemoryStream())
+						{
+							using (var diffI = new MagickImage())
+							{
+								using (var beforeI = new MagickImage(before.Data, new MagickReadSettings()))
+								using (var afterI = new MagickImage(after.Data, new MagickReadSettings()))
+								{
+									beforeI.Compare(afterI, ErrorMetric.Absolute, diffI);
+								}
+								diffI.Write(ms, MagickFormat.Png32);
+							}
+							return new Image { Data = ms.ToArray() };
+						}
+					}
+
+					result.DifferenceImage = GenerateDifferenceImage(result.BeforeImage, result.AfterImage);
 
 					return new KeyValuePair<MapDiff, MapRegion>(result, r2?.MapRegion);
 				}
@@ -619,10 +643,11 @@ namespace MapDiffBot.Core
 				var I = kv.Key;
 				var beforeUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "before"));
 				var afterUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "after"));
+				var differenceUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "diff"));
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "logs"));
 
 				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture,
-					"<details><summary>{0}</summary>{11}{11}{1} | {2}{11}--- | ---{11}![{13}]({3}) | ![{13}]({4}){11}{11}{5} | {6} | {7} | {12}{11}--- | --- | --- | ---{11}{8} | {9} | [{7}]({10}) | [{1}]({3}) \\| [{2}]({4}){11}{11}</details>{11}{11}",
+					"<details><summary>{0}</summary>{11}{11}{1} | {2} | {14}{11}--- | --- | ---{11}![{13}]({3}) | ![{13}]({4}) | ![{13}]({15}){11}{11}{5} | {6} | {7} | {12}{11}--- | --- | --- | ---{11}{8} | {9} | [{7}]({10}) | [{1}]({3}) \\| [{2}]({4}){11}{11}</details>{11}{11}",
 					I.MapPath,
 					stringLocalizer["Old"],
 					stringLocalizer["New"],
@@ -636,7 +661,9 @@ namespace MapDiffBot.Core
 					logsUrl,
 					Environment.NewLine,
 					stringLocalizer["Raw"],
-					stringLocalizer["If the image doesn't load, it may be too big for GitHub. Use the \"Raw\" links."]
+					stringLocalizer["If the image doesn't load, it may be too big for GitHub. Use the \"Raw\" links."],
+					stringLocalizer["Difference"],
+					differenceUrl
 					));
 				logger.LogTrace("Adding MapDiff for {0}...", I.MapPath);
 				databaseContext.MapDiffs.Add(I);

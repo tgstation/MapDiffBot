@@ -28,6 +28,11 @@ namespace MapDiffBot.Models
 		public DbSet<MapDiff> MapDiffs { get; set; }
 
 		/// <summary>
+		/// The <see cref="DbSet{TEntity}"/> for <see cref="Image"/>s
+		/// </summary>
+		public DbSet<Image> Images { get; set; }
+
+		/// <summary>
 		/// The <see cref="DbSet{TEntity}"/> for <see cref="Log"/>s
 		/// </summary>
 		public DbSet<Log> Logs { get; set; }
