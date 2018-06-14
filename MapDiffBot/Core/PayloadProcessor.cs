@@ -179,7 +179,7 @@ namespace MapDiffBot.Core
 					}
 
 					var allChangedMaps = await changedMapsTask.ConfigureAwait(false);
-					var changedDmms = allChangedMaps.Where(x => x.FileName.EndsWith(".dmm", StringComparison.InvariantCultureIgnoreCase)).Select(x => x.FileName).ToList();
+					var changedDmms = allChangedMaps.Where(x => x.Changes > 0 && x.FileName.EndsWith(".dmm", StringComparison.InvariantCultureIgnoreCase)).Select(x => x.FileName).ToList();
 					if (changedDmms.Count == 0)
 					{
 						logger.LogDebug("Pull request has no changed maps, exiting");
