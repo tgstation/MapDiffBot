@@ -647,7 +647,7 @@ namespace MapDiffBot.Core
 				var logsUrl = String.Concat(prefix, FilesController.RouteTo(pullRequest.Base.Repository, checkRunId, formatterCount, "logs"));
 
 				commentBuilder.Append(String.Format(CultureInfo.InvariantCulture,
-					"<details><summary>{0}</summary>{11}{11}{1} | {2} | {14}{11}--- | --- | ---{11}![{13}]({3}) | ![{13}]({4}) | ![{13}]({15}){11}{11}{5} | {6} | {7} | {12}{11}--- | --- | --- | ---{11}{8} | {9} | [{7}]({10}) | [{1}]({3}) \\| [{2}]({4}){11}{11}</details>{11}{11}",
+					"<details><summary>{0}</summary>{11}{11}{1} | {2} | {14}{11}--- | --- | ---{11}![{13}]({3}) | ![{13}]({4}) | ![{13}]({15}){11}{11}{5} | {6} | {7} | {12}{11}--- | --- | --- | ---{11}{8} | {9} | [{7}]({10}) | [{1}]({3}) \\| [{2}]({4}) \\| [{14}]({15}){11}{11}</details>{11}{11}",
 					I.MapPath,
 					stringLocalizer["Old"],
 					stringLocalizer["New"],
