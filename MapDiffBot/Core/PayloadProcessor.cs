@@ -284,55 +284,54 @@ namespace MapDiffBot.Core
 					}, cancellationToken);
 				};
 
+				var progressBuilder = new StringBuilder();
+				void AddProgressLine(string line)
+				{
+					logger.LogTrace(line);
+
+					var ourTask = new TaskCompletionSource<object>();
+					Task toAwait;
+					async Task RunNext()
+					{
+						await toAwait.ConfigureAwait(false);
+
+						string ourLine;
+						lock (progressBuilder)
+						{
+							progressBuilder.AppendLine(String.Format(CultureInfo.InvariantCulture, "[{0}]: {1}", DateTimeOffset.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture), line));
+							ourLine = progressBuilder.ToString();
+						}
+
+						await gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
+						{
+							Status = CheckStatus.InProgress,
+							Output = new CheckRunOutput(stringLocalizer["Generating Diffs"], stringLocalizer["Progress:"], String.Format(CultureInfo.InvariantCulture, "```{0}{1}{0}```", Environment.NewLine, ourLine), null, null),
+						}, cancellationToken).ConfigureAwait(false);
+
+						ourTask.SetResult(null);
+					};
+					lock (progressBuilder)
+					{
+						toAwait = generatingCommentTask;
+						generatingCommentTask = RunNext();
+					}
+				}
+
+				async Task DirectoryPrep(bool recreate)
+				{
+					AddProgressLine("Cleaning working directory...");
+					await currentIOManager.DeleteDirectory(".", cancellationToken).ConfigureAwait(false);
+					if (recreate)
+						await currentIOManager.CreateDirectory(".", cancellationToken).ConfigureAwait(false);
+					AddProgressLine("Working directory cleaned!");
+				};
+
 				logger.LogTrace("Locking repository...");
 				using (var repo = await repositoryManager.GetRepository(pullRequest.Base.Repository, OnCloneProgress, CreateBlockedComment, cancellationToken).ConfigureAwait(false))
 				{
 					logger.LogTrace("Repository ready");
 
-					var progressBuilder = new StringBuilder();
-
-					void AddProgressLine(string line)
-					{
-						logger.LogTrace(line);
-
-						var ourTask = new TaskCompletionSource<object>();
-						Task toAwait;
-						async Task RunNext()
-						{
-							await toAwait.ConfigureAwait(false);
-
-							string ourLine;
-							lock (progressBuilder)
-							{
-								progressBuilder.AppendLine(String.Format(CultureInfo.InvariantCulture, "[{0}]: {1}", DateTimeOffset.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture), line));
-								ourLine = progressBuilder.ToString();
-							}
-
-							await gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
-							{
-								Status = CheckStatus.InProgress,
-								Output = new CheckRunOutput(stringLocalizer["Generating Diffs"], stringLocalizer["Progress:"], String.Format(CultureInfo.InvariantCulture, "```{0}{1}{0}```", Environment.NewLine, ourLine), null, null),
-							}, cancellationToken).ConfigureAwait(false);
-
-							ourTask.SetResult(null);
-						};
-						lock (progressBuilder)
-						{
-							toAwait = generatingCommentTask;
-							generatingCommentTask = RunNext();
-						}
-					}
-
 					AddProgressLine("Initializing...");
-
-					//prep the outputDirectory
-					async Task DirectoryPrep()
-					{
-						AddProgressLine("Cleaning working directory...");
-						await currentIOManager.DeleteDirectory(".", cancellationToken).ConfigureAwait(false);
-						await currentIOManager.CreateDirectory(".", cancellationToken).ConfigureAwait(false);
-						AddProgressLine("Working directory cleaned!");
-					};
 
 					async Task<string> GetDmeToUse()
 					{
@@ -352,7 +351,7 @@ namespace MapDiffBot.Core
 						return customDme;
 					}
 
-					var dirPrepTask = DirectoryPrep();
+					var dirPrepTask = DirectoryPrep(false);
 					//get the dme to use
 					var dmeToUseTask = GetDmeToUse();
 
@@ -573,7 +572,6 @@ namespace MapDiffBot.Core
 						if (path != null && await currentIOManager.FileExists(path, cancellationToken).ConfigureAwait(false))
 						{
 							var bytes = await currentIOManager.ReadAllBytes(path, cancellationToken).ConfigureAwait(false);
-							await currentIOManager.DeleteFile(path, cancellationToken).ConfigureAwait(false);
 							return new Image { Data = bytes };
 						}
 						return null;
@@ -613,6 +611,9 @@ namespace MapDiffBot.Core
 				logger.LogTrace("Collecting results...");
 				var results = Enumerable.Range(0, changedDmms.Count).Select(x => GetResult(x)).ToList();
 				await Task.WhenAll(results).ConfigureAwait(false);
+
+				await DirectoryPrep(false).ConfigureAwait(false);
+
 				var dic = new Dictionary<MapDiff, MapRegion>();
 				foreach (var I in results.Select(x => x.Result))
 					dic.Add(I.Key, I.Value);
