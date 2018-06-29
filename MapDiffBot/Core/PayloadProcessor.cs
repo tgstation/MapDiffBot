@@ -351,7 +351,7 @@ namespace MapDiffBot.Core
 						return customDme;
 					}
 
-					var dirPrepTask = DirectoryPrep(false);
+					var dirPrepTask = DirectoryPrep(true);
 					//get the dme to use
 					var dmeToUseTask = GetDmeToUse();
 
