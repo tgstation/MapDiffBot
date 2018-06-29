@@ -604,15 +604,15 @@ namespace MapDiffBot.Core
 
 					return new KeyValuePair<MapDiff, MapRegion>(result, r2?.MapRegion);
 				}
-
-				logger.LogTrace("Waiting for GitHub check to finish updating...");
-				await generatingCommentTask.ConfigureAwait(false);
-
+				
 				logger.LogTrace("Collecting results...");
 				var results = Enumerable.Range(0, changedDmms.Count).Select(x => GetResult(x)).ToList();
 				await Task.WhenAll(results).ConfigureAwait(false);
 
 				await DirectoryPrep(false).ConfigureAwait(false);
+				
+				logger.LogTrace("Waiting for GitHub check to finish updating...");
+				await generatingCommentTask.ConfigureAwait(false);
 
 				var dic = new Dictionary<MapDiff, MapRegion>();
 				foreach (var I in results.Select(x => x.Result))
