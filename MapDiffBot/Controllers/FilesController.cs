@@ -77,7 +77,7 @@ namespace MapDiffBot.Controllers
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> of the operation</returns>
 		[HttpGet("{repositoryId}/{checkRunId}/{fileId}/{beforeOrAfter}.png")]
-		[ResponseCache(Duration = Int32.MaxValue)]
+		[ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
 		public async Task<IActionResult> HandleMapGet(long repositoryId, long checkRunId, int fileId, string beforeOrAfter, CancellationToken cancellationToken)
 		{
 			if (beforeOrAfter == null)
@@ -108,7 +108,6 @@ namespace MapDiffBot.Controllers
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> of the operation</returns>
 		[HttpGet("{repositoryId}/{checkRunId}/{fileId}/logs.txt")]
-		[ResponseCache(Duration = Int32.MaxValue)]
 		public async Task<IActionResult> HandleLogsGet(long repositoryId, long checkRunId, int fileId, CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved GET: {0}/{1}/{2}.txt", repositoryId, checkRunId, fileId);
@@ -124,7 +123,6 @@ namespace MapDiffBot.Controllers
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> of the operation</returns>
 		[HttpGet("{repositoryId}/{checkRunId}/logs.txt")]
-		[ResponseCache(Duration = Int32.MaxValue)]
 		public async Task<IActionResult> HandleAllLogsGet(long repositoryId, long checkRunId, CancellationToken cancellationToken)
 		{
 			logger.LogTrace("Recieved GET: {0}/{1}/logs.txt", repositoryId, checkRunId);
@@ -140,7 +138,6 @@ namespace MapDiffBot.Controllers
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task{TResult}"/> resulting in the <see cref="IActionResult"/> of the operation</returns>
 		[HttpGet("{repositoryId}/{checkRunId}")]
-		[ResponseCache(Duration = Int32.MaxValue)]
 		public async Task<IActionResult> Browse(long repositoryId, long checkRunId, CancellationToken cancellationToken)
 		{
 			var diffs = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId).Select(x => x.MapPath).ToListAsync(cancellationToken).ConfigureAwait(false);
