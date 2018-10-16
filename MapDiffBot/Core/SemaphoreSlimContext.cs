@@ -39,11 +39,13 @@ namespace MapDiffBot.Core
 		/// </summary>
 		/// <param name="lockedSemaphore">The value of <see cref="lockedSemaphore"/></param>
 		SemaphoreSlimContext(SemaphoreSlim lockedSemaphore) => this.lockedSemaphore = lockedSemaphore;
-
+		
 		/// <summary>
 		/// Finalize the <see cref="SemaphoreSlimContext"/>
 		/// </summary>
+#pragma warning disable CA1821 // Remove empty Finalizers
 		~SemaphoreSlimContext() => Dispose();
+#pragma warning restore CA1821 // Remove empty Finalizers
 
 		/// <summary>
 		/// Release the lock on <see cref="lockedSemaphore"/>
