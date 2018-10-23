@@ -14,6 +14,7 @@ namespace MapDiffBot.Core.Tests
 	[TestClass]
 	public sealed class TestLocalRepositoryManager
 	{
+		[Ignore]
 		[TestMethod]
 		public void TestInstantiation()
 		{
