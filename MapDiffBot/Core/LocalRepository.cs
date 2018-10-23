@@ -68,7 +68,9 @@ namespace MapDiffBot.Core
 		/// <summary>
 		/// Finalized the <see cref="LocalRepository"/>
 		/// </summary>
+#pragma warning disable CA1821 // Remove empty Finalizers
 		~LocalRepository() => Dispose();
+#pragma warning restore CA1821 // Remove empty Finalizers
 
 		/// <summary>
 		/// Disposes the <see cref="LocalRepository"/> and completes <see cref="onDisposal"/>

@@ -19,7 +19,7 @@ COPY SpacemanDMM/ ./
 
 RUN cargo build -p cli --release
 
-FROM microsoft/aspnetcore-build:2.0.6-2.1.101-jessie AS build
+FROM microsoft/dotnet:2.1-sdk AS build
 
 WORKDIR /src
 COPY MapDiffBot/MapDiffBot.csproj MapDiffBot/
@@ -35,7 +35,7 @@ RUN dotnet test -c Docker
 WORKDIR /src/MapDiffBot
 RUN dotnet publish -c Docker -o /app && cp entrypoint.sh /app/
 
-FROM microsoft/aspnetcore:2.0.6-jessie AS base
+FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
 EXPOSE 80
 
 #deps for libgit2
