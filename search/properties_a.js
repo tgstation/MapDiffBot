@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['path',['Path',['../interface_map_diff_bot_1_1_core_1_1_i_local_repository.html#a1a260aa65e803bf69b28d78a54538dbc',1,'MapDiffBot::Core::ILocalRepository']]],
-  ['pempath',['PemPath',['../class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a5b6cae385e48a4ba656bbff0a15cc9ed',1,'MapDiffBot::Configuration::GitHubConfiguration']]],
-  ['processlimit',['ProcessLimit',['../class_map_diff_bot_1_1_configuration_1_1_general_configuration.html#ac66e6e16de2164ea1a47a8ab1dcda235',1,'MapDiffBot::Configuration::GeneralConfiguration']]]
+  ['logmessage',['LogMessage',['../class_map_diff_bot_1_1_models_1_1_map_diff.html#a2a033c03706bb3cf4e43d2dc8c171fd1',1,'MapDiffBot::Models::MapDiff']]],
+  ['logs',['Logs',['../class_map_diff_bot_1_1_models_1_1_database_context.html#a619fd335558f7fc1f679e8f3e944552a',1,'MapDiffBot::Models::DatabaseContext']]]
 ];

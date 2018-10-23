@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['iomanager',['ioManager',['../class_map_diff_bot_1_1_core_1_1_generator.html#a6e34169238271280aebb56f67e1fd266',1,'MapDiffBot.Core.Generator.ioManager()'],['../class_map_diff_bot_1_1_core_1_1_local_repository_manager.html#ab73972f5152974311ec3cea9b43be9c6',1,'MapDiffBot.Core.LocalRepositoryManager.ioManager()'],['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#a2220d03a74552c35e2597ee7007b1d16',1,'MapDiffBot.Core.PayloadProcessor.ioManager()']]],
-  ['issuereporturl',['IssueReportUrl',['../class_map_diff_bot_1_1_core_1_1_payload_processor.html#ad72fd0bdf5cd01782160e7f3f69f0797',1,'MapDiffBot::Core::PayloadProcessor']]]
+  ['hostingenvironment',['hostingEnvironment',['../class_map_diff_bot_1_1_models_1_1_database_context.html#a1b9c2970f55a5949c8da685ea0924e5a',1,'MapDiffBot::Models::DatabaseContext']]],
+  ['httpclientadapter',['httpClientAdapter',['../class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#a49e33bb6b8a0b7ab5a52bb7b13552d04',1,'MapDiffBot::Core::GitHubClientFactory']]]
 ];

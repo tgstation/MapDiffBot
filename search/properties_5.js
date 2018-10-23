@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['fileid',['FileId',['../class_map_diff_bot_1_1_models_1_1_map_diff.html#abf8bb584a5d85d5a908e8c8c61a15826',1,'MapDiffBot::Models::MapDiff']]]
+  ['expiry',['Expiry',['../class_map_diff_bot_1_1_models_1_1_user_access_token.html#a3fe26bdab9d981c4ceaaafd77072fc07',1,'MapDiffBot::Models::UserAccessToken']]]
 ];

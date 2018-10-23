@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['webhooksecret',['WebhookSecret',['../class_map_diff_bot_1_1_configuration_1_1_git_hub_configuration.html#a3ff8b1cb3a20dd13e5115dcd27d5a719',1,'MapDiffBot::Configuration::GitHubConfiguration']]]
+  ['repositories',['Repositories',['../class_map_diff_bot_1_1_models_1_1_installation.html#a69ced215a9be6316e9033fd23ec090a2',1,'MapDiffBot::Models::Installation']]]
 ];

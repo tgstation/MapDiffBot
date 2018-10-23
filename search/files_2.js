@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['filescontroller_2ecs',['FilesController.cs',['../_files_controller_8cs.html',1,'']]]
+  ['browse_2eg_2ecshtml_2ecs',['Browse.g.cshtml.cs',['../_browse_8g_8cshtml_8cs.html',1,'']]]
 ];

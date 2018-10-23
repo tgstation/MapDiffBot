@@ -1,6 +1,24 @@
 var searchData=
 [
-  ['edit',['Edit',['../class_map_diff_bot_1_1_controllers_1_1_dme_configuration_controller.html#a46184902f55ee04c8c69071302ce2283',1,'MapDiffBot::Controllers::DmeConfigurationController']]],
-  ['expireauthorization',['ExpireAuthorization',['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a91534f8b528f85116959b3a1866afd14',1,'MapDiffBot.Core.GitHubManager.ExpireAuthorization()'],['../interface_map_diff_bot_1_1_core_1_1_i_git_hub_manager.html#a500537a4cc14bd3a0c096c325a883ca1',1,'MapDiffBot.Core.IGitHubManager.ExpireAuthorization()']]],
-  ['expiry',['Expiry',['../class_map_diff_bot_1_1_models_1_1_user_access_token.html#a3fe26bdab9d981c4ceaaafd77072fc07',1,'MapDiffBot::Models::UserAccessToken']]]
+  ['data',['Data',['../class_map_diff_bot_1_1_models_1_1_image.html#a91f4a8a2f196ebe35a2cf2c72c6aebd0',1,'MapDiffBot::Models::Image']]],
+  ['databaseconfiguration',['DatabaseConfiguration',['../class_map_diff_bot_1_1_configuration_1_1_database_configuration.html',1,'MapDiffBot::Configuration']]],
+  ['databaseconfiguration',['databaseConfiguration',['../class_map_diff_bot_1_1_models_1_1_database_context.html#a8d8b05521bbab517beca0a08430a4500',1,'MapDiffBot::Models::DatabaseContext']]],
+  ['databaseconfiguration_2ecs',['DatabaseConfiguration.cs',['../_database_configuration_8cs.html',1,'']]],
+  ['databasecontext',['DatabaseContext',['../class_map_diff_bot_1_1_models_1_1_database_context.html',1,'MapDiffBot::Models']]],
+  ['databasecontext',['DatabaseContext',['../class_map_diff_bot_1_1_models_1_1_database_context.html#a661e3754882a296d0cb20744aa773281',1,'MapDiffBot.Models.DatabaseContext.DatabaseContext()'],['../class_map_diff_bot_1_1_controllers_1_1_dme_configuration_controller.html#a8529b3637e37e523855b02be61b8c3a3',1,'MapDiffBot.Controllers.DmeConfigurationController.databaseContext()'],['../class_map_diff_bot_1_1_controllers_1_1_files_controller.html#a98e014fd0c4c2c0170aafb2df9fd232d',1,'MapDiffBot.Controllers.FilesController.databaseContext()'],['../class_map_diff_bot_1_1_core_1_1_git_hub_manager.html#a492e1ac1d74b950f4955d6395c6e8130',1,'MapDiffBot.Core.GitHubManager.databaseContext()']]],
+  ['databasecontext_2ecs',['DatabaseContext.cs',['../_database_context_8cs.html',1,'']]],
+  ['dbcontext',['DbContext',['../class_db_context.html',1,'']]],
+  ['defaultbuffersize',['DefaultBufferSize',['../class_map_diff_bot_1_1_core_1_1_default_i_o_manager.html#a82c5d8be380a3572e20b66bfaa098109',1,'MapDiffBot::Core::DefaultIOManager']]],
+  ['defaultiomanager',['DefaultIOManager',['../class_map_diff_bot_1_1_core_1_1_default_i_o_manager.html',1,'MapDiffBot::Core']]],
+  ['defaultiomanager_2ecs',['DefaultIOManager.cs',['../_default_i_o_manager_8cs.html',1,'']]],
+  ['deletedirectory',['DeleteDirectory',['../class_map_diff_bot_1_1_core_1_1_default_i_o_manager.html#a9afd6166703a7ef044b349e068bf74e0',1,'MapDiffBot.Core.DefaultIOManager.DeleteDirectory()'],['../interface_map_diff_bot_1_1_core_1_1_i_i_o_manager.html#a890be36ecae6d90e252bf068eb88326b',1,'MapDiffBot.Core.IIOManager.DeleteDirectory()']]],
+  ['deletefile',['DeleteFile',['../class_map_diff_bot_1_1_core_1_1_default_i_o_manager.html#a603cb1fba967adff7a75c7f23b8414f1',1,'MapDiffBot.Core.DefaultIOManager.DeleteFile()'],['../interface_map_diff_bot_1_1_core_1_1_i_i_o_manager.html#a629e3ccbf2a6dfa7c7a44d5efcb05697',1,'MapDiffBot.Core.IIOManager.DeleteFile()']]],
+  ['differenceimage',['DifferenceImage',['../class_map_diff_bot_1_1_models_1_1_map_diff.html#a4b3a0c63b7271ce5293582774e0c7f76',1,'MapDiffBot::Models::MapDiff']]],
+  ['dispose',['Dispose',['../class_map_diff_bot_1_1_core_1_1_generator_factory.html#a1d058e27ca429fe81c4090dc331ba366',1,'MapDiffBot.Core.GeneratorFactory.Dispose()'],['../class_map_diff_bot_1_1_core_1_1_git_hub_client_factory.html#af8867d61ec28ca7bbdd36efdbe54aa20',1,'MapDiffBot.Core.GitHubClientFactory.Dispose()'],['../class_map_diff_bot_1_1_core_1_1_local_repository.html#aa02c15059c413ef9e2374549dc4f9c1f',1,'MapDiffBot.Core.LocalRepository.Dispose()'],['../class_map_diff_bot_1_1_core_1_1_no_op_disposable.html#ac263da6bfc98129843c318a46922a4cf',1,'MapDiffBot.Core.NoOpDisposable.Dispose()'],['../class_map_diff_bot_1_1_core_1_1_semaphore_slim_context.html#acfc17e9189a81df90ce689339bc8784e',1,'MapDiffBot.Core.SemaphoreSlimContext.Dispose()']]],
+  ['disposed',['disposed',['../class_map_diff_bot_1_1_core_1_1_local_repository.html#abe42d40376803b2ecea077f1c4d29726',1,'MapDiffBot.Core.LocalRepository.disposed()'],['../class_map_diff_bot_1_1_core_1_1_semaphore_slim_context.html#aa627fe8cf975233d3b49bfdef09706a6',1,'MapDiffBot.Core.SemaphoreSlimContext.disposed()']]],
+  ['dmeargument',['dmeArgument',['../class_map_diff_bot_1_1_core_1_1_generator.html#a94d2cf133f147a6e72d61dfec1caf1cd',1,'MapDiffBot::Core::Generator']]],
+  ['dmeconfigurationcontroller',['DmeConfigurationController',['../class_map_diff_bot_1_1_controllers_1_1_dme_configuration_controller.html#a5ccdd8406b0124fc06c054aab39a1b0c',1,'MapDiffBot::Controllers::DmeConfigurationController']]],
+  ['dmeconfigurationcontroller',['DmeConfigurationController',['../class_map_diff_bot_1_1_controllers_1_1_dme_configuration_controller.html',1,'MapDiffBot::Controllers']]],
+  ['dmeconfigurationcontroller_2ecs',['DmeConfigurationController.cs',['../_dme_configuration_controller_8cs.html',1,'']]],
+  ['dmmtoolspath',['DMMToolsPath',['../class_map_diff_bot_1_1_core_1_1_generator.html#a45c08e12ddea945eeb8088c72bc10e31',1,'MapDiffBot::Core::Generator']]]
 ];
