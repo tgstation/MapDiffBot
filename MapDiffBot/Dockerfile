@@ -57,6 +57,6 @@ COPY --from=compiler /src/SpacemanDMM/target/release/dmm-tools dmm-tools.exe
 COPY --from=build /app .
 
 RUN mv appsettings.Docker.json /config_data/appsettings.Production.json
-VOLUME ["/config_data"]
+VOLUME ["/config_data", "/app/App_Data/Repositories" ]
 
 ENTRYPOINT ["./entrypoint.sh"]
