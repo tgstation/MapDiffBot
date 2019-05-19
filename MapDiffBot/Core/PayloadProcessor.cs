@@ -438,7 +438,7 @@ namespace MapDiffBot.Core
 							{
 								var xdiam = region.MaxX - region.MinX;
 								var ydiam = region.MaxY - region.MinY;
-								const int minDiffDimensions = 5 - 1;
+								const int minDiffDimensions = 6 - 1;
 								if (xdiam < minDiffDimensions || ydiam < minDiffDimensions)
 								{
 									//need to expand
