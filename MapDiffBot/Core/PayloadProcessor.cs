@@ -134,16 +134,11 @@ namespace MapDiffBot.Core
 				var changedMapsTask = gitHubManager.GetPullRequestChangedFiles(pullRequest, cancellationToken);
 				var requestIdentifier = String.Concat(pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name, pullRequest.Number);
 
-				var ncr = new NewCheckRun
+				var ncr = new NewCheckRun(String.Format(CultureInfo.InvariantCulture, "Map Diff Renders - Pull Request #{0}", pullRequest.Number), pullRequest.Head.Sha)
 				{
-					HeadSha = pullRequest.Head.Sha,
-					Name = String.Format(CultureInfo.InvariantCulture, "Map Diff Renders - Pull Request #{0}", pullRequest.Number),
 					StartedAt = DateTimeOffset.Now,
 					Status = CheckStatus.Queued
 				};
-
-				if (pullRequest.Head.Repository.Id == repositoryId)
-					ncr.HeadBranch = pullRequest.Head.Ref;
 
 				var checkRunId = await gitHubManager.CreateCheckRun(repositoryId, ncr, cancellationToken).ConfigureAwait(false);
 
@@ -152,7 +147,7 @@ namespace MapDiffBot.Core
 					CompletedAt = DateTimeOffset.Now,
 					Status = CheckStatus.Completed,
 					Conclusion = CheckConclusion.Neutral,
-					Output = new CheckRunOutput(stringLocalizer["Operation Cancelled"], stringLocalizer["The operation was cancelled on the server, most likely due to app shutdown. You may attempt re-running it."], null, null, null)
+					Output = new NewCheckRunOutput(stringLocalizer["Operation Cancelled"], stringLocalizer["The operation was cancelled on the server, most likely due to app shutdown. You may attempt re-running it."])
 				}, default);
 
 				try
@@ -173,7 +168,7 @@ namespace MapDiffBot.Core
 							CompletedAt = DateTimeOffset.Now,
 							Status = CheckStatus.Completed,
 							Conclusion = CheckConclusion.Failure,
-							Output = new CheckRunOutput(stringLocalizer["Merge Conflict"], stringLocalizer["Unable to render pull requests in an unmergeable state"], null, null, null)
+							Output = new NewCheckRunOutput(stringLocalizer["Merge Conflict"], stringLocalizer["Unable to render pull requests in an unmergeable state"])
 						}, cancellationToken).ConfigureAwait(false);
 						return;
 					}
@@ -189,7 +184,7 @@ namespace MapDiffBot.Core
 							CompletedAt = DateTimeOffset.Now,
 							Status = CheckStatus.Completed,
 							Conclusion = CheckConclusion.Neutral,
-							Output = new CheckRunOutput(stringLocalizer["No Modified Maps"], stringLocalizer["No modified .dmm files were detected in this pull request"], null, null, null)
+							Output = new NewCheckRunOutput(stringLocalizer["No Modified Maps"], stringLocalizer["No modified .dmm files were detected in this pull request"])
 						}, cancellationToken).ConfigureAwait(false);
 						return;
 					}
@@ -214,7 +209,7 @@ namespace MapDiffBot.Core
 							CompletedAt = DateTimeOffset.Now,
 							Status = CheckStatus.Completed,
 							Conclusion = CheckConclusion.Failure,
-							Output = new CheckRunOutput(stringLocalizer["Error rendering maps!"], stringLocalizer["Exception details:\n\n```\n{0}\n```\n\nPlease report this [here]({1})", e.ToString(), IssueReportUrl], null, null, null)
+							Output = new NewCheckRunOutput(stringLocalizer["Error rendering maps!"], stringLocalizer["Exception details:\n\n```\n{0}\n```\n\nPlease report this [here]({1})", e.ToString(), IssueReportUrl])
 						}, default).ConfigureAwait(false);
 						throw;
 					}
@@ -272,7 +267,7 @@ namespace MapDiffBot.Core
 					await gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
 					{
 						Status = CheckStatus.InProgress,
-						Output = new CheckRunOutput(stringLocalizer["Cloning Repository"], stringLocalizer["Clone Progress: {0}%", progress], null, null, null),
+						Output = new NewCheckRunOutput(stringLocalizer["Cloning Repository"], stringLocalizer["Clone Progress: {0}%", progress]),
 					}, cancellationToken).ConfigureAwait(false);
 				};
 				Task CreateBlockedComment()
@@ -280,7 +275,7 @@ namespace MapDiffBot.Core
 					logger.LogInformation("Waiting for another diff generation on {0}/{1} to complete...", pullRequest.Base.Repository.Owner.Login, pullRequest.Base.Repository.Name);
 					return gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
 					{
-						Output = new CheckRunOutput(stringLocalizer["Waiting for Repository"], stringLocalizer["Waiting for another operation on this repository to complete..."], null, null, null),
+						Output = new NewCheckRunOutput(stringLocalizer["Waiting for Repository"], stringLocalizer["Waiting for another operation on this repository to complete..."]),
 					}, cancellationToken);
 				};
 
@@ -305,7 +300,10 @@ namespace MapDiffBot.Core
 						await gitHubManager.UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, new CheckRunUpdate
 						{
 							Status = CheckStatus.InProgress,
-							Output = new CheckRunOutput(stringLocalizer["Generating Diffs"], stringLocalizer["Progress:"], String.Format(CultureInfo.InvariantCulture, "```{0}{1}{0}```", Environment.NewLine, ourLine), null, null),
+							Output = new NewCheckRunOutput(stringLocalizer["Generating Diffs"], stringLocalizer["Progress:"])
+							{
+								Text = String.Format(CultureInfo.InvariantCulture, "```{0}{1}{0}```", Environment.NewLine, ourLine)
+							},
 						}, cancellationToken).ConfigureAwait(false);
 
 						ourTask.SetResult(null);
@@ -688,7 +686,10 @@ namespace MapDiffBot.Core
 				DetailsUrl = String.Concat(prefix, FilesController.RouteToBrowse(pullRequest.Base.Repository, checkRunId)),
 				Status = CheckStatus.Completed,
 				CompletedAt = DateTimeOffset.Now,
-				Output = new CheckRunOutput(stringLocalizer["Map Renderings"], stringLocalizer["Maps with diff:"], comment, null, null),
+				Output = new NewCheckRunOutput(stringLocalizer["Map Renderings"], stringLocalizer["Maps with diff:"])
+				{
+					Text = comment
+				},
 				Conclusion = CheckConclusion.Success
 			};
 			await scope.ServiceProvider.GetRequiredService<IGitHubManager>().UpdateCheckRun(pullRequest.Base.Repository.Id, checkRunId, ncr, cancellationToken).ConfigureAwait(false);
@@ -700,22 +701,18 @@ namespace MapDiffBot.Core
 		/// <param name="repositoryId">The <see cref="Repository.Id"/></param>
 		/// <param name="gitHubManager">The <see cref="IGitHubManager"/> for the operation</param>
 		/// <param name="checkSuiteSha">The <see cref="CheckSuite.HeadSha"/></param>
-		/// <param name="checkSuiteBranch">The <see cref="CheckSuite.HeadBranch"/></param>
 		/// <param name="cancellationToken">The <see cref="CancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
-		async Task CreateUnassociatedCheck(long repositoryId, IGitHubManager gitHubManager, string checkSuiteSha, string checkSuiteBranch, CancellationToken cancellationToken)
+		async Task CreateUnassociatedCheck(long repositoryId, IGitHubManager gitHubManager, string checkSuiteSha, CancellationToken cancellationToken)
 		{
 			var now = DateTimeOffset.Now;
 			var nmc = stringLocalizer["No Associated Pull Request"];
-			await gitHubManager.CreateCheckRun(repositoryId, new NewCheckRun
+			await gitHubManager.CreateCheckRun(repositoryId, new NewCheckRun(nmc, checkSuiteSha)
 			{
 				CompletedAt = now,
 				StartedAt = now,
 				Conclusion = CheckConclusion.Neutral,
-				HeadSha = checkSuiteSha,
-				HeadBranch = checkSuiteBranch,
-				Name = nmc,
-				Output = new CheckRunOutput(nmc, String.Empty, null, null, null),
+				Output = new NewCheckRunOutput(nmc, String.Empty),
 				Status = CheckStatus.Completed
 			}, cancellationToken).ConfigureAwait(false);
 		}
@@ -726,11 +723,10 @@ namespace MapDiffBot.Core
 		/// <param name="repositoryId">The <see cref="PullRequest.Base"/> <see cref="Repository.Id"/></param>
 		/// <param name="checkSuiteId">The <see cref="CheckSuite.Id"/></param>
 		/// <param name="checkSuiteSha">The <see cref="CheckSuite.HeadSha"/></param>
-		/// <param name="checkSuiteBranch">The <see cref="CheckSuite.HeadBranch"/></param>
 		/// <param name="jobCancellationToken">The <see cref="IJobCancellationToken"/> for the operation</param>
 		/// <returns>A <see cref="Task"/> representing the running operation</returns>
 		[AutomaticRetry(Attempts = 0)]
-		public async Task ScanCheckSuite(long repositoryId, long checkSuiteId, string checkSuiteSha, string checkSuiteBranch, IJobCancellationToken jobCancellationToken)
+		public async Task ScanCheckSuite(long repositoryId, long checkSuiteId, string checkSuiteSha, IJobCancellationToken jobCancellationToken)
 		{
 			using (logger.BeginScope("Scanning check suite {0} for repository {1}. Sha: ", checkSuiteId, repositoryId, checkSuiteSha))
 			using (var scope = serviceProvider.CreateScope())
@@ -740,7 +736,7 @@ namespace MapDiffBot.Core
 				var checkRuns = await gitHubManager.GetMatchingCheckRuns(repositoryId, checkSuiteId, cancellationToken).ConfigureAwait(false);
 				bool testedAny = false;
 
-				await Task.WhenAll(checkRuns.Select(x =>
+				await Task.WhenAll(checkRuns.CheckRuns.Select(x =>
 				{
 					var result = GetPullRequestNumberFromCheckRun(x);
 					if (result.HasValue)
@@ -752,7 +748,7 @@ namespace MapDiffBot.Core
 				})).ConfigureAwait(false);
 
 				if (!testedAny)
-					await CreateUnassociatedCheck(repositoryId, gitHubManager, checkSuiteSha, checkSuiteBranch, cancellationToken).ConfigureAwait(false);
+					await CreateUnassociatedCheck(repositoryId, gitHubManager, checkSuiteSha, cancellationToken).ConfigureAwait(false);
 			}
 		}
 
@@ -785,7 +781,7 @@ namespace MapDiffBot.Core
 			if (payload.Action != "rerequested")
 				return;
 			
-			backgroundJobClient.Enqueue(() => ScanCheckSuite(payload.Repository.Id, payload.CheckSuite.Id, payload.CheckSuite.HeadSha, payload.CheckSuite.HeadBranch, JobCancellationToken.Null));
+			backgroundJobClient.Enqueue(() => ScanCheckSuite(payload.Repository.Id, payload.CheckSuite.Id, payload.CheckSuite.HeadSha, JobCancellationToken.Null));
 		}
 
 		/// <inheritdoc />
@@ -797,7 +793,7 @@ namespace MapDiffBot.Core
 			if (prNumber.HasValue)
 				backgroundJobClient.Enqueue(() => ScanPullRequest(payload.Repository.Id, prNumber.Value, JobCancellationToken.Null));
 			else
-				await CreateUnassociatedCheck(payload.Repository.Id, gitHubManager, payload.CheckRun.CheckSuite.HeadSha, payload.CheckRun.CheckSuite.HeadBranch, cancellationToken).ConfigureAwait(false);
+				await CreateUnassociatedCheck(payload.Repository.Id, gitHubManager, payload.CheckRun.CheckSuite.HeadSha, cancellationToken).ConfigureAwait(false);
 		}
 	}
 }

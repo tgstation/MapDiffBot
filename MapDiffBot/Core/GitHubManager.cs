@@ -291,7 +291,7 @@ namespace MapDiffBot.Core
 		}
 
 		/// <inheritdoc />
-		public async Task<IReadOnlyList<CheckRun>> GetMatchingCheckRuns(long repositoryId, long checkSuiteId, CancellationToken cancellationToken)
+		public async Task<CheckRunsResponse> GetMatchingCheckRuns(long repositoryId, long checkSuiteId, CancellationToken cancellationToken)
 		{
 			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
 			return await client.Check.Run.GetAllForCheckSuite(repositoryId, checkSuiteId).ConfigureAwait(false);

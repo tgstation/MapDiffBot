@@ -44,7 +44,7 @@ namespace MapDiffBot.Controllers
 		/// <param name="fileId">The <see cref="MapDiff.FileId"/></param>
 		/// <param name="postfix">Either "before", "after" or "logs"</param>
 		/// <returns>A relative url to the appropriate <see cref="FilesController"/> action</returns>
-		public static string RouteTo(Repository repository, long checkRunId, int fileId, string postfix) => String.Format(CultureInfo.InvariantCulture, "/{5}/{0}/{1}/{2}/{3}.{4}", repository.Id, checkRunId, fileId, postfix, postfix == "logs" ? "txt" : "png", Route);
+		public static string RouteTo(Repository repository, long checkRunId, int fileId, string postfix) => String.Format(CultureInfo.InvariantCulture, "/{5}/{0}/{1}/{2}/{3}.{4}", repository?.Id, checkRunId, fileId, postfix, postfix == "logs" ? "txt" : "png", Route);
 
 		/// <summary>
 		/// Create a route to the <see cref="Browse(long, long, CancellationToken)"/> page for a given <paramref name="checkRunId"/>
@@ -52,7 +52,7 @@ namespace MapDiffBot.Controllers
 		/// <param name="repository">The <see cref="Repository"/></param>
 		/// <param name="checkRunId">The <see cref="CheckRun.Id"/></param>
 		/// <returns>A relative url to the appropriate <see cref="FilesController"/> action</returns>
-		public static string RouteToBrowse(Repository repository, long checkRunId) => String.Format(CultureInfo.InvariantCulture, "/{2}/{0}/{1}", repository.Id, checkRunId, Route);
+		public static string RouteToBrowse(Repository repository, long checkRunId) => String.Format(CultureInfo.InvariantCulture, "/{2}/{0}/{1}", repository?.Id, checkRunId, Route);
 
 		/// <summary>
 		/// Construct a <see cref="FilesController"/>
