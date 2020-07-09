@@ -32,10 +32,5 @@ before_build:
 build:
   project: MapDiffBot.sln
   verbosity: minimal
-test_script:
-  - OpenCover.Console.exe -returntargetcode -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -c %CONFIGURATION% --logger:trx;LogFileName=results.trx /p:DebugType=full MapDiffBot.Tests\MapDiffBot.Tests.csproj" -filter:"+[MapDiffBot*]* -output:".\coverage.xml" -oldstyle
-  - ps: $wc = New-Object 'System.Net.WebClient'
-  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\MapDiffBot.Tests\TestResults\results.trx))
 after_test:
-  - ps: Tools/UploadCoverage.ps1
   - ps: Tools/BuildDox.ps1
