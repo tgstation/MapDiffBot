@@ -147,6 +147,17 @@ namespace MapDiffBot.Core
 
 				var checkRunId = await gitHubManager.CreateCheckRun(repositoryId, ncr, cancellationToken).ConfigureAwait(false);
 
+				if (gitHubConfiguration.BlacklistedRepos.Contains(repositoryId)) {
+					logger.LogWarning("Pull request is from a blacklisted repo. Aborting.");
+					await gitHubManager.UpdateCheckRun(repositoryId, checkRunId, new CheckRunUpdate {
+						CompletedAt = DateTimeOffset.Now,
+						Status = CheckStatus.Completed,
+						Conclusion = CheckConclusion.Neutral,
+						Output = new CheckRunOutput(stringLocalizer["Blacklisted From Service"], stringLocalizer["This repository is blacklisted from using MapDiffBot. Please contact support in coderbus."], null, null, null)
+					}, cancellationToken).ConfigureAwait(false);
+					return;
+				}
+
 				Task HandleCancel() => gitHubManager.UpdateCheckRun(repositoryId, checkRunId, new CheckRunUpdate
 				{
 					CompletedAt = DateTimeOffset.Now,
