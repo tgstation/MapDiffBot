@@ -45,6 +45,8 @@ namespace MapDiffBot.Configuration
 		/// <summary>
 		/// A list of blacklisted repos
 		/// </summary>
-		public List<long> BlacklistedRepos { get; }
+#pragma warning disable CA2227 // Collection properties should be read only
+		public List<long> BlacklistedRepos { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
 	}
 }
