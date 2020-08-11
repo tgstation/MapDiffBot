@@ -45,6 +45,6 @@ namespace MapDiffBot.Configuration
 		/// <summary>
 		/// A list of blacklisted repos
 		/// </summary>
-		public List<long> BlacklistedRepos { get; set; }
+		public List<long> BlacklistedRepos { get; }
 	}
 }
