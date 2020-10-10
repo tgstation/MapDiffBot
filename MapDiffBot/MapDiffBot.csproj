@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -21,7 +21,7 @@
     <PackageReference Include="GitHubJwt" Version="0.0.4" />
     <PackageReference Include="HangFire" Version="1.6.20" />
     <PackageReference Include="Hangfire.MySqlStorage" Version="1.1.1-beta" />
-    <PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0027" />
+    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="7.9.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.2">
