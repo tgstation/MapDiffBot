@@ -1,4 +1,6 @@
-﻿namespace MapDiffBot.Configuration
+﻿using System.Collections.Generic;
+
+namespace MapDiffBot.Configuration
 {
 	/// <summary>
 	/// GitHub configuration settings
@@ -39,5 +41,12 @@
 		/// The client secret for the Oauth application
 		/// </summary>
 		public string OauthSecret { get; set; }
+
+		/// <summary>
+		/// A list of blacklisted repos
+		/// </summary>
+#pragma warning disable CA2227 // Collection properties should be read only
+		public List<long> BlacklistedRepos { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
 	}
 }

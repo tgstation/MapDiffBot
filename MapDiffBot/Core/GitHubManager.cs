@@ -77,7 +77,7 @@ namespace MapDiffBot.Core
 
 			if (installation != null)
 			{
-				if (installation.AccessTokenExpiry < DateTimeOffset.Now.AddMinutes(10))
+				if (installation.AccessTokenExpiry < DateTimeOffset.Now.AddMinutes(-1))
 				{
 					var newToken = await gitHubClientFactory.CreateAppClient().GitHubApps.CreateInstallationToken(installation.Id).ConfigureAwait(false);
 					installation.AccessToken = newToken.Token;
@@ -294,7 +294,8 @@ namespace MapDiffBot.Core
 		public async Task<IReadOnlyList<CheckRun>> GetMatchingCheckRuns(long repositoryId, long checkSuiteId, CancellationToken cancellationToken)
 		{
 			var client = await CreateInstallationClient(repositoryId, cancellationToken).ConfigureAwait(false);
-			return await client.Check.Run.GetAllForCheckSuite(repositoryId, checkSuiteId).ConfigureAwait(false);
+			var response = await client.Check.Run.GetAllForCheckSuite(repositoryId, checkSuiteId).ConfigureAwait(false);
+			return response.CheckRuns;
 		}
 	}
 }
