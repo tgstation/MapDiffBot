@@ -91,7 +91,13 @@ namespace MapDiffBot.Controllers
 			if (!differ && !before && beforeOrAfter != "AFTER")
 				return BadRequest();
 
-			var diff = await databaseContext.MapDiffs.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId && x.FileId == fileId).Select(x => differ ? x.DifferenceImage : (before ? x.BeforeImage : x.AfterImage)).Select(x => x.Data).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+			var diff = await databaseContext
+				.MapDiffs
+				.Where(x => x.InstallationRepositoryId == repositoryId && x.CheckRunId == checkRunId && x.FileId == fileId && (differ ? x.DifferenceImage != null : (before ? x.BeforeImage != null : x.AfterImage != null)))
+				.Select(x => differ ? x.DifferenceImage : (before ? x.BeforeImage : x.AfterImage))
+				.Select(x => x.Data)
+				.FirstOrDefaultAsync(cancellationToken)
+				.ConfigureAwait(false);
 
 			if (diff == null)
 				return NotFound();

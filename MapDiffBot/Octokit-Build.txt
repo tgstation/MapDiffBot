@@ -1,2 +1,0 @@
-﻿Revision: a1d3c7a7d13a6856ee647c6aa2bf02ffb2fe97d6
-Configuration: Release
