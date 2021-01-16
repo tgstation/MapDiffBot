@@ -19,7 +19,7 @@
   <ItemGroup>
     <PackageReference Include="Cyberboss.AspNetCore.AsyncInitializer" Version="1.2.0" />
     <PackageReference Include="GitHubJwt" Version="0.0.4" />
-    <PackageReference Include="HangFire" Version="1.6.20" />
+    <PackageReference Include="HangFire" Version="1.7.11" />
     <PackageReference Include="Hangfire.MySqlStorage" Version="1.1.1-beta" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="7.9.0" />
