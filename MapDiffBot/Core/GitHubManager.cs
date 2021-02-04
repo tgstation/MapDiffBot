@@ -102,9 +102,10 @@ namespace MapDiffBot.Core
 
 			async Task<Models.Installation> CreateAccessToken(Octokit.Installation newInstallation)
 			{
+				AccessToken installationToken;
 				try
 				{
-					var installationToken = await client.GitHubApps.CreateInstallationToken(newInstallation.Id).ConfigureAwait(false);
+					installationToken = await client.GitHubApps.CreateInstallationToken(newInstallation.Id).ConfigureAwait(false);
 				}
 				catch
 				{
