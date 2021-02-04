@@ -102,7 +102,17 @@ namespace MapDiffBot.Core
 
 			async Task<Models.Installation> CreateAccessToken(Octokit.Installation newInstallation)
 			{
-				var installationToken = await client.GitHubApps.CreateInstallationToken(newInstallation.Id).ConfigureAwait(false);
+				AccessToken installationToken;
+				try
+				{
+					installationToken = await client.GitHubApps.CreateInstallationToken(newInstallation.Id).ConfigureAwait(false);
+				}
+				catch
+				{
+					//LMAO WTF ARE LOGS
+					return null;
+				}
+				
 				var entity = new Models.Installation
 				{
 					Id = newInstallation.Id,
@@ -120,7 +130,7 @@ namespace MapDiffBot.Core
 
 			var newEntities = await Task.WhenAll(installsToAdd.Select(x => CreateAccessToken(x))).ConfigureAwait(false);
 
-			await databaseContext.Installations.AddRangeAsync(newEntities).ConfigureAwait(false);
+			await databaseContext.Installations.AddRangeAsync(newEntities.Where(x => x != null)).ConfigureAwait(false);
 			await databaseContext.Save(cancellationToken).ConfigureAwait(false);
 			//its either in newEntities now or it doesn't exist
 			return gitHubClientFactory.CreateOauthClient(newEntities.First(x => x.Repositories.Any(y => y.Id == repositoryId)).AccessToken);
