@@ -155,6 +155,17 @@ namespace MapDiffBot.Core
 					return;
 				}
 
+				if (pullRequest.Title.Contains("[MDB IGNORE]", StringComparison.InvariantCultureIgnoreCase)) {
+					logger.LogWarning("Pull request has [MDB IGNORE] in title. Aborting.");
+					await gitHubManager.UpdateCheckRun(repositoryId, checkRunId, new CheckRunUpdate {
+						CompletedAt = DateTimeOffset.Now,
+						Status = CheckStatus.Completed,
+						Conclusion = CheckConclusion.Neutral,
+						Output = new NewCheckRunOutput(stringLocalizer["PR Ignored"], stringLocalizer["This PR has `[MDB IGNORE]` in the title. Aborting."])
+					}, cancellationToken).ConfigureAwait(false);
+					return;
+				}
+
 				Task HandleCancel() => gitHubManager.UpdateCheckRun(repositoryId, checkRunId, new CheckRunUpdate
 				{
 					CompletedAt = DateTimeOffset.Now,
